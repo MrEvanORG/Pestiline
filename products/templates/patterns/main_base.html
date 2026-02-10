@@ -1,0 +1,79 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="{% block description %}{% endblock %}">
+        <title>{% block title %}{% endblock %}</title>
+        <link href="{% static 'css/Vazirmatn.css' %}" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="{% static 'css/all_awesome.css' %}">
+        <link rel="stylesheet" href="{% static 'css/main.css' %}">
+        {% block head %}{% endblock %}
+    </head>
+    <body>
+
+        <div id="mobileMenuOverlay" class="mobile-menu-overlay"></div>
+        <aside id="mobileSidebar" class="mobile-sidebar">
+            <div class="sidebar-header">
+                <div class="user-profile">
+                    <div class="user-avatar">
+                        <i class="fa-slab-press fa-regular fa-user"></i>
+                    </div>
+                    <span>کاربر میهمان</span>
+                </div>
+                <span class="close-menu-btn" onclick="toggleMenu()">
+                    <i class="fa-slab-press fa-regular fa-xmark"></i>
+                </span>
+            </div>
+            
+            <div class="sidebar-logo-container">
+                <img src="{% static 'img/light-logo-second.svg' %}" alt="لوگو پستیلاین" class="sidebar-logo-img">
+            </div>
+
+            <ul class="sidebar-links">
+                <li><a href="#"><i class="fa-slab-press fa-regular fa-house"></i> خانه</a></li>
+                <li><a href="#products"><i class="fa-slab-press fa-regular fa-cart-shopping"></i> محصولات</a></li>
+                <li><a href="#mix"><i class="fa-slab-press fa-regular fa-headset"></i>پشتیبانی</a></li>
+                <li><a href="#blog"><i class="fa-slab-press fa-regular fa-newspaper"></i> وبلاگ پستیلاین</a></li>
+                <li><a href="#about"><i class="fa-slab-press fa-regular fa-address-card"></i> درباره ما</a></li>
+            </ul>
+            
+            <div class="sidebar-footer">
+                <button class="btn-sidebar-login">ورود / عضویت</button>
+                <p>نسخه 2.0.1 پستیلاین</p>
+            </div>
+        </aside>
+
+        <header class="main-header">
+            <div class="header-container">
+                <span class="hamburger-icon" onclick="toggleMenu()">
+                    <i class="fa-slab-press fa-regular fa-bars" style="font-size: 1.5rem;"></i>
+                </span>
+                
+                <a href="#" class="header-logo-link mobile-hidden">
+                    <img src="{% static 'img/light-logo.svg' %}" alt="لوگو پستیلاین" class="logo">
+                </a>
+
+                <nav class="desktop-nav">
+                    <a href="#"><i class="fa-slab-press fa-regular fa-house"></i> خانه</a>
+                    <a href="#products"><i class="fa-slab-press fa-regular fa-cart-shopping"></i> محصولات</a>
+                    <a href="#mix"><i class="fa-slab-press fa-regular fa-headset"></i>پشتیبانی</a>
+                    <a href="#blog"><i class="fa-slab-press fa-regular fa-newspaper"></i> وبلاگ پستیلاین</a>
+                    <a href="#about"><i class="fa-slab-press fa-regular fa-circle-info"></i> درباره ما</a>
+                </nav>
+
+                <div class="header-actions">
+                    <a href="#" class="cart-icon">
+                        <i class="fa-slab-press fa-regular fa-cart-shopping"></i>
+                    </a>
+                    <a href="#" class="btn-login-desktop">ورود / عضویت</a>
+                </div>
+            </div>
+        </header>
+        {% block content %}{% endblock %}
+        {% include 'patterns/footer.html' %}
+        <script src="{% static 'js/main.js' %}"></script>
+        {%  block 'script' %}{% endblock %}
+    </body>
+</html>

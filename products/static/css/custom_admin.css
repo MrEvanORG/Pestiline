@@ -1,0 +1,111 @@
+body, 
+.dashboard .module caption, 
+.field-box, 
+.form-row, 
+h1, h2, h3, h4, h5, h6, 
+input, select, textarea, button {
+    font-family: 'yekan', Tahoma, sans-serif !important;
+}
+
+
+html[data-theme="light"],
+:root {
+    --primary: var(--primary-color) ;
+    --secondary:var(--secondary-color) !important;
+    --accent: #f5dd5d;
+    --primary-fg: #fff;
+
+    --body-fg: #333;
+    --body-bg:var(--section-bg-color);
+    --body-quiet-color: #666;
+    --body-medium-color: #444;
+    --body-loud-color: #000;
+
+    --header-color: #ffc;
+    --header-branding-color: var(--accent);
+    --header-bg: var(--secondary);
+    --header-link-color: var(--primary-fg);
+
+    --breadcrumbs-fg: #c4dce8;
+    --breadcrumbs-link-fg: var(--body-bg);
+    --breadcrumbs-bg: var(--primary-color);
+
+    --link-fg: #417893;
+    --link-hover-color: #036;
+    --link-selected-fg: var(--secondary);
+
+    --hairline-color: #c2bebe;
+    --border-color: #ccc;
+
+    --error-fg: #ba2121;
+
+    --message-debug-bg: #efefef;
+    --message-info-bg: #ccefff;
+    --message-success-bg: #dfd;
+    --message-warning-bg: #ffc;
+    --message-error-bg: #ffefef;
+
+    --darkened-bg: var(--dark-section-bg-color); /* A bit darker than --body-bg */
+    --selected-bg: #e4e4e4; /* E.g. selected table cells */
+    --selected-row: #ffc;
+
+    --button-fg: #fff;
+    --button-bg: var(--secondary);
+    --button-hover-bg: #205067;
+    --default-button-bg: #205067;
+    --default-button-hover-bg: var(--secondary);
+    --close-button-bg: #747474;
+    --close-button-hover-bg: #333;
+    --delete-button-bg: #ba2121;
+    --delete-button-hover-bg: #a41515;
+
+    --object-tools-fg: var(--button-fg);
+    --object-tools-bg: var(--close-button-bg);
+    --object-tools-hover-bg: var(--close-button-hover-bg);
+
+    color-scheme: light;
+}
+
+
+html[data-theme="dark"] {
+    --primary: var(--primary-color);
+    --primary-fg: #f7f7f7;
+
+    --body-fg: #eeeeee;
+    --body-bg: #121212;
+    --body-quiet-color: #d0d0d0;
+    --body-medium-color: #e0e0e0;
+    --body-loud-color: #ffffff;
+
+    --breadcrumbs-link-fg: #e0e0e0;
+    --breadcrumbs-bg: var(--primary);
+
+    --link-fg: #81d4fa;
+    --link-hover-color: #4ac1f7;
+    --link-selected-fg: #6f94c6;
+
+    --hairline-color: #272727;
+    --border-color: #353535;
+
+    --error-fg: #e35f5f;
+
+    --message-debug-bg: #4e4e4e;
+    --message-debug-icon: url(../img/icon-debug-dark.svg);
+    --message-info-bg: #265895;
+    --message-info-icon: url(../img/icon-info-dark.svg);
+    --message-success-bg: #006b1b;
+    --message-success-icon: url(../img/icon-yes-dark.svg);
+    --message-warning-bg: #583305;
+    --message-warning-icon: url(../img/icon-alert-dark.svg);
+    --message-error-bg: #570808;
+    --message-error-icon: url(../img/icon-no-dark.svg);
+
+    --darkened-bg: #212121;
+    --selected-bg: #1b1b1b;
+    --selected-row:var(--selected-row-color);
+
+    --close-button-bg: #333333;
+    --close-button-hover-bg: #666666;
+
+    color-scheme: dark;
+}

@@ -1,0 +1,225 @@
+/* .main-card{
+    box-sizing: border-box;
+    background-color:var(--white-color);
+    font-family: Montserrat, sans-serif;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 2rem;
+    padding: 40px 30px;
+    min-height: 35vh;
+    margin: 0;
+    transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.card-container h3 {
+    margin: 10px 0;
+}
+
+.card-container h6 {
+    margin: 10px 0;
+    text-transform: uppercase;
+}
+
+.skills h6{
+    color: var(--white-color);
+}
+
+.card-container p{
+    color: var(--white-color);
+    font-size:var(--p-font-size);
+    line-height: 21px;
+}
+
+.card-container {
+    background-color: var(--secondary-color);
+    border-radius: 20px;
+    box-shadow: 0px 10px 20px -10px rgba(0,0,0,0.75);
+    color: var(--white-color);
+    padding-top: 30px;
+    position: relative;
+    width: 380px;
+    max-width: 100%;
+    text-align: center;
+}
+
+.card-container .pro {
+    color: var(--dark-color);
+    background-color: #FEBB0B;
+    border-radius: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 5px 11px;
+    position: absolute;
+    top: 30px;
+    left: 30px;
+}
+
+.card-container .round {
+    border: 1px solid var(--primary-color);
+    border-radius: 25px 25px 25px 0px;
+    padding: 7px;
+}
+
+button.primary {
+    background-color: var(--secondary-color);
+    border: 1px solid var(--primary-color);
+    border-radius: 100px;
+    color: var(--primary-color);
+    font-family: Montserrat, sans-serif;
+    font-weight: 500;
+    padding: 10px 25px;
+}
+button.primary:hover{
+    background-color: var(--primary-color);
+    color:var(--white-color);
+}
+
+
+.skills {
+    border-radius: 0px 0px 20px 0px;
+    background-color: var(--primary-color);
+    text-align: right;
+    padding: 15px;
+    margin-top: 30px;
+}
+
+.skills ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.skills ul li {
+    color: var(--white-color);
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    display: inline-block;
+    font-size: 12px;
+    margin: 0 7px 7px 0;
+    padding: 7px;
+} */
+:root{
+  --transition: all 0.3s ease;
+}
+.main-card{
+    box-sizing: border-box;
+    font-family: vazir;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 2rem;
+    padding: 40px 30px;
+    min-height: 35vh;
+    margin: 0;
+    transition: var(--transition);
+}
+
+.card-container h3 {
+    margin: 10px 0;
+    font-size: var(--h4-font-size);
+}
+
+.card-container h6 {
+    margin: 10px 0;
+    text-transform: uppercase;
+}
+.skill-container{
+    padding: 0px 23px 30px 23px;
+}
+
+.skills h6{
+    padding: 0px 30px;
+    color: var(--white-color);
+}
+
+.card-container p{
+    color: var(--p-color);
+    font-size:var(--p-font-size);
+    line-height: 21px;
+}
+
+.card-container {
+    font-family: vazir;
+    background-color: var(--white-color);
+    border-radius: 20px;
+    box-shadow: 0 1rem 3rem rgba(0,0,0,.175)!important;
+    /* box-shadow: 0 10px 20px rgba(100, 100, 100, 0.1); */
+    color: var(--white-color);
+    padding: 30px;
+    position: relative;
+    width: 380px;
+    max-width: 100%;
+    text-align: center;
+    transition: var(--transition);
+}
+.card-container:hover {
+  transform: translateY(-3px);
+  box-shadow: 0px 15px 25px -10px rgba(29, 29, 29, 0.75);
+}
+
+.card-container .pro {
+
+    font-family: vazir;
+    max-width: 67px;
+    color: var(--white-color);
+    background-color: var(--secondary-color);
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 5px 11px;
+    position: absolute;
+    top: 30px;
+    left: 30px;
+}
+
+.card-container .round {
+    border: 1px solid var(--secondary-color);
+    border-radius: 20px;
+    padding: 7px;
+}
+
+button.primary {
+    background-color: var(--white-color);
+    border: 1px solid var(--secondary-color);
+    border-radius: 100px;
+    color: var(--secondary-color);
+    font-family: vazir;
+    font-weight: 500;
+    padding: 10px 25px;
+    transition: var(--transition);
+}
+button.primary:hover{
+    background-color: var(--primary-color);
+    color:var(--white-color);
+}
+
+
+.skills {
+    margin: -30px;
+    border-radius: 0px 0px 20px 20px;
+    background-color: var(--secondary-color);
+    text-align: right;
+    padding-top: 15px;
+    margin-top: 30px;
+}
+
+.skills ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.skills ul li {
+    color: var(--white-color);
+    border: 1px solid var(--border-color);
+    border-radius: 3px;
+    display: inline-block;
+    font-size: 12px;
+    margin: 0 7px 7px 0;
+    padding: 7px;
+}

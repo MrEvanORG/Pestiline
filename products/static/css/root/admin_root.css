@@ -1,0 +1,45 @@
+:root {
+    --white-color:                  #ffffff;
+    --dark-color:                   #0e0e0ef1;
+    
+    --primary-color:                #123524;
+    --selected-row-color:           #1f4433;
+    --custom-btn-bg-hover-color:    #123524;
+    --link-hover-color:             #123524;
+  
+    --secondary-color:              #85A947;
+    --custom-btn-bg-color:          #85A947;
+
+    --link-color :                  #a8bd77;
+    --link-color-hover:             #96b847;
+  
+    --section-bg-color:             #dae9c3;
+    --dark-section-bg-color:        #cbdab5;
+  
+    --p-color:                      #333;
+  
+    --border-color:                 #ccc;
+    
+    --body-font-family:             'vazir', vazir;
+    --title-font-family:            'vazir', vazir;
+    
+    --h1-font-size:                 54px;
+    --h2-font-size:                 34px;
+    --h3-font-size:                 28px;
+    --h4-font-size:                 24px;
+    --h5-font-size:                 20px;
+    --h6-font-size:                 18px;
+    --p-font-size:                  16px;
+    --menu-font-size:               14px;
+    --btn-font-size:                14px;
+    --copyleft-font-size:          12px;
+    
+    --border-radius-large:          100px;
+    --border-radius-medium:         20px;
+    --border-radius-small:          10px;
+    
+    --font-weight-normal:           400;
+    --font-weight-medium:           500;
+    --font-weight-semibold:         600;
+    --font-weight-bold:             700;
+    }

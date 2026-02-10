@@ -1,0 +1,307 @@
+{% extends "patterns/main_base.html" %}
+{% load static %}
+{% block description %}پستیلاین بازار تخصصی خرید و فروش پسته ؛ بهترین قیمت ، بهترین کیفیت ، خرید مستقیم پسته از کشاورزان رفسنجان و سرتاسر کشور .{% endblock %}
+{% block title %}خرید و فروش پسته به صورت آنلاین | پستیلاین {% endblock title %}
+{% block content %}
+<section class="hero">
+    <div class="hero-overlay"></div>
+    <div class="hero-content">
+        <h1>پستیلاین بازار تخصصی خرید و فروش پسته</h1>
+        <p>بهترین قیمت و کیفیت با خرید مستقیم از کشاورز</p>
+        <a href="#products" class="btn-hero">
+            مشاهده محصولات
+            <i class="fa-sharp fa-regular fa-arrow-left"></i>
+        </a>
+    </div>
+</section>
+
+<section class="features-section">
+    <div class="features-header">
+        <h2>چرا پستیلاین؟</h2>
+        <p>تفاوت ما در کیفیت و اصالت است</p>
+    </div>
+    
+    <div class="features-grid">
+        <div class="feature-item">
+            <div class="feature-icon-box">
+                <i class="fa-slab-press fa-regular fa-leaf" style="color: var(--secondary);"></i>
+            </div>
+            <h3>کاملا ارگانیک</h3>
+            <p>تمامی محصولات بدون مواد نگهدارنده شیمیایی و به صورت کاملا طبیعی فرآوری می‌شوند.</p>
+        </div>
+
+        <div class="feature-item">
+            <div class="feature-icon-box">
+                <i class="fa-slab-press fa-regular fa-truck-fast" style="color: var(--secondary);"></i>
+            </div>
+            <h3>ارسال سریع</h3>
+            <p>بسته‌بندی‌های ایمن و ارسال فوری به سراسر کشور تا پسته تازه به دستتان برسد.</p>
+        </div>
+
+        <div class="feature-item">
+            <div class="feature-icon-box">
+                <i class="fa-slab-press fa-regular fa-handshake-simple" style="color: var(--secondary);"></i>
+            </div>
+            <h3>خرید مستقیم</h3>
+            <p>حذف کامل دلال‌ها و خرید مستقیم از کشاورز برای تضمین بهترین قیمت بازار.</p>
+        </div>
+    </div>
+</section>
+
+<main id="products" class="products-section">
+    <div class="section-title">
+        <h2>محصولات منتخب</h2>
+        <div class="title-line"></div>
+    </div>
+
+    <div class="products-grid">
+        
+        <article class="product-card">
+            <div class="ribbon-diagonal-stack">
+                <div class="diag-ribbon economy">اقتصادی</div>
+                <div class="diag-ribbon offer">ارسال رایگان</div>
+                <div class="diag-ribbon official">محصول پستیلاین</div>
+            </div>
+            <div class="badge-hanging">ویژه</div>
+            <button class="info-btn" onclick="toggleDetails(this)">
+                <i class="fa-slab-press fa-regular fa-info"></i>
+            </button>
+            
+            <div class="product-img">
+                <img src="{% static 'img/home/product.webp' %}" alt="پسته اکبری اعلا">
+            </div>
+            
+            <div class="product-content">
+                <h3 class="p-title">پسته اکبری اعلا</h3>
+                <div class="p-meta">
+                    <span class="p-price">۹۸۰,۰۰۰ تومان</span>
+                    <span class="p-unit">بسته‌ای (۱ کیلو)</span>
+                </div>
+                <button class="btn-add">
+                    <i class="fa-slab-press fa-regular fa-basket-shopping" style="margin-left: 5px;"></i>افزودن به سبد خرید                
+                </button>
+            </div>
+
+            <div class="details-overlay">
+                <span class="close-details" onclick="toggleDetails(this)">
+                    <i class="fa-slab-press fa-regular fa-xmark"></i>
+                </span>
+                <h4 class="details-title">مشخصات فنی</h4>
+                <div class="details-scroll-area">
+                    <div class="spec-row"><span class="spec-label">نوع:</span><span class="spec-val">اکبری</span></div>
+                    <div class="spec-row"><span class="spec-label">فرآوری:</span><span class="spec-val">شور زعفرانی</span></div>
+                    <div class="spec-row"><span class="spec-label">انس:</span><span class="spec-val">۲۰-۲۲</span></div>
+                    <p class="spec-desc">محصول برتر پستیلاین با تضمین کیفیت و ارسال رایگان برای خریدهای اول.</p>
+                </div>
+            </div>
+        </article>
+
+        <article class="product-card">
+            <div class="ribbon-diagonal-stack">
+                <div class="diag-ribbon economy">اقتصادی</div>
+            </div>
+            <button class="info-btn" onclick="toggleDetails(this)">
+                <i class="fa-slab-press fa-regular fa-info"></i>
+            </button>
+            <div class="product-img">
+                <img src="{% static 'img/home/product.webp' %}" alt="پسته فندقی">
+            </div>
+            <div class="product-content">
+                <h3 class="p-title">پسته فندقی ریز</h3>
+                <div class="p-meta">
+                    <span class="p-price">۶۵۰,۰۰۰ تومان</span>
+                    <span class="p-unit">کیلویی</span>
+                </div>
+                <button class="btn-add">
+                    <i class="fa-slab-press fa-regular fa-basket-shopping" style="margin-left: 5px;"></i>افزودن به سبد خرید
+                </button>
+            </div>
+            <div class="details-overlay">
+                <span class="close-details" onclick="toggleDetails(this)">
+                    <i class="fa-slab-press fa-regular fa-xmark"></i>
+                </span>
+                <h4 class="details-title">مشخصات فنی</h4>
+                <div class="details-scroll-area">
+                    <div class="spec-row"><span class="spec-label">نوع:</span><span class="spec-val">فندقی</span></div>
+                    <div class="spec-row"><span class="spec-label">فرآوری:</span><span class="spec-val">خام</span></div>
+                </div>
+            </div>
+        </article>
+
+        <article class="product-card">
+            <div class="ribbon-diagonal-stack">
+                <div class="diag-ribbon offer">ارسال رایگان</div>
+            </div>
+            <button class="info-btn" onclick="toggleDetails(this)">
+                <i class="fa-slab-press fa-regular fa-info"></i>
+            </button>
+            <div class="product-img">
+                <img src="{% static 'img/home/product.webp' %}" alt="پسته احمدآقایی">
+            </div>
+            <div class="product-content">
+                <h3 class="p-title">پسته احمدآقایی</h3>
+                <div class="p-meta">
+                    <span class="p-price">۸۹۰,۰۰۰ تومان</span>
+                    <span class="p-unit">کیلویی</span>
+                </div>
+                <button class="btn-add">
+                    <i class="fa-slab-press fa-regular fa-basket-shopping" style="margin-left: 5px;"></i> افزودن به سبد
+                </button>
+            </div>
+            <div class="details-overlay">
+                <span class="close-details" onclick="toggleDetails(this)">
+                        <i class="fa-slab-press fa-regular fa-xmark"></i>
+                </span>
+                <h4 class="details-title">مشخصات فنی</h4>
+                <div class="details-scroll-area">
+                    <div class="spec-row"><span class="spec-label">نوع:</span><span class="spec-val">احمدآقایی</span></div>
+                    <div class="spec-row"><span class="spec-label">فرآوری:</span><span class="spec-val">شور</span></div>
+                </div>
+            </div>
+        </article>
+
+            <article class="product-card">
+            <div class="badge-hanging">ویژه</div>
+            <button class="info-btn" onclick="toggleDetails(this)">
+                <i class="fa-slab-press fa-regular fa-info"></i>
+            </button>
+            <div class="product-img">
+                <img src="{% static 'img/home/product.webp' %}" alt="پسته کله قوچی">
+            </div>
+            <div class="product-content">
+                <h3 class="p-title">پسته کله قوچی</h3>
+                <div class="p-meta">
+                    <span class="p-price">۹۲۰,۰۰۰ تومان</span>
+                    <span class="p-unit">کیلویی</span>
+                </div>
+                <button class="btn-add">
+                    <i class="fa-slab-press fa-regular fa-basket-shopping" style="margin-left: 5px;"></i> افزودن به سبد
+                </button>
+            </div>
+            <div class="details-overlay">
+                <span class="close-details" onclick="toggleDetails(this)">
+                        <i class="fa-slab-press fa-regular fa-xmark"></i>
+                </span>
+                <h4 class="details-title">مشخصات فنی</h4>
+                <div class="details-scroll-area">
+                    <div class="spec-row"><span class="spec-label">نوع:</span><span class="spec-val">کله قوچی</span></div>
+                    <div class="spec-row"><span class="spec-label">سایز:</span><span class="spec-val">درشت</span></div>
+                </div>
+            </div>
+        </article>
+
+    </div>
+</main>
+
+<section class="ai-helper-section" id="ai-helper">
+    <div class="ai-glam-wide-container compact">
+        
+        <div class="ai-glow-effect glow-1"></div>
+        <div class="ai-glow-effect glow-2"></div>
+
+        <div class="ai-flex-content">
+            <div class="ai-visual-part">
+                <div class="ai-main-icon-glam small">
+                    <i class="fa-sharp fa-solid fa-sparkles"></i>
+                </div>
+            </div>
+            
+            <div class="ai-text-part">
+                <div class="ai-title-style">برای خرید پسته نیاز به راهنمایی داری؟</div>
+                <p>دستیار هوشمند ما بهت کمک می‌کنه بهترین نوع پسته رو بر اساس بودجه و نیازت انتخاب کنی.</p>
+                
+                <button class="btn-ai-glass compact-btn">
+                    <i class="fa-sharp fa-regular fa-microchip-ai"></i>
+                    شروع مشاوره خرید
+                </button>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section id="farmers" class="farmers-section">
+    <div class="farmers-content">
+        <span class="coming-soon-badge">به زودی</span>
+        <h2>بازار مستقیم کشاورزان</h2>
+        <p>به زودی پلتفرمی برای فروش مستقیم محصولات کشاورزان سراسر ایران بدون واسطه.</p>
+    </div>
+    <div class="farmers-icon">
+        <img src="{% static 'img/home/farmer.png' %}" alt="عکس کشاورز">
+    </div>
+</section>
+
+<section id="mix" class="mix-section-sharp">
+    <div class="mix-visual"></div>
+    <div class="mix-info">
+        <span class="mix-badge">پیشنهاد ویژه</span>
+        <h2>
+            <i class="fa-slab-press fa-regular fa-blender" style="margin-left: 10px;"></i>
+            میکس اختصاصی خودت رو بساز!
+        </h2>
+        <p>ترکیب پسته اکبری با بادام هندی؟ یا فندقی با تخمه؟ انتخاب با شماست. جعبه دلخواهت رو طراحی کن.</p>
+        <button class="btn-mix-sharp">شروع ساخت میکس &larr;</button>
+    </div>
+</section>
+
+<section id="blog" class="blog-section">
+    <div class="blog-header">
+        <h2>
+            <i class="fa-slab-press fa-regular fa-newspaper" style="margin-left: 8px;"></i>
+            مجله پستیلاین
+        </h2>
+        <p>سفر به دنیای سبز پسته؛ از ترفندهای تشخیص کیفیت تا جدیدترین خواص سلامتی که شاید ندانید.</p>
+    </div>
+
+
+
+    <div class="blog-grid">
+        <article class="blog-card">
+            <div class="blog-img-wrapper">
+                <span class="blog-tag">آموزشی</span>
+                <img src="{% static 'img/home/blog.webp' %}" alt="خواص پسته">
+            </div>
+            <div class="blog-content">
+                <span class="blog-date">۱۲ اسفند ۱۴۰۳</span>
+                <h3 class="blog-title">۱۰ خاصیت پسته برای رشد هوش کودکان</h3>
+                <p class="blog-excerpt">پسته منبع غنی از فسفر و آهن است که تاثیر مستقیمی بر بهبود عملکرد مغزی دارد...</p>
+                <a href="#" class="read-more-btn">
+                    خواندن کامل مقاله
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                </a>
+            </div>
+        </article>
+
+        <article class="blog-card">
+            <div class="blog-img-wrapper">
+                <span class="blog-tag">راهنمای خرید</span>
+                <img src="{% static 'img/home/blog.webp' %}" alt="تفاوت پسته">
+            </div>
+            <div class="blog-content">
+                <span class="blog-date">۱۰ اسفند ۱۴۰۳</span>
+                <h3 class="blog-title">تفاوت پسته اکبری و احمدآقایی چیست؟</h3>
+                <p class="blog-excerpt">خیلی‌ها موقع خرید تفاوت ظاهری این دو رقم را نمی‌دانند. در این مقاله به بررسی تفاوت‌ها می‌پردازیم...</p>
+                <a href="#" class="read-more-btn">
+                    خواندن کامل مقاله
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                </a>
+            </div>
+        </article>
+
+        <article class="blog-card">
+            <div class="blog-img-wrapper">
+                <span class="blog-tag">نگهداری</span>
+                <img src="{% static 'img/home/blog.webp' %}" alt="نگهداری پسته">
+            </div>
+            <div class="blog-content">
+                <span class="blog-date">۰۵ اسفند ۱۴۰۳</span>
+                <h3 class="blog-title">چطور پسته خام را تازه نگه داریم؟</h3>
+                <p class="blog-excerpt">رطوبت و گرما دشمن اصلی پسته هستند. برای جلوگیری از بوی نا، این ترفندها را اجرا کنید...</p>
+                <a href="#" class="read-more-btn">
+                    خواندن کامل مقاله
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                </a>
+            </div>
+        </article>
+    </div>
+</section>
+{% endblock %}
