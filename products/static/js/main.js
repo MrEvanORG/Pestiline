@@ -32,3 +32,15 @@ document.querySelectorAll('.close-details').forEach(btn => {
         card.classList.remove('active');
     });
 });
+
+// اسکرول نرم به بالا برای لینک‌های با href="#"
+document.querySelectorAll('a[href="#"]').forEach(anchor => {
+    anchor.addEventListener('click', function (e) {
+        e.preventDefault(); // جلوگیری از پرش ناگهانی مرورگر
+        
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth' // اسکرول نرم
+        });
+    });
+});

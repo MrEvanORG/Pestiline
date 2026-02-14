@@ -8,6 +8,7 @@
     --secondary: #85A947;   /* سبز روشن */
     --section-bg: #dae9c3;  /* پس‌زمینه سکشن‌ها */
     --link-color: #a8bd77;
+    --accent-brick: #9F4A40;
     --border: #e0e0e0;
     --shadow: 0 5px 15px rgba(18, 53, 36, 0.1);
     --radius: 12px;
@@ -109,7 +110,20 @@ img { max-width: 100%; display: block; }
         color:var(--primary)
     }
 }
+/* استایل لینک فعال در دسکتاپ */
+.desktop-nav a.active i {
+    color: var(--primary) !important; /* یا هر رنگی که برای حالت فعال مد نظر داری */
+}
 
+/* استایل لینک فعال در موبایل */
+.sidebar-links a.active {
+    color: var(--primary);
+    font-weight: bold;
+}
+
+.sidebar-links a.active i {
+    color: var(--primary);
+}
 /* =========================================
    3. منوی موبایل (Mobile Sidebar)
    ========================================= */
@@ -120,9 +134,17 @@ img { max-width: 100%; display: block; }
 }
 
 .mobile-sidebar {
-    position: fixed; top: 0; right: -300px; width: 280px; height: 100%;
-    background: white; z-index: 999; transition: 0.4s var(--transition);
-    display: flex; flex-direction: column; box-shadow: -5px 0 20px rgba(0,0,0,0.1);
+    position: fixed;
+    top: 0;
+    right: -300px;
+    width: 280px;
+    height: 100%;
+    background: white;
+    z-index: 999;
+    transition: var(--transition);
+    display: flex;
+    flex-direction: column;
+    box-shadow: -5px 0 20px rgba(0,0,0,0.1);
 }
 
 body.menu-open .mobile-menu-overlay { opacity: 1; visibility: visible; }
@@ -719,7 +741,27 @@ body.menu-open .mobile-sidebar { right: 0; }
         justify-content: start;
     }
 }
+/* استایل لینک‌های دسترسی سریع */
+.footer-links a {
+    display: flex;             /* قرارگیری آیکون و متن در یک خط */
+    align-items: center;       /* تراز عمودی وسط */
+    gap: 10px;                 /* فاصله بین آیکون و متن */
+    text-decoration: none;
+    color: inherit;            /* ارث‌بری رنگ از متن فوتر */
+    transition: all 0.3s ease; /* انیمیشن نرم */
+}
 
+/* افکت هاور: تغییر رنگ متن و آیکون با هم */
+.footer-links a:hover {
+    color: var(--secondary);   /* تغییر رنگ به سبز روشن (طبق روت رنگی شما) */
+    padding-right: 5px;        /* حرکت جزئی به سمت چپ برای زیبایی */
+}
+
+/* تنظیم اندازه و وضعیت آیکون‌ها */
+.footer-links a i {
+    font-size: 1.1em;
+    transition: color 0.3s ease;
+}
 /* =========================================
    11. نقطه شکست تبلت (Tablet Responsive)
    ========================================= */

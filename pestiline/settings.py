@@ -74,6 +74,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'products.context_processors.site_settings'
             ],
         },
     },
@@ -125,6 +126,15 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+AUTHENTICATION_BACKENDS = [
+    # آدرس دقیق فایلی که ساختیم (نام اپلیکیشن.نام فایل.نام کلاس)
+    # فرض بر این است نام اپلیکیشن شما products است. اگر چیز دیگری است تغییر دهید.
+    'products.backends.PhoneBackend', 
+    
+    # بک‌اند پیش‌فرض جنگو (برای اینکه ادمین پنل خراب نشود حتما باید باشد)
+    'django.contrib.auth.backends.ModelBackend',
+]
+
 if not DEV_MODE : 
     SECURE_SSL_REDIRECT = True
     SESSION_COOKIE_SECURE = True
@@ -158,3 +168,7 @@ SITE_ID = 1
 STATIC_URL = 'static/'
 
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+MEDIA_URL = '/media/'
+
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

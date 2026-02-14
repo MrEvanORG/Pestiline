@@ -4,37 +4,108 @@
             <h4>پستیلاین</h4>
             <p>ما متعهد هستیم که بهترین و تازه‌ترین پسته ایرانی را مستقیم از باغات خودمان به دست شما برسانیم.</p>
         </div>
+
         <div class="footer-col">
-            <h4>دسترسی سریع</h4>
+            <h4><i class="fa-slab-press fa-regular fa-link margin-left-5"></i> دسترسی سریع</h4>
             <ul class="footer-links">
-                <li><a href="#">صفحه اصلی</a></li>
-                <li><a href="#products">محصولات</a></li>
-                <li><a href="#blog">وبلاگ آموزشی</a></li>
+                <li>
+                    <a href="#">
+                        <i class="fa-slab-press fa-regular fa-house"></i>
+                        صفحه اصلی
+                    </a>
+                </li>
+                <li>
+                    <a href="#products">
+                        <i class="fa-slab-press fa-regular fa-cart-shopping"></i>
+                        محصولات
+                    </a>
+                </li>
+                <li>
+                    <a href="#blog">
+                        <i class="fa-slab-press fa-regular fa-newspaper"></i>
+                        وبلاگ آموزشی
+                    </a>
+                </li>
+                <li>
+                    <a href="#mix">
+                        <i class="fa-slab-press fa-regular fa-headset"></i>
+                        پشتیبانی
+                    </a>
+                </li>
             </ul>
         </div>
+
         <div class="footer-col">
-            <h4>ارتباط با ما</h4>
+            <h4><i class="fa-slab-press fa-regular fa-headset margin-left-5"></i> ارتباط با ما</h4>
             <ul class="contact-list">
-                <li><i class="fa-slab-press fa-regular fa-phone"></i> ۰۲۱-۸۸۸۸۸۸۸۸</li>
-                <li><i class="fa-slab-press fa-regular fa-mobile-screen"></i> ۰۹۱۲-۰۰۰-۰۰۰۰</li>
-                <li><i class="fa-slab-press fa-regular fa-location-dot"></i> تهران، ساختمان پستیلاین</li>
+                
+                {% if site_settings.link_prphone %}
+                <li>
+                    <a href="tel:{{ site_settings.link_prphone }}">
+                        <i class="fa-slab-press fa-regular fa-phone"></i>
+                        {{ site_settings.link_prphone }}
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if site_settings.link_phone1 %}
+                <li>
+                    <a href="tel:{{ site_settings.link_phone1 }}">
+                        <i class="fa-slab-press fa-regular fa-mobile-screen"></i>
+                        {{ site_settings.link_phone1 }}
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if site_settings.link_phone2 %}
+                <li>
+                    <a href="tel:{{ site_settings.link_phone2 }}">
+                        <i class="fa-slab-press fa-regular fa-mobile-screen"></i>
+                        {{ site_settings.link_phone2 }}
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if site_settings.link_mail %}
+                <li>
+                    <a href="mailto:{{ site_settings.link_mail }}">
+                        <i class="fa-slab-press fa-regular fa-envelope"></i>
+                        {{ site_settings.link_mail }}
+                    </a>
+                </li>
+                {% endif %}
+
+                {% if site_settings.address_text %}
+                <li>
+                    {% if site_settings.link_address %}
+                    <a href="{{ site_settings.link_address }}" target="_blank">
+                            <i class="fa-slab-press fa-regular fa-location-dot"></i>
+                            {{ site_settings.address_text }}
+                        </a>
+                    {% else %}
+                        <span>{{ site_settings.address_text }}</span>
+                    {% endif %}
+                </li>
+                {% endif %}
             </ul>
         </div>
+
         <div class="footer-col centered-col">
-            <h4>نمادهای اعتماد</h4>
+            <h4><i class="fa-solid fa-regular fa-shield-halved margin-left-5"></i> نمادهای اعتماد</h4>
             <div class="trust-icons">
                 <div class="trust-box">اینماد</div>
                 <div class="trust-box">زرین‌پال</div>
             </div>
         </div>
     </div>
+
     <div class="footer-bottom-bar">
         <div class="copyright-text">
             © کپی رایت تیم پستیلاین ۱۴۰۳ - تمامی حقوق محفوظ است.
         </div>
         <div class="developer-credit">
             <span>طراحی و توسعه : <i class="fa-slab-press fa-regular fa-code code-icon"></i>&nbsp;Ehsan Ramezani</span>
-            
         </div>
     </div>
 </footer>
+
