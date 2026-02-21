@@ -1,0 +1,289 @@
+{% extends 'patterns/main_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}{{ product.name }} | پستیلاین{% endblock %}
+{% block description %}{{ product.description|truncatewords:30 }}{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'products/css/product_page.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="product-page-container">
+    
+    <div class="custom-breadcrumbs">
+        <a href="{% url 'index' %}" class="breadcrumb-item">
+            <i class="fa-slab-press fa-regular fa-house-chimney"></i>
+            <span>خانه</span>
+        </a>
+        <span class="separator"><i class="fa-slab-press fa-regular fa-chevron-left"></i></span>
+        <a href="{% url 'index' %}#products" class="breadcrumb-item">
+            <i class="fa-slab-press fa-regular fa-store"></i>
+            <span>محصولات</span>
+        </a>
+        <span class="separator"><i class="fa-slab-press fa-regular fa-chevron-left"></i></span>
+        <span class="breadcrumb-item active">
+            <i class="fa-slab-press fa-regular fa-tag"></i>
+            <span>{{ product.name }}</span>
+        </span>
+    </div>
+
+    <div class="product-main-grid">
+        
+        <div class="product-gallery-wrapper">
+            <div class="gallery-main-stage" id="galleryStage">
+                <button type="button" class="gallery-nav-btn prev" id="btnPrev"><i class="fa-slab-press fa-regular fa-chevron-right"></i></button>
+                <button type="button" class="gallery-nav-btn next" id="btnNext"><i class="fa-slab-press fa-regular fa-chevron-left"></i></button>
+                
+                <div class="slider-track" id="sliderTrack">
+                    {% if product.images.all %}
+                        {% for img in product.images.all %}
+                        <div class="slide-item">
+                            <img src="{{ img.image.url }}" alt="{{ product.name }}" draggable="false">
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="slide-item"><div class="no-image-placeholder">تصویر ندارد</div></div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="gallery-thumbs" id="galleryThumbs">
+                {% for img in product.images.all %}
+                    <div class="thumb-item {% if forloop.first %}active{% endif %}" data-index="{{ forloop.counter0 }}">
+                        <img src="{{ img.image.url }}" alt="thumb" draggable="false">
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+        <div class="product-info-panel">
+            <h1 class="product-title-main">{{ product.name }}</h1>
+            
+            <div class="badges-column">
+                {% if product.seller.is_superuser %}
+                <span class="info-badge pestiline">
+                    <i class="fa-slab-press fa-regular fa-gem"></i> محصول اختصاصی پستیلاین
+                </span>
+                {% endif %}
+                {% if product.is_free_shipping %}
+                <span class="info-badge shipping">
+                    <i class="fa-slab-press fa-regular fa-truck-fast"></i> ارسال رایگان
+                </span>
+                {% endif %}
+                {% with q=product.get_quality_badge %}
+                {% if q %}
+                <span class="info-badge quality {{ q.class }}">
+                    <i class="fa-slab-press fa-regular fa-medal"></i> {{ q.text }}
+                </span>
+                {% endif %}
+                {% endwith %}
+            </div>
+
+            <div class="stock-status-box blue-theme">
+                <div class="status-row-blue">
+                    <div class="icon-box"><i class="fa-slab-press fa-regular fa-truck-fast"></i></div>
+                    <div class="text-content">
+                        <span class="title">ارسال سریع و مطمئن</span>
+                        <span class="subtitle">{{ product.time_tosend|default:"تحویل به پست بین ۲ تا ۴ روز کاری" }}</span>
+                    </div>
+                </div>
+                <div class="divider-blue"></div>
+                <div class="status-row-blue">
+                    <div class="icon-box">
+                        {% if product.stock > 0 %}
+                            <i class="fa-slab-press fa-regular fa-box-check"></i>
+                        {% else %}
+                            <i class="fa-slab-press fa-regular fa-box-open"></i>
+                        {% endif %}
+                    </div>
+                    <div class="text-content">
+                        <span class="title">وضعیت موجودی</span>
+                        <span class="subtitle {% if product.stock > 0 %}instock{% else %}outstock{% endif %}">
+                            {% if product.stock > 0 %}موجود در انبار پستیلاین{% else %}فعلاً ناموجود{% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="product-specs-box">
+                <div class="detail-spec-row">
+                    <span class="spec-label"><i class="fa-slab-press fa-regular fa-seedling"></i> نوع محصول:</span>
+                    <span class="spec-value">{{ product.get_dynamic_title }}</span>
+                </div>
+                <div class="detail-spec-row">
+                    <span class="spec-label"><i class="fa-slab-press fa-regular fa-fire-burner"></i> فرآوری:</span>
+                    <span class="spec-value">{{ product.get_dynamic_processing }}</span>
+                </div>
+                {% if product.is_mixed %}
+                <div class="composition-wrapper">
+                    <span class="comp-header">ترکیبات دقیق:</span>
+                    <div class="comp-tags">
+                        {% for comp in product.get_composition_list %}
+                        <span class="comp-tag">
+                            <b>{{ comp.percentage }}%</b> {{ comp.get_pistachio_type_display }}
+                        </span>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+            {% if product.description %}
+            <div class="product-description-box">
+                <p>{{ product.description|linebreaksbr }}</p>
+            </div>
+            {% endif %}
+
+            <div class="input-control-wrapper">
+                {% if product.sale_method == 'PACKAGED' %}
+                    <label class="input-label">تعداد بسته:</label>
+                    <div class="counter-control">
+                        <button onclick="updateQty(1)"><i class="fa-slab-press fa-regular fa-plus"></i></button>
+                        <input type="text" id="qtyInput" value="1" readonly>
+                        <button onclick="updateQty(-1)"><i class="fa-slab-press fa-regular fa-minus"></i></button>
+                    </div>
+                {% else %}
+                    <label class="input-label">وزن (کیلوگرم):</label>
+                    <div class="auth-style-input">
+                        <input type="number" id="weightInput" class="clean-input" value="1" step="0.1" min="{{ product.min_order }}" max="{{ product.max_order }}" oninput="manualWeightInput()">
+                        <span class="unit-suffix">KG</span>
+                    </div>
+                    <div class="weight-shortcuts">
+                        <span class="weight-tag" onclick="setWeight(0.5, this)">0.5</span>
+                        <span class="weight-tag active" onclick="setWeight(1, this)">1</span>
+                        <span class="weight-tag" onclick="setWeight(2, this)">2</span>
+                        <span class="weight-tag" onclick="setWeight(5, this)">5</span>
+                    </div>
+                {% endif %}
+            </div>
+
+            <div class="action-bar-wrapper">
+                <div class="unit-price-display">
+                    <span class="price-val">{{ product.price|intcomma:False }}</span>
+                    <span class="currency">تومان</span>
+                    <span class="per-unit">
+                        / {% if product.sale_method == 'PACKAGED' %}هر بسته{% else %}هر کیلو{% endif %}
+                    </span>
+                </div>
+
+                <button class="btn-pro-cart" {% if product.stock <= 0 %}disabled{% endif %}>
+                    <div class="cart-btn-content">
+                        <div class="btn-right">
+                            <i class="fa-slab-press fa-regular fa-bag-shopping"></i>
+                            <span class="btn-text">
+                                {% if product.stock > 0 %}افزودن به سبد{% else %}خبرم کن{% endif %}
+                            </span>
+                        </div>
+                        <div class="btn-left">
+                            <span class="total-label">مبلغ نهایی:</span>
+                            <span class="final-price-preview" id="finalPriceDisplay">...</span>
+                        </div>
+                    </div>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    {% if related_products %}
+    <section class="related-products-section">
+        <div class="section-title-left">
+            <h3>شاید این محصولات را هم بپسندید</h3>
+            <div class="line-deco"></div>
+        </div>
+
+        <div class="related-grid">
+            {% for rp in related_products %}
+            <article class="product-card">
+                <div class="ribbon-diagonal-stack">
+                    {% if rp.get_quality_badge.class == 'economy' %}
+                        <div class="diag-ribbon economy">اقتصادی</div>
+                    {% endif %}
+                    {% if rp.is_free_shipping %}
+                        <div class="diag-ribbon offer">ارسال رایگان</div>
+                    {% endif %}
+                    {% if rp.seller.is_superuser %}
+                        <div class="diag-ribbon official">محصول پستیلاین</div>
+                    {% endif %}
+                </div>
+
+                {% if rp.get_quality_badge.class == 'luxury' %}
+                    <div class="badge-hanging">ویژه</div>
+                {% endif %}
+
+                <button class="info-btn" onclick="toggleDetails(this)">
+                    <i class="fa-slab-press fa-regular fa-info"></i>
+                </button>
+                
+                <a href="{% url 'product_detail' rp.slug %}" class="product-link-wrapper">
+                    <div class="product-img">
+                        {% if rp.images.first %}
+                            <img src="{{ rp.images.first.image.url }}" alt="{{ rp.name }}">
+                        {% else %}
+                            <div class="no-img-placeholder"><i class="fa-slab-press fa-regular fa-image"></i></div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="product-content">
+                        <h3 class="p-title">{{ rp.name }}</h3>
+                        <div class="p-meta">
+                            <span class="p-price">{{ rp.price|intcomma }} تومان</span>
+                            <span class="p-unit">{% if rp.sale_method == 'PACKAGED' %}بسته‌ای{% else %}کیلویی{% endif %}</span>
+                        </div>
+                    </div>
+                </a>
+                
+                <div style="padding: 0 1.5rem 1.5rem;">
+                    <a href="{% url 'product_detail' rp.slug %}" class="btn-add">
+                        <i class="fa-slab-press fa-regular fa-basket-shopping" style="margin-left: 5px;"></i>مشاهده
+                    </a>
+                </div>
+
+                <div class="details-overlay">
+                    <span class="close-details" onclick="toggleDetails(this)">
+                        <i class="fa-slab-press fa-regular fa-xmark"></i>
+                    </span>
+                    <h4 class="details-title">مشخصات فنی</h4>
+                    <div class="details-scroll-area">
+                        <div class="spec-row"><span class="spec-label">نوع:</span><span class="spec-val">{{ rp.get_dynamic_title }}</span></div>
+                        <div class="spec-row"><span class="spec-label">فرآوری:</span><span class="spec-val">{{ rp.get_dynamic_processing }}</span></div>
+                    </div>
+                </div>
+            </article>
+            {% endfor %}
+
+            <a href="{% url 'index' %}#products" class="see-more-card {{ see_more_span }}">
+                <div class="see-more-content">
+                    <div class="icon-wrapper">
+                        <i class="fa-slab-press fa-regular fa-arrow-left"></i>
+                    </div>
+                    <div class="text-wrapper">
+                        <h3>مشاهده همه محصولات</h3>
+                        <p>دنبال چیز دیگری هستید؟ کل محصولات را ببینید.</p>
+                        <span class="cta-link">ورود به فروشگاه <i class="fa-slab-press fa-chevron-left"></i></span>
+                    </div>
+                </div>
+            </a>
+
+        </div>
+    </section>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block script %}
+<script>
+    const PRODUCT_DATA = {
+        id: {{ product.id }}, // <--- اضافه شد
+        inCart: {% if in_cart %}true{% else %}false{% endif %}, // <--- اضافه شد
+        currentQty: {{ current_qty|default:0 }},
+        price: {{ product.price|default:0 }},
+        isPackaged: {% if product.sale_method == 'PACKAGED' %}true{% else %}false{% endif %},
+        minOrder: {{ product.min_order|default:1 }},
+        maxOrder: {{ product.max_order|default:100 }},
+        imagesCount: {{ product.images.count }}
+    };
+</script>
+<script src="{% static 'products/js/product_page.js' %}"></script>
+{% endblock %}

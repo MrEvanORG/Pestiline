@@ -106,7 +106,7 @@ button.primary:hover{
 }
 .main-card{
     box-sizing: border-box;
-    font-family: vazir;
+    font-family: var(--font-main);
     display: flex;
     align-items: center;
     flex-direction: row;
@@ -121,7 +121,7 @@ button.primary:hover{
 
 .card-container h3 {
     margin: 10px 0;
-    font-size: var(--h4-font-size);
+    font-size: 24px;
 }
 
 .card-container h6 {
@@ -134,7 +134,7 @@ button.primary:hover{
 
 .skills h6{
     padding: 0px 30px;
-    color: var(--white-color);
+    color: var(--white);
 }
 
 .card-container p{

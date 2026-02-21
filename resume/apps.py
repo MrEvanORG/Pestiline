@@ -6,4 +6,7 @@ class ResumeConfig(AppConfig):
     name = 'resume'
     verbose_name = 'برنامه رزومه'
 
+    def ready(self):
+        import resume.signals
+
 

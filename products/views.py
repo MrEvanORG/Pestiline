@@ -1,25 +1,135 @@
 import json
 import time
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.http import require_POST
 from django.urls import reverse
+from decimal import Decimal
 from .forms import UserRegisterForm, UserLoginForm
-from .models import User, Province, City
+from .models import User, Province, City, Product, Order, OrderItem
 from .addons import initiate_otp_process, get_otp_settings, get_remaining_otp_time
-
 # ... (صفحات عمومی بدون تغییر) ...
 def index_page(request): return render(request, 'index.html')
 @login_required(login_url='auth')
 def dashboard_page(request): return HttpResponse(f"خوش آمدید {request.user.first_name}!")
 
+def get_cart_count(request):
+    """محاسبه تعداد اقلام در سبد خرید فعال (وضعیت CART)"""
+    if request.user.is_authenticated:
+        order = Order.objects.filter(customer=request.user, status='CART').first()
+        return order.items.count() if order else 0
+    else:
+        cart = request.session.get('cart', {})
+        return len(cart)
+
+def merge_session_cart(request, user, explicit_cart=None):
+    """
+    ادغام سبد خرید.
+    آرگومان explicit_cart برای زمانی است که سشن پس از لاگین تغییر کرده
+    و می‌خواهیم نسخه قبل از لاگین را پاس بدهیم.
+    """
+    # اگر کارت صریح داده شد از آن استفاده کن، وگرنه از سشن فعلی بگیر
+    session_cart = explicit_cart if explicit_cart is not None else request.session.get('cart', {})
+    
+    if not session_cart:
+        return
+
+    # ایجاد یا دریافت سفارش با وضعیت CART
+    order, created = Order.objects.get_or_create(customer=user, status='CART')
+    
+    for product_id, item_data in session_cart.items():
+        try:
+            product = Product.objects.get(id=product_id)
+            order_item, created = OrderItem.objects.get_or_create(
+                order=order,
+                product=product,
+                defaults={
+                    'quantity': item_data['quantity'],
+                    'price': product.price
+                }
+            )
+            if not created:
+                order_item.quantity = item_data['quantity']
+                order_item.save()
+        except Product.DoesNotExist:
+            continue
+            
+    order.calculate_total()
+    
+    # پاک کردن سبد از سشن جاری (چه جدید چه قدیم)
+    request.session['cart'] = {}
+    request.session.modified = True
+
+@require_POST
+def update_cart_api(request):
+    """API برای افزودن، حذف و آپدیت تعداد آیتم‌های سبد"""
+    try:
+        data = json.loads(request.body)
+        product_id = str(data.get('product_id'))
+        action = data.get('action') # 'add', 'remove', 'update'
+        quantity = float(data.get('quantity', 1))
+    except:
+        return JsonResponse({'success': False, 'message': 'داده نامعتبر'}, status=400)
+
+    in_cart = False
+
+    # === سناریوی کاربر لاگین شده (دیتابیس) ===
+    if request.user.is_authenticated:
+        # دریافت یا ساخت سبد خرید (وضعیت CART)
+        order, _ = Order.objects.get_or_create(customer=request.user, status='CART')
+        
+        if action == 'remove':
+            OrderItem.objects.filter(order=order, product_id=product_id).delete()
+            in_cart = False
+        else: 
+            # برای add و update
+            product = get_object_or_404(Product, id=product_id)
+            item, created = OrderItem.objects.get_or_create(
+                order=order, 
+                product=product,
+                defaults={'quantity': quantity, 'price': product.price}
+            )
+            
+            # اگر آیتم از قبل بود یا درخواست آپدیت صریح داشتیم، مقدار را بروز کن
+            if not created or action == 'update':
+                item.quantity = quantity
+                item.save()
+            
+            in_cart = True
+        
+        order.calculate_total()
+        cart_count = order.items.count()
+
+    # === سناریوی کاربر مهمان (سشن) ===
+    else:
+        cart = request.session.get('cart', {})
+        
+        if action == 'remove':
+            if product_id in cart:
+                del cart[product_id]
+            in_cart = False
+        else: 
+            # برای add و update مقدار را ست میکنیم
+            cart[product_id] = {'quantity': quantity}
+            in_cart = True
+        
+        request.session['cart'] = cart
+        request.session.modified = True
+        cart_count = len(cart)
+
+    return JsonResponse({
+        'success': True,
+        'in_cart': in_cart,     # وضعیت نهایی محصول (در سبد هست یا نه)
+        'cart_count': cart_count, # تعداد کل اقلام سبد برای بج هدر
+        'message': 'سبد خرید بروز شد'
+    })
 # ==========================================
 # سیستم احراز هویت ماژولار
 # ==========================================
 def auth_page(request):
-    # اگر کاربر قبلاً لاگین کرده، نیازی به دیدن این صفحه ندارد
+
     if request.user.is_authenticated:
         return redirect('dashboard')
 
@@ -68,6 +178,7 @@ def auth_page(request):
                 user = authenticate(request, phone_number=phone, password=password)
                 if user:
                     login(request, user)
+                    merge_session_cart(request, user)
                     return redirect('dashboard')
                 else:
                     login_form.add_error(None, 'اطلاعات ورود اشتباه است.')
@@ -174,6 +285,7 @@ def verify_otp_api(request):
     except:
         return JsonResponse({'success': False, 'message': 'فرمت نامعتبر'}, status=400)
 
+    # دریافت کانتکست قبل از هر کاری
     otp_context = request.session.get('otp_context')
     if not otp_context:
         return JsonResponse({'success': False, 'message': 'نشست منقضی شده.'}, status=400)
@@ -189,10 +301,14 @@ def verify_otp_api(request):
         if intent == 'register':
             extra = otp_context.get('extra_data', {})
             try:
+                # 1. کپی کردن سبد خرید قبل از اینکه لاگین سشن را تغییر دهد
+                pre_login_cart = request.session.get('cart', {})
+
                 from .models import User, Province, City 
                 province = Province.objects.get(id=extra['province_id'])
                 city = City.objects.get(id=extra['city_id'])
                 phone = otp_context['phone_number']
+                
                 user = User(
                     first_name=extra['first_name'],
                     last_name=extra['last_name'],
@@ -203,20 +319,33 @@ def verify_otp_api(request):
                 )
                 if extra.get('password'): user.set_password(extra['password'])
                 else: user.set_unusable_password()
+                
                 user.save()
+                
+                # جلوگیری از ارور Multiple Backends
+                user.backend = 'django.contrib.auth.backends.ModelBackend'
+                
+                # 2. انجام لاگین (اینجا سشن ممکن است ریست شود)
                 login(request, user)
-                del request.session['otp_context']
+                
+                # 3. فراخوانی مرج با سبد خریدی که کپی کرده بودیم
+                merge_session_cart(request, user, explicit_cart=pre_login_cart)
+                
+                # 4. پاک کردن امن کانتکست (با pop که ارور ندهد)
+                request.session.pop('otp_context', None)
+                
                 return JsonResponse({'success': True, 'redirect_url': reverse('dashboard')})
+                
             except Exception as e:
                 return JsonResponse({'success': False, 'message': f'خطای ثبت‌ نام: {str(e)}'}, status=500)
+        
         elif intent == 'login':
-            # لاگین پیاده سازی شود
+            # همین منطق را برای لاگین با OTP هم می‌توانید پیاده کنید
             return JsonResponse({'success': True, 'redirect_url': reverse('dashboard')})
-        elif intent == 'reset_password':
-             return JsonResponse({'success': True, 'redirect_url': '/auth/reset-password-confirm/'})
+            
     else:
         return JsonResponse({'success': False, 'message': 'کد نادرست است.'}, status=400)
-
+    
 @require_POST
 def resend_otp_api(request):
     otp_context = request.session.get('otp_context')
@@ -232,3 +361,87 @@ def resend_otp_api(request):
         if result['rate_limited']:
              return JsonResponse({'success': False, 'message': 'لطفاً صبر کنید.', 'ttl': result['ttl']}, status=429)
         return JsonResponse({'success': False, 'message': 'خطا در ارسال.'}, status=500)
+    
+from django.shortcuts import render, get_object_or_404
+from .models import Product
+from django.db.models import Q
+
+
+def product_detail(request, slug):
+    # دریافت محصول فعال
+    product = get_object_or_404(Product, slug=slug, active_status=True)
+    
+    # 1. منطق بازدید (Session Based)
+    session_key = f'viewed_product_{product.id}'
+    if not request.session.get(session_key, False):
+        product.visit_count += 1
+        product.save()
+        request.session[session_key] = True
+
+    # 2. بررسی وضعیت سبد خرید (آیا محصول در سبد هست؟ مقدارش چقدره؟)
+    in_cart = False
+    current_qty = 0
+    
+    if request.user.is_authenticated:
+        # جستجو در سفارش باز (CART)
+        item = OrderItem.objects.filter(
+            order__customer=request.user, 
+            order__status='CART', 
+            product=product
+        ).first()
+        
+        if item:
+            in_cart = True
+            current_qty = item.quantity
+    else:
+        # جستجو در سشن
+        cart = request.session.get('cart', {})
+        if str(product.id) in cart:
+            in_cart = True
+            current_qty = cart[str(product.id)]['quantity']
+
+    # 3. محصولات مرتبط (کدهای قبلی شما)
+    current_types = product.components.values_list('pistachio_type', flat=True)
+    base_query = Product.objects.filter(active_status=True).exclude(id=product.id)
+
+    if not product.is_mixed:
+        cat1 = list(base_query.filter(is_mixed=False, components__pistachio_type__in=current_types).distinct().order_by('-visit_count'))
+        cat2 = list(base_query.filter(is_mixed=True, components__pistachio_type__in=current_types).distinct().order_by('-visit_count'))
+    else:
+        cat1 = list(base_query.filter(is_mixed=True, components__pistachio_type__in=current_types).distinct().order_by('-visit_count'))
+        cat2 = list(base_query.filter(is_mixed=False, components__pistachio_type__in=current_types).distinct().order_by('-visit_count'))
+
+    final_list = []
+    final_list.extend(cat1[:3])
+    final_list.extend(cat2[:3])
+    
+    if len(final_list) < 4:
+        needed = 6 - len(final_list)
+        existing_ids = [p.id for p in final_list] + [product.id]
+        populars = list(Product.objects.filter(active_status=True).exclude(id__in=existing_ids).order_by('-visit_count')[:needed])
+        final_list.extend(populars)
+
+    related_products = final_list[:6]
+
+    # محاسبه سایز کارت "مشاهده بیشتر"
+    count = len(related_products)
+    remainder = count % 3
+    
+    if remainder == 0:
+        see_more_span = "span-3"
+    elif remainder == 1:
+        see_more_span = "span-2"
+    else:
+        see_more_span = "span-1"
+
+    context = {
+        'product': product,
+        'related_products': related_products,
+        'see_more_span': see_more_span,
+        'in_cart': in_cart,       # برای وضعیت اولیه دکمه
+        'current_qty': current_qty, # برای پر کردن اینپوت تعداد/وزن
+    }
+    return render(request, 'product_detail.html', context)
+
+def aboutus_page(request):
+    return HttpResponse("about us")

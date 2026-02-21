@@ -37,7 +37,7 @@
 
         <div class="footer-col">
             <h4><i class="fa-slab-press fa-regular fa-headset margin-left-5"></i> ارتباط با ما</h4>
-            <ul class="contact-list">
+            <ul class="footer-links">
                 
                 {% if site_settings.link_prphone %}
                 <li>
@@ -104,7 +104,9 @@
             © کپی رایت تیم پستیلاین ۱۴۰۳ - تمامی حقوق محفوظ است.
         </div>
         <div class="developer-credit">
-            <span>طراحی و توسعه : <i class="fa-slab-press fa-regular fa-code code-icon"></i>&nbsp;Ehsan Ramezani</span>
+            <a href="{% url 'resume_detail' 'Ehsan-Ramezani' %}">
+                <span>طراحی و توسعه : <i class="fa-slab-press fa-regular fa-code code-icon"></i>&nbsp;Ehsan Ramezani</span>
+            </a>
         </div>
     </div>
 </footer>

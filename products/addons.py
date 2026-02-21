@@ -93,7 +93,7 @@ def send_otp_simulation(phone_number):
     
     # فرض کنیم همیشه 200 است، مگر اینکه بخواهیم تست کنیم
     # برای تست می‌توانید status_code را دستی تغییر دهید
-    status_code = 301
+    status_code = 200
     
     if status_code == 200:
         print(f"\n{'='*40}")

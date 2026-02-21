@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'products.apps.ProductsConfig',
     'resume.apps.ResumeConfig',
+    'django.contrib.humanize',
 ]
 
 MIDDLEWARE = [
@@ -74,7 +75,8 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'products.context_processors.site_settings'
+                'products.context_processors.site_settings',
+                'products.context_processors.cart_context'
             ],
         },
     },

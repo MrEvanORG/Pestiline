@@ -1,0 +1,15 @@
+:root {
+    --white: #ffffff;
+    --dark: #0e0e0ef1;
+    --primary: #123524;     /* سبز تیره */
+    --secondary: #85A947;   /* سبز روشن */
+    --section-bg: #dae9c3;  /* پس‌زمینه سکشن‌ها */
+    --link-color: #a8bd77;
+    --accent-brick: #9F4A40;
+    --border: #ccc;
+    --p-color:#333;
+    --shadow: 0 5px 15px rgba(18, 53, 36, 0.1);
+    --radius: 12px;
+    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    --font-main: 'Vazirmatn', sans-serif;
+}

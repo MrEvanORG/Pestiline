@@ -1,8 +1,13 @@
-from .addons import persian_slugify
-from django.utils.text import slugify
-from django.urls import reverse
+import os
 from django.db import models
-import os 
+from django.urls import reverse
+from django.utils.text import slugify
+from django.core.exceptions import ValidationError
+
+# ایمپورت تابع فشرده‌سازی از محصولات
+from products.models import compress_image 
+from .addons import persian_slugify
+
 
 def get_filename_ext(filepath):
     base_name = os.path.basename(filepath)
@@ -13,32 +18,44 @@ def upload_image_path(instance, filename):
     name, ext = get_filename_ext(filename)
     slug_name = instance.slug if instance.slug else slugify(instance.name, allow_unicode=True)
     final_name = f"{slug_name}{ext}"
-    return f"avatars/{final_name}"
+    # تغییر مسیر به پوشه مورد نظر شما
+    return f"avatars_photo/{final_name}"
+
+# ولیدیتور برای محدودیت ۲ مگابایتی فایل
+def validate_file_size(value):
+    filesize = value.size
+    if filesize > 2 * 1024 * 1024:  # 2 MB
+        raise ValidationError("حداکثر حجم مجاز برای فایل رزومه ۲ مگابایت است.")
+
 
 class Resume(models.Model):
 
     class RoleType(models.TextChoices):
-        developer = "developer","توسعه دهنده"
-        accountant = "accountant","حسابدار"
-        content_manager = "content_manager","مدیر محتوا"
-        seo_manager = "seo_manager","مدیر سئو"
-        ui_designer = "ui_designer","طراح Ux"
-        ux_designer = "ux_designer","طراح Ui"
-        uxui_designer = "uxui_designer","طراح Ui/Ux"
-        sql_designer = "sql_designer","طراح پایگاه داده"
+        developer = "developer", "توسعه دهنده"
+        accountant = "accountant", "حسابدار"
+        content_manager = "content_manager", "مدیر محتوا"
+        seo_manager = "seo_manager", "مدیر سئو"
+        ui_designer = "ui_designer", "طراح Ux"
+        ux_designer = "ux_designer", "طراح Ui"
+        uxui_designer = "uxui_designer", "طراح Ui/Ux"
+        sql_designer = "sql_designer", "طراح پایگاه داده"
 
-    slug = models.SlugField(allow_unicode=True,unique=True, blank=True,verbose_name='اسلاگ رزومه')
-    role = models.CharField(max_length=20,choices=RoleType,default=RoleType.developer,verbose_name='نقش')
-    is_confirmed = models.BooleanField(default=False,verbose_name='وضعیت نمایش')
+    slug = models.SlugField(allow_unicode=True, unique=True, blank=True, verbose_name='اسلاگ رزومه')
+    role = models.CharField(max_length=20, choices=RoleType, default=RoleType.developer, verbose_name='نقش')
+    is_confirmed = models.BooleanField(default=False, verbose_name='وضعیت نمایش')
     name = models.CharField(max_length=100, verbose_name="نام")
     title = models.CharField(max_length=100, verbose_name="تخصص کوتاه (مثلا: برنامه‌نویس وب)")
+    
+    # استفاده از upload_image_path جدید
     avatar = models.ImageField(upload_to=upload_image_path, verbose_name="تصویر آواتار", help_text="بهترین اندازه: 200x200 پیکسل")
     about_me = models.TextField(verbose_name="درباره من (معرفی کوتاه)")
     age = models.PositiveIntegerField(verbose_name="سن")
     email = models.EmailField(verbose_name="ایمیل")
     phone_number = models.CharField(max_length=20, verbose_name="شماره همراه")
     address = models.CharField(max_length=255, verbose_name="آدرس")
-    resume_file = models.FileField(upload_to='resumes/', verbose_name="فایل رزومه (PDF)", null=True, blank=True)
+    
+    # اضافه شدن validator برای محدودیت حجم
+    resume_file = models.FileField(upload_to='resumes/', validators=[validate_file_size], verbose_name="فایل رزومه (PDF)", null=True, blank=True)
 
     skills_category_1 = models.TextField(
         verbose_name="مهارت‌های دسته اول (فنی)",
@@ -48,7 +65,6 @@ class Resume(models.Model):
         verbose_name="مهارت‌های دسته دوم (نرم‌افزار)",
         help_text='مثال: Adobe Photoshop,80;Sketch,85'
     )
-
 
     twitter_url = models.URLField(max_length=200, blank=True, null=True, verbose_name="لینک توییتر")
     telegram_url = models.URLField(max_length=200, blank=True, null=True, verbose_name="لینک تلگرام")
@@ -61,20 +77,32 @@ class Resume(models.Model):
     class Meta:
         verbose_name = "رزومه"
         verbose_name_plural = "رزومه‌ها"
+
     def get_absolute_url(self):
-        return reverse("resume_detail",args=[self.slug])
-    
+        return reverse("resume_detail", args=[self.slug])
 
-    def save(self,*args,**kwargs):
-        if not self.slug :
+    def save(self, *args, **kwargs):
+        if not self.slug:
             self.slug = persian_slugify(self.name)
-        super().save(*args,**kwargs)
+            
+        if self.avatar:
+            if not self.pk: 
+                self.avatar = compress_image(self.avatar)
+            else: 
+                try:
+                    old = Resume.objects.get(pk=self.pk)
+                    if self.avatar.name != old.avatar.name: 
+                        self.avatar = compress_image(self.avatar)
+                except Resume.DoesNotExist:
+                    pass
 
+        super().save(*args, **kwargs)
+# مدل‌های WorkExperience و Education تغییر نکردند (همان کدهای خودتان را نگه دارید)
 class WorkExperience(models.Model):
     resume = models.ForeignKey(Resume, related_name='work_experiences', on_delete=models.CASCADE)
     position = models.CharField(max_length=100, verbose_name="سمت شغلی")
     company = models.CharField(max_length=100, verbose_name="محل انجام کار (شرکت)")
-    web_link = models.URLField(verbose_name="لینک وبسایت ارائه شده",null=True,blank=True)
+    web_link = models.URLField(verbose_name="لینک وبسایت ارائه شده", null=True, blank=True)
     period = models.CharField(max_length=100, verbose_name="بازه زمانی (مثال: May, 2015 - Present)")
     description = models.TextField(verbose_name="توضیحات و تجربیات")
 
@@ -99,5 +127,4 @@ class Education(models.Model):
     class Meta:
         verbose_name = "سابقه تحصیلی"
         verbose_name_plural = "سوابق تحصیلی"
-        ordering = ['-id'] 
-
+        ordering = ['-id']

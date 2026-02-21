@@ -22,28 +22,31 @@ def get_file_path(instance, filename):
     # تغییر مسیر به پوشه درخواستی شما
     return os.path.join(f'products_photos/{instance.product.id}/', filename)
 
-def compress_image(image, max_size_kb=500):
-    """فشرده‌سازی و تغییر سایز عکس"""
+def compress_image(image, max_size_kb=500, max_width=1200):
     im = PilImage.open(image)
     output = BytesIO()
     
     if im.mode in ("RGBA", "P"):
         im = im.convert("RGB")
     
-    max_width = 1200
+    # تغییر سایز هوشمند بر اساس ورودی
     if im.width > max_width:
         ratio = max_width / im.width
         new_height = int(im.height * ratio)
         im = im.resize((max_width, new_height), PilImage.Resampling.LANCZOS)
 
-    quality = 90
-    im.save(output, format='JPEG', quality=quality)
+    # شروع با کیفیت عالی و روشن کردن بهینه‌ساز پیش‌فرض
+    quality = 95
+    step = 4  # کاهش ملایم‌تر کیفیت
     
-    while output.tell() > max_size_kb * 1024 and quality > 20:
+    im.save(output, format='JPEG', quality=quality, optimize=True)
+    
+    # حلقه فشرده‌سازی تا رسیدن به زیر حجم مدنظر یا حداقل کیفیت مجاز
+    while output.tell() > max_size_kb * 1024 and quality > 30:
         output.seek(0)
         output.truncate(0)
-        quality -= 10
-        im.save(output, format='JPEG', quality=quality)
+        quality -= step
+        im.save(output, format='JPEG', quality=quality, optimize=True)
 
     output.seek(0)
     
@@ -55,7 +58,6 @@ def compress_image(image, max_size_kb=500):
         sys.getsizeof(output), 
         None
     )
-
 # --- تنظیمات سایت ---
 class SiteSettings(models.Model):
     SITE_STATUS_CHOICES = [
@@ -127,15 +129,23 @@ class Product(models.Model):
     PISTACHIO_TYPES = [('AKBARI', 'اکبری'), ('FANDOGHI', 'فندقی'), ('AHMAD_AGHAEI', 'احمدآقایی'), ('KALEH_GHOOCHI', 'کله قوچی')]
     SALE_METHODS = [('PACKAGED', 'بسته‌ای'), ('BY_KILO', 'کیلویی')]
 
-    seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products', verbose_name="فروشنده")
+    slug = models.SlugField(max_length=255, unique=True, allow_unicode=True, verbose_name="آدرس یکتا (Slug)", null=True)
+    active_status = models.BooleanField(default=True, verbose_name='وضعیت نمایش محصول')
+    seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products', verbose_name="فروشنده", help_text='فروشنده ابرکاربر پستیلاین تلقی میشود .')
     name = models.CharField(max_length=255, verbose_name="نام محصول")
     sale_method = models.CharField(max_length=20, choices=SALE_METHODS, verbose_name="نوع فروش")
-    price = models.DecimalField(max_digits=12, decimal_places=0, verbose_name="قیمت (تومان)")
-    package_weight = models.FloatField(null=True, blank=True, verbose_name="وزن هر بسته (کیلو)")
-    stock = models.FloatField(verbose_name="موجودی")
-    min_order = models.FloatField(default=1, verbose_name="کف سفارش")
-    max_order = models.FloatField(default=100, verbose_name="سقف سفارش")
+    price = models.DecimalField(max_digits=12, decimal_places=0, verbose_name="قیمت (تومان)", help_text='برای هر کیلوگرم یا هر بسته')
+    package_weight = models.FloatField(null=True, blank=True, verbose_name="وزن هر بسته (کیلو)", help_text='درصورت فروش بسته ای وارد کنید')
+    stock = models.FloatField(verbose_name="موجودی", help_text='درصورت ناموجود بودن محصول عدد 0 وارد شود')
+    min_order = models.FloatField(default=1, verbose_name="کف سفارش", help_text='تعداد بسته یا کیلوگرم')
+    max_order = models.FloatField(default=100, verbose_name="سقف سفارش", help_text='تعداد بسته یا کیلوگرم')
+    description = models.TextField(blank=True, null=True, verbose_name="توضیحات کامل محصول")
+    visit_count = models.PositiveIntegerField(default=0, verbose_name="تعداد بازدید")
     is_mixed = models.BooleanField(default=False, verbose_name="آیا محصول ترکیبی است؟")
+    is_free_shipping = models.BooleanField(default=False, verbose_name='دارای ارسال رایگان است ؟')
+    time_tosend = models.CharField(null=True, max_length=50, verbose_name='متن مدت زمان ارسال', help_text='مثلا : تحویل به پست تا 3 روز کاری')
+    
+    # --- فیلد جدید ---
 
     def clean(self):
         if self.sale_method == 'PACKAGED' and not self.package_weight:
@@ -144,6 +154,45 @@ class Product(models.Model):
     def __str__(self): return self.name
     class Meta: verbose_name = "محصول"; verbose_name_plural = "محصولات"
 
+    # متدهای کمکی
+    def get_dynamic_title(self):
+        comps = self.components.all()
+        if not comps.exists(): return self.name
+        type_map = dict(self.PISTACHIO_TYPES)
+        shell_map = dict(ProductComponent.SHELL_CHOICES)
+        types = [type_map.get(c.pistachio_type) for c in comps]
+        shells = [shell_map.get(c.shell_status) for c in comps]
+        unique_shells = set(shells)
+        if len(unique_shells) == 1:
+            joined_types = " و ".join(types)
+            return f"پسته {joined_types} {shells[0]}"
+        else:
+            parts = [f"{type_map.get(c.pistachio_type)} {shell_map.get(c.shell_status)}" for c in comps]
+            return "پسته " + " و ".join(parts)
+
+    def get_dynamic_processing(self):
+        comps = self.components.all()
+        if not comps.exists(): return ""
+        proc_map = dict(ProductComponent.PROCESSING_CHOICES)
+        procs = [proc_map.get(c.processing) for c in comps]
+        if len(set(procs)) == 1:
+            return f"{procs[0]}"
+        else:
+            type_map = dict(self.PISTACHIO_TYPES)
+            parts = [f"{type_map.get(c.pistachio_type)} {proc_map.get(c.processing)}" for c in comps]
+            return " و ".join(parts)
+
+    def get_quality_badge(self):
+        comps = self.components.all()
+        qualities = [c.quality for c in comps]
+        if 'LUXARY' in qualities: return {'text': 'دستچین اعلاء', 'class': 'luxury'}
+        elif 'STANDARD' in qualities: return {'text': 'استاندارد', 'class': 'standard'}
+        elif 'ECONOMY' in qualities: return {'text': 'اقتصادی', 'class': 'economy'}
+        return None
+    
+    def get_composition_list(self):
+        if not self.is_mixed: return None
+        return self.components.all().order_by('-percentage')
 # --- مدل اجزای تشکیل‌دهنده ---
 class ProductComponent(models.Model):
     PROCESSING_CHOICES = [('RAW', 'خام'), ('ROASTED', 'شور/بو داده')]
@@ -190,7 +239,8 @@ from decimal import Decimal
 
 class Order(models.Model):
     STATUS_CHOICES = [
-        ('PENDING', 'در انتظار پرداخت'),
+        ('CART', 'سبد خرید (در انتظار تکمیل)'),        # <--- وضعیت جدید
+        ('PENDING', 'در انتظار پرداخت (تایید شده)'),
         ('PROCESSING', 'در حال پردازش (تایید پرداخت)'),
         ('SHIPPED', 'ارسال شده'),
         ('DELIVERED', 'تحویل شده'),
@@ -233,7 +283,6 @@ class Order(models.Model):
         verbose_name = "سفارش"
         verbose_name_plural = "سفارشات"
         ordering = ['-created_at']
-
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items', verbose_name="سفارش")

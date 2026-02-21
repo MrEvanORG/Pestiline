@@ -20,5 +20,5 @@ from products.admin import super_admin_site
 urlpatterns = [
     path('', include('products.urls')),
     path('secure_admin_login_auth/', super_admin_site.urls),
-    path('resume/', include('resume.urls')),
+    path('resume/',include('resume.urls')),
 ]

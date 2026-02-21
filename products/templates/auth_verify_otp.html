@@ -5,17 +5,17 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>تایید شماره همراه | پستیلاین</title>
-    <link href="{% static 'css/Vazirmatn.css' %}" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="{% static 'css/all_awesome.css' %}"/>
-    <link rel="stylesheet" href="{% static 'css/main.css' %}"/> 
-    <link rel="stylesheet" href="{% static 'css/auth.css' %}"/> 
+    <link href="{% static 'products/css/Vazirmatn.css' %}" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="{% static 'products/css/all_awesome.css' %}"/>
+    <link rel="stylesheet" href="{% static 'products/css/main.css' %}"/> 
+    <link rel="stylesheet" href="{% static 'products/css/auth.css' %}"/> 
 </head>
 <body class="auth-page">
 
     <div class="auth-container">
         <div class="auth-logo">
             <a href="/">
-                <img src="{% static 'img/light-logo.svg' %}" alt="پستیلاین">
+                <img src="{% static 'products/img/light-logo.svg' %}" alt="پستیلاین">
             </a>
         </div>
 
@@ -73,6 +73,6 @@
         const SERVER_TIMER_REMAINING = {{ timer_duration|default:0 }};
     </script>
     
-    <script src="{% static 'js/otp.js' %}"></script>
+    <script src="{% static 'products/js/otp.js' %}"></script>
 </body>
 </html>

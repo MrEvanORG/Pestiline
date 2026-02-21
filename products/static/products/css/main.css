@@ -1,20 +1,7 @@
 /* =========================================
    1. متغیرها و تنظیمات پایه (Variables & Reset)
    ========================================= */
-:root {
-    --white: #ffffff;
-    --dark: #0e0e0ef1;
-    --primary: #123524;     /* سبز تیره */
-    --secondary: #85A947;   /* سبز روشن */
-    --section-bg: #dae9c3;  /* پس‌زمینه سکشن‌ها */
-    --link-color: #a8bd77;
-    --accent-brick: #9F4A40;
-    --border: #e0e0e0;
-    --shadow: 0 5px 15px rgba(18, 53, 36, 0.1);
-    --radius: 12px;
-    --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    --font-main: 'Vazirmatn', sans-serif;
-}
+@import url('root/light_root.css');
 
 * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
 
@@ -702,7 +689,7 @@ body.menu-open .mobile-sidebar { right: 0; }
 
 .footer-grid {
     display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 2.5rem; padding: 0 5% 3rem; max-width: 1400px; margin: 0 auto;
+    gap: 2.5rem; padding: 0 5% 3rem; margin: 0 auto;
 }
 
 .footer-col h4 {
@@ -713,9 +700,9 @@ body.menu-open .mobile-sidebar { right: 0; }
 
 .footer-links li { margin-bottom: 10px; }
 .footer-links a { color: #b0b0b0; transition: 0.3s; display: inline-block; }
-.footer-links a:hover { color: var(--secondary); transform: translateX(-5px); }
+.footer-links a:hover { color: var(--secondary); transform: translateX(-1px); }
 
-.contact-list li { margin-bottom: 12px; display: flex; align-items: center; gap: 8px; }
+
 
 .centered-col { text-align: center; }
 .trust-icons { display: flex; gap: 10px; justify-content: center; margin-top: 10px; }
@@ -820,4 +807,34 @@ body.menu-open .mobile-sidebar { right: 0; }
     .btn-add {
         padding: 15px; /* دکمه خرید بزرگتر */
     }
+}
+/* اضافه کردن به main.css */
+
+.cart-icon {
+    position: relative;
+    display: inline-block;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background-color: #ef4444; /* قرمز جذاب */
+    color: white;
+    font-size: 0.7rem;
+    font-weight: bold;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 2px solid white;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.15);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+/* انیمیشن پاپ شدن */
+.cart-badge.pop {
+    transform: scale(1.4);
 }
