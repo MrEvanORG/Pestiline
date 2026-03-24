@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>پستیلاین | در حال توسعه</title>
+    
+    <link href="{% static 'products/css/Vazirmatn.css' %}" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="{% static 'products/css/all_awesome.css' %}">
+    <link rel="stylesheet" href="{% static 'products/css/root/light_root.css' %}">
+    <link rel="stylesheet" href="{% static 'products/css/status_page.css' %}">
+</head>
+<body>
+<div class="cs-bg"></div>
+<div class="cs-overlay"></div>
+
+<div class="cs-layout">
+    
+    <div class="cs-content-side">
+        <img src="{% static 'products/img/light-logo-to.svg' %}" alt="پستیلاین" class="cs-logo">
+        
+        <h1 class="cs-title">این <span>بخش</span><br>در حال توسعه است</h1>
+        
+        <p class="cs-desc">
+            {{ message|default:"ما در حال طراحی، برنامه‌نویسی و آماده‌سازی این قسمت از پستیلاین هستیم تا تجربه بی‌نظیری را برای شما رقم بزنیم. به زودی با امکانات جدید در این صفحه میزبان شما خواهیم بود." }}
+        </p>
+
+        <!-- دکمه بازگشت به صفحه قبل با جاوا اسکریپت (فلش راست برای سایت راست‌چین) -->
+        <button onclick="window.history.back();" class="btn-action-glass">
+            <i class="fa-slab-press fa-arrow-right"></i> بازگشت به صفحه قبل
+        </button>
+    </div>
+
+    <div class="cs-development-side">
+        
+        <div class="dev-glass-box">
+            <!-- استفاده از یک آیکون مینیمال و جذاب -->
+            <div class="dev-icon-wrapper">
+                <i class="fa-slab-press fa-laptop-code d-icon-main"></i>
+            </div>
+            <h3 class="d-glass-title">در حال ساخت و ساز...</h3>
+            <p class="d-glass-subtitle">ایده‌های شگفت‌انگیزی در راهند</p>
+        </div>
+
+        {% if site_settings %}
+        <div class="cs-social-bar">
+            {% if site_settings.link_instagram %}
+                <a href="{{ site_settings.link_instagram }}" target="_blank" class="cs-social-link" title="اینستاگرام"><i class="fab fa-instagram"></i></a>
+            {% endif %}
+            {% if site_settings.link_telegram %}
+                <a href="{{ site_settings.link_telegram }}" target="_blank" class="cs-social-link" title="تلگرام"><i class="fab fa-telegram-plane"></i></a>
+            {% endif %}
+            {% if site_settings.link_whatsapp %}
+                <a href="{{ site_settings.link_whatsapp }}" target="_blank" class="cs-social-link" title="واتس‌اپ"><i class="fab fa-whatsapp"></i></a>
+            {% endif %}
+            {% if site_settings.link_twitter %}
+                <a href="{{ site_settings.link_twitter }}" target="_blank" class="cs-social-link" title="توییتر"><i class="fab fa-x-twitter"></i></a>
+            {% endif %}
+            {% if site_settings.link_prphone %}
+                <a href="tel:{{ site_settings.link_prphone }}" class="cs-social-link" title="تماس با ما"><i class="fas fa-phone-alt"></i></a>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+    </div>
+
+</div>
+
+</body>
+</html>

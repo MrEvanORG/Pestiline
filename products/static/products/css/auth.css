@@ -485,3 +485,60 @@ input.invalid {
 .resend-wrapper { margin-bottom: 1.5rem; font-size: 0.9rem; color: #777; height: 40px; display: flex; align-items: center; justify-content: center; }
 .btn-resend { background: transparent; color: var(--secondary); font-weight: bold; display: none; align-items: center; gap: 5px; }
 .btn-resend:hover { background: #f0f4e8; padding: 5px 10px; border-radius: 8px; }
+/* اضافه کردن به فایل auth.css */
+
+/* =========================================
+   استایل نمایش پیام‌های راهنمای 시스템 (Next URL)
+   ========================================= */
+.auth-messages {
+    margin-bottom: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.auth-alert {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: 16px;
+    font-size: 0.85rem;
+    font-weight: 800;
+    line-height: 1.6;
+    animation: authFadeIn 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.auth-alert i {
+    font-size: 1.3rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+}
+
+/* حالت اطلاعات (Info) - برای هدایت از سبد خرید و داشبورد */
+.auth-alert-info {
+    background: #e3f2fd; /* آبی بسیار ملایم و جذاب */
+    color: #0d47a1;      /* آبی تیره و خوانا برای متن و آیکون */
+    border: 1px solid #90caf9;
+    box-shadow: 0 4px 12px rgba(13, 71, 161, 0.08); /* یک سایه ظریف آبی */
+}
+/* حالت خطا (Error) */
+.auth-alert-error {
+    background: #fff0f0;
+    color: #d32f2f;
+    border: 1px solid #ffcdd2;
+}
+
+/* حالت هشدار (Warning) */
+.auth-alert-warning {
+    background: #fff8e1;
+    color: #b07d00;
+    border: 1px solid #ffe082;
+}
+
+/* حالت موفقیت (Success) */
+.auth-alert-success {
+    background: #e8f5e9;
+    color: #2e7d32;
+    border: 1px solid #a5d6a7;
+}

@@ -1,0 +1,349 @@
+{% extends 'patterns/main_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}سبد خرید | پستیلاین{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'products/css/checkout.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="checkout-container">
+    <div class="checkout-header">
+        <h1><i class="fa-slab-press fa-regular fa-cart-shopping"></i> سبد خرید شما</h1>
+    </div>
+
+    <div class="empty-cart-state" id="emptyCartState" style="{% if not is_empty %}display: none;{% endif %}">
+        <div class="empty-icon"><i class="fa-slab-press fa-regular fa-basket-shopping"></i></div>
+        <h2>سبد خرید شما در حال حاضر خالی است!</h2>
+        <p>اما پسته‌های تازه رفسنجان منتظر شما هستند.</p>
+        <a href="{% url 'index' %}#products" class="btn-hero" style="margin-top:20px;">
+            مشاهده محصولات <i class="fa-sharp fa-regular fa-arrow-left"></i>
+        </a>
+    </div>
+
+    <div class="cart-grid" id="cartGridContent" style="{% if is_empty %}display: none;{% endif %}">
+        <div class="cart-items-list" id="cartItemsList">
+            {% for item in cart_items %}
+            <div class="cart-item-card" id="cart-item-{{ item.product.id }}">
+                <a href="{% url 'product_detail' item.product.slug %}">
+                    <div class="item-img">
+                        {% if item.product.images.first %}
+                            <img src="{{ item.product.images.first.image.url }}" alt="{{ item.product.name }}">
+                        {% else %}
+                            <div class="no-img-placeholder" style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; color:#ccc; font-size:3rem;">
+                                <i class="fa-slab-press fa-regular fa-image"></i>
+                            </div>
+                        {% endif %}
+                    </div>
+                </a>
+                <div class="item-details">
+                    <h3 class="item-title">{{ item.product.name }}</h3>
+                    
+                    <div class="item-badges">
+                        {% if item.product.is_free_shipping %}
+                            <span class="badge badge-free"><i class="fa-slab-press fa-regular fa-truck-fast"></i> ارسال رایگان</span>
+                        {% endif %}
+                        {% if item.product.get_quality_badge.class == 'luxury' %}
+                            <span class="badge badge-luxury"><i class="fa-slab-press fa-regular fa-medal"></i> دستچین اعلا</span>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="item-price-unit">
+                        قیمت واحد: <span class="format-num">{{ item.product.price }}</span> تومان 
+                    </div>
+                </div>
+                
+                <div class="item-actions-wrapper">
+                    <div class="cart-qty-control">
+                        {% if item.product.sale_method == 'PACKAGED' %}
+                            <div class="counter-control">
+                                <button type="button" onclick="changeQty('{{ item.product.id }}', 1, {{ item.product.price }})"><i class="fa-slab-press fa-regular fa-plus"></i></button>
+                                <input type="text" id="qty-input-{{ item.product.id }}" value="{{ item.quantity|floatformat:0 }}" data-price="{{ item.product.price }}" readonly>
+                                <button type="button" onclick="changeQty('{{ item.product.id }}', -1, {{ item.product.price }})"><i class="fa-slab-press fa-regular fa-minus"></i></button>
+                            </div>
+                        {% else %}
+                            <div class="cart-weight-control">
+                                <input type="number" id="qty-input-{{ item.product.id }}" value="{{ item.quantity|floatformat:1 }}" data-price="{{ item.product.price }}" step="0.1" min="0.1" 
+                                oninput="updateWeight('{{ item.product.id }}', {{ item.product.price }})" 
+                                onblur="validateWeight(this, '{{ item.product.id }}', {{ item.product.price }})">
+                                <span>کیلو</span>
+                            </div>
+                        {% endif %}
+                        
+                        <button class="btn-delete-item" onclick="promptDelete('{{ item.product.id }}', '{{ item.product.name }}', {{ item.quantity }})">
+                            <i class="fa-slab-press fa-regular fa-trash"></i>
+                        </button>
+                    </div>
+
+                    <div class="item-total-price">
+                        <span id="item-total-{{ item.product.id }}" class="format-num">{{ item.total_cost }}</span> <small>تومان</small>
+                    </div>
+                </div>
+            </div>
+
+            {% endfor %}
+        </div>
+
+        <div class="cart-summary-box">
+            <h3>پیش‌فاکتور سفارش</h3>
+            <div class="summary-row">
+                <span>مبلغ کل کالاها:</span>
+                <span><strong id="summaryTotalItems" class="format-num">{{ total_price }}</strong> تومان</span>
+            </div>
+            <div class="summary-row">
+                <span>هزینه ارسال:</span>
+                <span id="summaryShipping" class="{% if all_free_shipping %}text-success fw-bold{% else %}text-warning{% endif %}">
+                    {% if all_free_shipping %}رایگان{% else %}پس از بررسی آدرس محاسبه می‌شود{% endif %}
+                </span>
+            </div>
+            
+            <div class="summary-divider"></div>
+            
+            <div class="summary-row final-total">
+                <span>مبلغ نهایی (تخمینی):</span>
+                <span><span id="summaryFinalTotal" class="format-num">{{ total_price }}</span> <small>تومان</small></span>
+            </div>
+            
+            <div class="payment-notice">
+                <i class="fa-slab-press fa-regular fa-shield-check"></i>
+                ثبت سفارش اولیه کاملاً رایگان است. پس از تایید موجودی، همکاران ما برای پرداخت و ارسال با شما تماس می‌گیرند.
+            </div>
+
+            <a href="{% url 'checkout_page' %}" class="btn-primary-block mt-3" id="checkoutBtn">
+                مرحله بعد: اطلاعات ارسال <i class="fa-slab-press fa-regular fa-arrow-left"></i>
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="delete-modal-overlay" id="deleteModal">
+    <div class="delete-modal-box">
+        <div class="modal-icon"><i class="fa-slab-press fa-regular fa-triangle-exclamation"></i></div>
+        <h3>حذف محصول</h3>
+        <p>آیا از حذف <strong id="deleteProductName"></strong> از سبد خرید اطمینان دارید؟</p>
+        <div class="modal-actions">
+            <button class="btn-cancel" onclick="closeDeleteModal()">انصراف</button>
+            <button class="btn-confirm-delete" onclick="confirmDelete()">بله، حذف کن</button>
+        </div>
+    </div>
+</div>
+
+<div class="undo-toast" id="undoToast">
+    <span>محصول از سبد خرید حذف شد.</span>
+    <button class="btn-undo" onclick="undoDelete()"><i class="fa-slab-press fa-regular fa-rotate-left"></i> بازگردانی</button>
+</div>
+
+{% csrf_token %}
+{% endblock %}
+
+{% block script %}
+<script>
+    // دیکشنری برای ذخیره تایمرهای Debounce هر محصول
+    let updateTimers = {};
+    let itemToDelete = null;
+    let deletedItemBackup = null;
+    let undoTimeout = null;
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.querySelectorAll('.format-num').forEach(el => {
+            el.textContent = formatNumber(el.textContent);
+        });
+    });
+
+    function formatNumber(num) {
+        let n = parseFloat(num.toString().replace(/,/g, ''));
+        if (isNaN(n)) return "0";
+        return n.toLocaleString('en-US');
+    }
+
+    function getCsrf() {
+        return document.querySelector('[name=csrfmiddlewaretoken]').value;
+    }
+
+    // --- محاسبه Live در کلاینت (قبل از ارسال به سرور) ---
+    function updateLocalUI(productId, newQty, unitPrice) {
+        // ۱. آپدیت قیمت ردیف محصول
+        const itemTotal = newQty * unitPrice;
+        const itemTotalEl = document.getElementById(`item-total-${productId}`);
+        if(itemTotalEl) itemTotalEl.textContent = formatNumber(itemTotal);
+
+        // ۲. محاسبه مجدد کل سبد خرید
+        let totalCart = 0;
+        document.querySelectorAll('.cart-item-card').forEach(card => {
+            if(card.style.display !== 'none') {
+                const qtyInput = card.querySelector('input[id^="qty-input-"]');
+                const price = parseFloat(qtyInput.getAttribute('data-price'));
+                const qty = parseFloat(qtyInput.value) || 0;
+                totalCart += (price * qty);
+            }
+        });
+
+        // ۳. درج در فاکتور
+        document.getElementById('summaryTotalItems').textContent = formatNumber(totalCart);
+        document.getElementById('summaryFinalTotal').textContent = formatNumber(totalCart);
+    }
+
+    // --- توابع تغییر مقدار ---
+
+    // تغییر مقدار بسته‌ای (با دکمه)
+    function changeQty(productId, change, unitPrice) {
+        const input = document.getElementById(`qty-input-${productId}`);
+        let newVal = parseInt(input.value) + change;
+        if (newVal >= 1) {
+            input.value = newVal;
+            handleQuantityChange(productId, newVal, unitPrice);
+        }
+    }
+
+    // تغییر مقدار فله‌ای (هنگام تایپ - oninput)
+    function updateWeight(productId, unitPrice) {
+        const input = document.getElementById(`qty-input-${productId}`);
+        let newVal = parseFloat(input.value);
+        if (isNaN(newVal)) return; // اگر کاربر فیلد را کاملا پاک کرد ریکوئست نزن
+        
+        handleQuantityChange(productId, newVal, unitPrice);
+    }
+
+    // اعتبارسنجی هنگام خروج از فیلد (onblur)
+    function validateWeight(input, productId, unitPrice) {
+        let val = parseFloat(input.value);
+        if (isNaN(val) || val < 0.1) {
+            input.value = 0.5; // حداقل مجاز
+            handleQuantityChange(productId, 0.5, unitPrice);
+        }
+    }
+
+    // --- منطق مشترک Debounce و اعمال UI ---
+    function handleQuantityChange(productId, newVal, unitPrice) {
+        // ۱. آپدیت زنده رابط کاربری (بدون تاخیر)
+        updateLocalUI(productId, newVal, unitPrice);
+
+        // ۲. ارسال ریکوئست به دیتابیس با 800 میلی‌ثانیه تاخیر (Debounce)
+        clearTimeout(updateTimers[productId]);
+        
+        updateTimers[productId] = setTimeout(() => {
+            fetch('/api/cart/update/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCsrf()
+                },
+                body: JSON.stringify({ product_id: productId, action: 'update', quantity: newVal })
+            })
+            .then(res => res.json())
+            .then(data => {
+                // سرور پاسخ نهایی را میدهد (برای تایید وضعیت ارسال رایگان و قیمت نهایی)
+                if(data.success) {
+                    syncServerData(productId, data);
+                }
+            });
+        }, 800); // تاخیر مناسب برای کاهش فشار سرور
+    }
+
+
+    // --- پروسه حذف ---
+    function promptDelete(productId, productName) {
+        itemToDelete = { id: productId, name: productName, qty: document.getElementById(`qty-input-${productId}`).value };
+        document.getElementById('deleteProductName').textContent = productName;
+        document.getElementById('deleteModal').classList.add('show');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModal').classList.remove('show');
+        itemToDelete = null;
+    }
+
+    function confirmDelete() {
+        if (!itemToDelete) return;
+        
+        const productId = itemToDelete.id;
+        deletedItemBackup = { ...itemToDelete };
+
+        fetch('/api/cart/update/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrf() },
+            body: JSON.stringify({ product_id: productId, action: 'remove' })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                closeDeleteModal();
+                document.getElementById(`cart-item-${productId}`).style.display = 'none';
+                syncServerData(productId, data);
+                showUndoToast();
+            }
+        });
+    }
+
+    function showUndoToast() {
+        const toast = document.getElementById('undoToast');
+        toast.classList.add('show');
+        clearTimeout(undoTimeout);
+        undoTimeout = setTimeout(() => {
+            toast.classList.remove('show');
+            if(deletedItemBackup) {
+                const el = document.getElementById(`cart-item-${deletedItemBackup.id}`);
+                if(el) el.remove();
+                deletedItemBackup = null;
+            }
+        }, 4000);
+    }
+
+    function undoDelete() {
+        if (!deletedItemBackup) return;
+        const productId = deletedItemBackup.id;
+        const qty = deletedItemBackup.qty;
+
+        fetch('/api/cart/update/', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'X-CSRFToken': getCsrf() },
+            body: JSON.stringify({ product_id: productId, action: 'update', quantity: qty })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success) {
+                document.getElementById('undoToast').classList.remove('show');
+                clearTimeout(undoTimeout);
+                document.getElementById(`cart-item-${productId}`).style.display = 'flex';
+                syncServerData(productId, data);
+                deletedItemBackup = null;
+            }
+        });
+    }
+
+    // همگام سازی نهایی داده‌های سرور با کلاینت
+    function syncServerData(productId, data) {
+        if (data.item_total !== undefined) {
+            const itemTotalEl = document.getElementById(`item-total-${productId}`);
+            if (itemTotalEl) itemTotalEl.textContent = formatNumber(data.item_total);
+        }
+        document.getElementById('summaryTotalItems').textContent = formatNumber(data.total_price);
+        document.getElementById('summaryFinalTotal').textContent = formatNumber(data.total_price);
+
+        const shipEl = document.getElementById('summaryShipping');
+        if (data.all_free_shipping) {
+            shipEl.textContent = 'رایگان';
+            shipEl.className = 'text-success fw-bold';
+        } else {
+            shipEl.textContent = 'پس از بررسی آدرس محاسبه می‌شود';
+            shipEl.className = 'text-warning';
+        }
+
+        const badge = document.getElementById('cartBadge');
+        if (badge) {
+            badge.textContent = data.cart_count;
+            badge.style.display = data.cart_count > 0 ? 'flex' : 'none';
+        }
+
+        if (data.cart_count === 0) {
+            document.getElementById('cartGridContent').style.display = 'none';
+            document.getElementById('emptyCartState').style.display = 'block';
+        } else {
+            document.getElementById('cartGridContent').style.display = 'grid';
+            document.getElementById('emptyCartState').style.display = 'none';
+        }
+    }
+</script>
+{% endblock %}

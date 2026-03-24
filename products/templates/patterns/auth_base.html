@@ -1,0 +1,26 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{% block title %}{% endblock %}</title>
+        <meta name="description" content="{% block description %}{% endblock %}">
+        <link href="{% static 'products/css/Vazirmatn.css' %}" rel="stylesheet" type="text/css" />
+        <link rel="stylesheet" href="{% static 'products/css/all_awesome.css' %}"/>
+        <link rel="stylesheet" href="{% static 'products/css/main.css' %}"/> 
+        <link rel="stylesheet" href="{% static 'products/css/auth.css' %}"/> 
+        {% block head %}{% endblock %}
+    </head>
+    <body class="auth-page">
+        <div class="auth-container">
+            <div class="auth-logo">
+                <a href="{% url 'index' %}">
+                    <img src="{% static 'products/img/light-logo.svg' %}" alt="لوگو پستیلاین لینک به خانه">
+                </a>
+            </div>
+            {% block content %}{% endblock %}
+        </div>
+        {% block script %}{% endblock %}
+    </body>
+</html>

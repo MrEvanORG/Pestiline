@@ -3,7 +3,7 @@ from django.db import models
 from django.urls import reverse
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
-
+from products.models import User
 # ایمپورت تابع فشرده‌سازی از محصولات
 from products.models import compress_image 
 from .addons import persian_slugify
@@ -41,6 +41,7 @@ class Resume(models.Model):
         sql_designer = "sql_designer", "طراح پایگاه داده"
 
     slug = models.SlugField(allow_unicode=True, unique=True, blank=True, verbose_name='اسلاگ رزومه')
+    related_user = models.ForeignKey(User,null=True,blank=True,on_delete=models.SET_NULL,verbose_name='مرتبط با کاربر')
     role = models.CharField(max_length=20, choices=RoleType, default=RoleType.developer, verbose_name='نقش')
     is_confirmed = models.BooleanField(default=False, verbose_name='وضعیت نمایش')
     name = models.CharField(max_length=100, verbose_name="نام")

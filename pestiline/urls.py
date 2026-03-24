@@ -21,4 +21,5 @@ urlpatterns = [
     path('', include('products.urls')),
     path('secure_admin_login_auth/', super_admin_site.urls),
     path('resume/',include('resume.urls')),
+    path('blog/',include('blog.urls')),
 ]

@@ -51,9 +51,9 @@ html[data-theme="light"],
 
     --button-fg: #fff;
     --button-bg: var(--secondary);
-    --button-hover-bg: #205067;
-    --default-button-bg: #205067;
-    --default-button-hover-bg: var(--secondary);
+    --button-hover-bg:var(--darker-primary);
+    --default-button-bg:var(--primary);
+    --default-button-hover-bg: var(--darker-primary);
     --close-button-bg: #747474;
     --close-button-hover-bg: #333;
     --delete-button-bg: #ba2121;

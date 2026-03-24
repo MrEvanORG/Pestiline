@@ -1,0 +1,457 @@
+/* =========================================
+   Pestiline Pro Coming Soon - Bold & Modern
+   ========================================= */
+@import url('../root/light_root.css');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Vazirmatn', Tahoma, sans-serif ; 
+}
+
+body, html {
+    height: 100%;
+    width: 100%;
+    overflow-x: hidden;
+    background-color: var(--primary);
+}
+
+/* پس زمینه تمام صفحه با عکس مزرعه/محصول */
+.cs-bg {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: url('../img/home/banner.webp') center/cover no-repeat;
+    z-index: 1;
+}
+
+/* گرادینت تاریک روی عکس */
+.cs-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(377deg,rgba(60, 53, 36, 0.8) 22%, rgba(18, 53, 36, 0.4) 90%);
+    backdrop-filter: blur(5px);
+    z-index: 2;
+}
+
+/* ساختار گرید دسکتاپ */
+.cs-layout {
+    position: relative; z-index: 3;
+    display: grid;
+    grid-template-columns: 1.2fr 1fr;
+    min-height: 100vh;
+    padding: 3rem 0 0 0;
+}
+
+/* ============ بخش راست (متن و ساعت) ============ */
+.cs-content-side {
+    padding: 0 3rem 2rem 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.cs-logo { width: 220px; margin-bottom: 3rem; filter: drop-shadow(7px 2px 20px rgba(199, 158, 104, 0.952)); }
+.cs-title { font-size: 3.5rem; font-weight: 900; color: #fff; line-height: 1.3; margin-bottom: 1.5rem; text-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+.cs-title span { color: var(--secondary); }
+.cs-desc { font-size: 1.2rem; color: #dae9c3; max-width: 550px; line-height: 1.9; margin-bottom: 3rem; }
+
+/* ============ ساعت فلیپ کلاک 3D ============ */
+.flip-clock-container {
+    display: flex; gap: 20px; direction: ltr; margin-bottom: 2rem;
+    justify-content: flex-end;
+}
+
+.flip-unit-wrapper {
+    display: flex; flex-direction: column; align-items: center;
+}
+
+.flip-card {
+    position: relative;
+    width: 90px; height: 110px;
+    background: rgba(20, 20, 20, 0.6);
+    border-radius: 12px;
+    font-size: 4rem; font-weight: 900; color: #fff;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+    perspective: 1000px;
+}
+
+.flip-card::after {
+    content: ""; position: absolute; top: 50%; left: 0; width: 100%; height: 2px;
+    background: rgba(0,0,0,0.8); z-index: 5; margin-top: -1px;
+}
+
+.flip-top, .flip-bottom, .flip-top-anim, .flip-bottom-anim {
+    position: absolute; left: 0; width: 100%; height: 50%;
+    background: rgba(40, 40, 40, 0.8); color: #fff;
+    overflow: hidden; display: flex; justify-content: center;
+    border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px);
+}
+
+.flip-top, .flip-top-anim {
+    top: 0; align-items: flex-end; border-radius: 12px 12px 0 0; border-bottom: none;
+    transform-origin: bottom;
+}
+
+.flip-bottom, .flip-bottom-anim {
+    bottom: 0; align-items: flex-start; border-radius: 0 0 12px 12px; border-top: none;
+    transform-origin: top;
+}
+
+.flip-top span, .flip-top-anim span { transform: translateY(50%); }
+.flip-bottom span, .flip-bottom-anim span { transform: translateY(-50%); }
+
+/* انیمیشن فلیپ مکانیکی */
+.flip-top-anim {
+    z-index: 3;
+    animation: flipDownTop 0.4s ease-in forwards;
+}
+.flip-bottom-anim {
+    z-index: 3;
+    transform: rotateX(90deg);
+    animation: flipDownBottom 0.4s ease-out 0.4s forwards;
+}
+
+@keyframes flipDownTop {
+    0% { transform: rotateX(0deg); background: rgba(40,40,40,0.8); }
+    100% { transform: rotateX(-90deg); background: rgba(10,10,10,0.8); }
+}
+@keyframes flipDownBottom {
+    0% { transform: rotateX(90deg); background: rgba(10,10,10,0.8); }
+    100% { transform: rotateX(0deg); background: rgba(40,40,40,0.8); }
+}
+
+.flip-label {
+    margin-top: 15px; font-size: 1rem; color: var(--white); font-weight: 800; letter-spacing: 1px;
+}
+
+/* ============ بخش چپ (تیم پستیلاین و شبکه‌های اجتماعی) ============ */
+.cs-team-side {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column; /* چیدمان ستونی برای قرار گرفتن آیکون‌ها زیر رزومه‌ها */
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+}
+
+.team-masonry {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 25px;
+    width: 100%;
+    max-width: 600px;
+}
+
+/* کارت‌ها در ستون دوم کمی پایین‌تر می‌آیند تا نامتقارن شود */
+.team-masonry .cs-team-card:nth-child(even) {
+    transform: translateY(40px);
+}
+
+.cs-team-card {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 25px 20px;
+    text-align: center;
+    text-decoration: none;
+    backdrop-filter: blur(15px);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+}
+
+.cs-team-card:hover {
+    background: rgba(255, 255, 255, 0.15);
+    border-color: var(--secondary);
+    transform: translateY(-10px) !important;
+    box-shadow: 0 20px 40px rgba(133, 169, 71, 0.2);
+}
+
+.team-avatar-box {
+    width: 120px; height: 120px; margin: 0 auto 20px;
+    border-radius: 50%; padding: 4px;
+    background: linear-gradient(135deg, var(--secondary), var(--primary));
+    transition: transform 0.5s;
+}
+
+.team-avatar-box img {
+    width: 100%; height: 100%; border-radius: 50%; object-fit: cover;
+    border: 3px solid #1a1a1a;
+}
+
+.cs-team-card:hover .team-avatar-box { transform: scale(1.08) rotate(5deg); }
+
+.team-card-name { font-size: 1.3rem; font-weight: 900; color: #fff; margin-bottom: 8px; }
+.team-card-role { font-size: 0.95rem; color: var(--secondary); font-weight: bold; }
+
+/* ============ باکس شیشه‌ای شبکه‌های اجتماعی ============ */
+.cs-social-bar {
+    width: 100%;
+    max-width: 600px; /* هم‌عرض گرید بالا */
+    margin-top: 4.5rem; /* فاصله مناسب از کارت‌های تیم تا به بالا شیفت پیدا کنند */
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 15px;
+    z-index: 10;
+    
+    /* استایل پنل شیشه‌ای (Glassmorphism) */
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 20px;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+}
+
+.cs-social-link {
+    /* color: var(--secondary); */
+    text-decoration: none;
+    width: 48px; height: 48px; border-radius: 12px;
+    background: rgba(255,255,255,0.06); color: #fff;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.4rem; border: 1px solid rgba(255,255,255,0.08);
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.cs-social-link:hover {
+    background: var(--secondary); color: var(--primary);
+    transform: translateY(-8px) scale(1.1); /* در حالت افقی رو به بالا شناور می‌شود */
+    box-shadow: 0 8px 20px rgba(133, 169, 71, 0.4);
+    border-color: var(--secondary);
+}
+
+/* ============ رسپانسیو ============ */
+@media (max-width: 1024px) {
+    .cs-layout { grid-template-columns: 1fr; }
+    .cs-content-side { padding: 4rem 2rem 2rem; text-align: center; align-items: center; }
+    .cs-desc { text-align: center; }
+    .flip-clock-container { justify-content: center; }
+    
+    .team-masonry .cs-team-card:nth-child(even) { transform: none; }
+    .cs-social-bar { margin-top: 3rem; }
+    .cs-team-side { padding-bottom: 5rem; }
+}
+
+@media (max-width: 500px) {
+    .cs-title { font-size: 2.5rem; }
+    .flip-card { width: 70px; height: 90px; font-size: 2.8rem; }
+    .team-masonry { grid-template-columns: 1fr; gap: 20px; }
+    .cs-team-card { padding: 20px; }
+    .cs-social-bar { padding: 15px; }
+    .cs-social-link { width: 40px; height: 40px; font-size: 1.2rem; }
+}
+/* ============ بخش اختصاصی صفحه بروزرسانی (Maintenance) ============ */
+.cs-maintenance-side {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+}
+
+.maintenance-glass-box {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 30px;
+    padding: 4rem 2rem;
+    text-align: center;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 500px;
+    transition: transform 0.4s ease;
+}
+
+.maintenance-glass-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 50px rgba(133, 169, 71, 0.15);
+    border-color: rgba(133, 169, 71, 0.3);
+}
+
+.maintenance-icon-wrapper {
+    margin-bottom: 2rem;
+    filter: drop-shadow(0 0 25px rgba(133, 169, 71, 0.5));
+}
+
+/* انیمیشن چرخ‌دنده‌های متصل به هم */
+.m-gear-1 {
+    font-size: 6.5rem;
+    color: var(--secondary);
+    animation: spinRight 6s linear infinite;
+    display: inline-block;
+}
+
+.m-gear-2 {
+    font-size: 4rem;
+    color:var(--primary);
+    opacity: 0.9;
+    animation: spinLeft 6s linear infinite;
+    display: inline-block;
+    margin-right: -25px;
+    margin-top: -45px;
+    vertical-align: top;
+}
+
+@keyframes spinRight { 100% { transform: rotate(360deg); } }
+@keyframes spinLeft { 100% { transform: rotate(-360deg); } }
+
+.m-glass-title {
+    color: #fff;
+    font-size: 1.6rem;
+    font-weight: 900;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+.m-glass-subtitle {
+    color: #dae9c3;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+/* دکمه تلاش مجدد در سمت راست */
+.btn-retry-glass {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 1rem;
+    padding: 14px 40px;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(5px);
+    width: fit-content;
+}
+
+.btn-retry-glass:hover {
+    background: var(--secondary);
+    color: var(--primary);
+    border-color: var(--secondary);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(133, 169, 71, 0.4);
+}
+
+.btn-retry-glass i {
+    font-size: 1.2rem;
+}
+/* =========================================
+   Development Page Styles (Under Construction)
+   ========================================= */
+
+.cs-development-side {
+    margin-top: 2rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    position: relative;
+}
+
+/* باکس شیشه‌ای صفحه توسعه */
+.dev-glass-box {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 30px;
+    padding: 4rem 2rem;
+    text-align: center;
+    backdrop-filter: blur(15px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    max-width: 500px;
+    transition: transform 0.4s ease;
+}
+
+.dev-glass-box:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 50px rgba(133, 169, 71, 0.15);
+    border-color: rgba(133, 169, 71, 0.3);
+}
+
+.dev-icon-wrapper {
+    margin-bottom: 2.5rem;
+    /* ایجاد یک سایه ملایم و درخشان برای آیکون اصلی */
+    filter: drop-shadow(0 15px 25px rgba(133, 169, 71, 0.4));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* آیکون تک و مینیمال با انیمیشن نرم */
+.d-icon-main {
+    font-size: 7.5rem;
+    color: var(--secondary);
+    animation: floatSmooth 4s ease-in-out infinite;
+}
+
+/* انیمیشن شناور با تغییر مقیاس بسیار نامحسوس برای جذابیت بیشتر */
+@keyframes floatSmooth {
+    0%, 100% { 
+        transform: translateY(0) scale(1); 
+    }
+    50% { 
+        transform: translateY(-18px) scale(1.03); 
+    }
+}
+
+.d-glass-title {
+    color: #fff;
+    font-size: 1.6rem;
+    font-weight: 900;
+    margin-bottom: 10px;
+    letter-spacing: 1px;
+}
+
+.d-glass-subtitle {
+    color: #dae9c3;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+/* استایل دکمه بازگشت (یکپارچه با طراحی شیشه‌ای) */
+.btn-action-glass {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 1rem;
+    padding: 14px 40px;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: #fff;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 16px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(5px);
+    width: fit-content;
+}
+
+.btn-action-glass:hover {
+    background: var(--secondary);
+    color: var(--primary);
+    border-color: var(--secondary);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(133, 169, 71, 0.4);
+}
+
+.btn-action-glass i {
+    font-size: 1.2rem;
+}

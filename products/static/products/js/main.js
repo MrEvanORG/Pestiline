@@ -1,19 +1,22 @@
 /* === Logic: Mobile Menu & Product Detail Overlay === */
 
-
 // Toggle Mobile Menu
 function toggleMenu() {
     document.body.classList.toggle('menu-open');
 }
 
-// Close Menu on Overlay click
-document.getElementById('mobileMenuOverlay').addEventListener('click', function() {
-    document.body.classList.remove('menu-open');
-});
+// Close Menu on Overlay click (ایمن شده)
+const mobileOverlay = document.getElementById('mobileMenuOverlay');
+if (mobileOverlay) {
+    mobileOverlay.addEventListener('click', function() {
+        document.body.classList.remove('menu-open');
+    });
+}
 
 // Toggle Product Details Panel
 function toggleDetails(btn) {
     const card = btn.closest('.product-card');
+    if (!card) return; // ایمن شده
     
     // Close other active panels first
     if (!card.classList.contains('active')) {
@@ -26,12 +29,15 @@ function toggleDetails(btn) {
 }
 
 // Global listener for closing details overlay when clicking '✕'
-document.querySelectorAll('.close-details').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-        const card = e.target.closest('.product-card');
-        card.classList.remove('active');
+const closeBtns = document.querySelectorAll('.close-details');
+if (closeBtns.length > 0) {
+    closeBtns.forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const card = e.target.closest('.product-card');
+            if (card) card.classList.remove('active');
+        });
     });
-});
+}
 
 // اسکرول نرم به بالا برای لینک‌های با href="#"
 document.querySelectorAll('a[href="#"]').forEach(anchor => {

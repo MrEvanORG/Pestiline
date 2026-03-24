@@ -354,3 +354,104 @@ function setupTabsAndUI() {
     // بررسی وضعیت دکمه در لحظه لود (برای وقتی اطلاعات پر است)
     triggerValidation();
 }
+// ==========================================
+// 4. مدیریت درخواست‌های ورود با OTP و فراموشی رمز
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    const otpLink = document.querySelector('.otp-link');
+    const forgotLink = document.querySelector('.forgot-link');
+    
+    function handleSpecialLoginRequest(e, intent) {
+        e.preventDefault();
+        
+        const phoneInput = document.getElementById('login-phone');
+        const errEl = document.getElementById('error-login-phone');
+        const genErrEl = document.getElementById('login-general-error');
+        
+        let val = phoneInput.value.trim();
+        
+        // تبدیل اعداد فارسی به انگلیسی
+        const persianNumbers = [/۰/g, /۱/g, /۲/g, /۳/g, /۴/g, /۵/g, /۶/g, /۷/g, /۸/g, /۹/g];
+        const englishNumbers = ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9'];
+        for (let i = 0; i < 10; i++) { val = val.replace(persianNumbers[i], englishNumbers[i]); }
+        
+        // ۱. بررسی خالی بودن فیلد
+        if(!val) {
+            errEl.textContent = intent === 'login' ? "برای ورود با کد لطفاً شماره تلفن خود را وارد نمایید." : "برای بازیابی رمز، لطفاً شماره تلفن خود را وارد نمایید.";
+            errEl.classList.add('show');
+            phoneInput.classList.add('invalid');
+            phoneInput.focus();
+            return;
+        }
+        
+        // ۲. بررسی فرمت صحیح شماره
+        if(!/^(09|۰۹)[0-9۰-۹]{9}$/.test(val)) {
+            errEl.textContent = "شماره نامعتبر است (مثال: 0912).";
+            errEl.classList.add('show');
+            phoneInput.classList.add('invalid');
+            return;
+        }
+        
+        errEl.classList.remove('show');
+        phoneInput.classList.remove('invalid');
+        genErrEl.classList.remove('show');
+        
+        // ۳. حالت Loading دکمه
+        const originalText = e.target.innerHTML;
+        e.target.innerHTML = '<i class="fa-duotone fa-spinner-third fa-spin"></i> لطفا صبر کنید...';
+        e.target.style.pointerEvents = 'none';
+        e.target.style.opacity = '0.7';
+        
+        // ۴. ارسال درخواست به سرور
+        fetch('/api/auth/request-otp/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            body: JSON.stringify({ phone_number: val, intent: intent })
+        })
+        .then(res => res.json())
+        .then(data => {
+            if(data.success || data.rate_limited) {
+                // هدایت به صفحه تایید کد
+                window.location.href = '/auth/verify/';
+            } else {
+                // نمایش ارور از سمت سرور (مثلا کاربر یافت نشد)
+                genErrEl.textContent = data.message;
+                genErrEl.classList.add('show');
+                resetLinkBtn();
+            }
+        })
+        .catch(err => {
+            genErrEl.textContent = "خطا در ارتباط با سرور، لطفاً اینترنت را بررسی کنید.";
+            genErrEl.classList.add('show');
+            resetLinkBtn();
+        });
+
+        function resetLinkBtn() {
+            e.target.innerHTML = originalText;
+            e.target.style.pointerEvents = 'auto';
+            e.target.style.opacity = '1';
+        }
+    }
+    
+    // اتصال رویدادها
+    if(otpLink) otpLink.addEventListener('click', (e) => handleSpecialLoginRequest(e, 'login'));
+    if(forgotLink) forgotLink.addEventListener('click', (e) => handleSpecialLoginRequest(e, 'reset_password'));
+});
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}

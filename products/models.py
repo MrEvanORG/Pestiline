@@ -10,7 +10,7 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
 from django.utils import timezone
 from django.contrib.auth import get_user_model
-
+from django.db.models import Sum
 # --- توابع کمکی ---
 
 def get_file_path(instance, filename):
@@ -70,10 +70,20 @@ class SiteSettings(models.Model):
     maintenance_message = models.TextField(blank=True, null=True, verbose_name="متن صفحه غیرفعال")
     coming_soon_date = models.DateTimeField(null=True, blank=True, verbose_name="تاریخ و زمان بازگشایی")
     otp_time_interval = models.PositiveIntegerField(default=120, verbose_name="زمان انتظار ارسال مجدد کد (ثانیه)")
+    bypass_for_staff = models.BooleanField(
+        default=False, 
+        verbose_name="دسترسی آزاد برای کارمندان", 
+        help_text="اگر فعال باشد، کاربرانی که تیک 'کارمند' دارند، سایت را به صورت عادی مشاهده خواهند کرد."
+    )
+    bypass_for_superuser = models.BooleanField(
+        default=False, 
+        verbose_name="دسترسی آزاد برای ابرکاربر", 
+        help_text="اگر فعال باشد، کاربرانی که تیک 'ابرکاربر' دارند، سایت را به صورت عادی مشاهده خواهند کرد."
+    )
 
     link_phone1 = models.CharField(max_length=100,verbose_name='لینک تماس 1',null=True,blank=True)
     link_phone2 = models.CharField(max_length=100,verbose_name='لینک تماس 2',null=True,blank=True)
-    link_prphone = models.CharField(max_length=100,verbose_name='لینک شماره تماس ثابت ',null=True,blank=True)
+    link_prphone = models.CharField(max_length=100,verbose_name='لینک تلفن ثابت',null=True,blank=True)
     link_sitenumber = models.CharField(max_length=100,verbose_name='لینک شماره ارسال پیامک ثابت',null=True,blank=True)
     link_mail = models.CharField(max_length=100,verbose_name='لینک ایمیل سایت',null=True,blank=True)
     link_instagram = models.CharField(max_length=100,verbose_name='لینک اینستاگرام',null=True,blank=True)
@@ -95,6 +105,78 @@ class SiteSettings(models.Model):
         verbose_name = "تنظیمات سایت"
         verbose_name_plural = "تنظیمات سایت"
 
+class MessageSiteSettings(models.Model):
+    class NotifStatusChoices(models.TextChoices):
+        DISABLE = "DISABLE","غیر فعال"
+        ENABLE = "ENABLE","فعال"
+
+    # ta : to to admin
+    # tu : to user
+    # ts : to staff
+
+    # ---------- To Admin Message Section ----------
+
+    ta_new_user = models.CharField(
+        max_length=8,
+        choices=NotifStatusChoices,
+        default=NotifStatusChoices.DISABLE,
+        verbose_name='کاربر جدید',
+        help_text='اطلاع رسانی به ادمین سیگنال کاربر جدید',
+    )
+    
+    ta_new_order = models.CharField(
+        max_length=8,
+        choices=NotifStatusChoices,
+        default=NotifStatusChoices.DISABLE,
+        verbose_name='سفارش جدید',
+        help_text='اطلاع رسانی به ادمین سیگنال سفارش جدید',
+    )
+
+    ta_cancell_order = models.CharField(
+        max_length=8,
+        choices=NotifStatusChoices,
+        default=NotifStatusChoices.DISABLE,
+        verbose_name='لغو سفارش',
+        help_text='اطلاع رسانی به ادمین سیگنال لغو سفارش\nلغو سفارش توسط کاربر پس از تایید سبد خرید و قبل از پرداخت  هزینه .'
+    )
+    #---------- To User Message Section ----------
+    tu_wellcome = models.CharField(
+        max_length=8,
+        choices=NotifStatusChoices,
+        default=NotifStatusChoices.DISABLE,
+        verbose_name='خوشامدگویی',
+        help_text='خوشامدگویی به کاربر پس از ثبت نام',
+        )
+    tu_submit_order = models.CharField(
+        max_length=8,
+        choices=NotifStatusChoices,
+        default=NotifStatusChoices.DISABLE,
+        verbose_name='ثبت سفارش',
+        help_text='اطلاع رسانی به کاربر پس از ثبت شدن سفارش و ارسال کد پیگیری سفارش'
+    )
+    tu_send_order = models.CharField(
+        max_length=8,
+        choices=NotifStatusChoices,
+        default=NotifStatusChoices.DISABLE,
+        verbose_name='ارسال سفارش',
+        help_text='اطلاع رسانی به کاربر پس از ارسال سفارش و ارسال کد پیگیری پستی'
+    )
+    
+    primary_line_number = models.CharField(
+        max_length=100,
+        null=True,
+        blank=True,
+        verbose_name='شماره ارسال پیامک',
+    )
+
+
+    def __str__(self):
+        return "تنظیمات اطلاع رسانی پستیلاین"
+
+    class Meta:
+        verbose_name = "تنظیمات اطلاع رسانی"
+        verbose_name_plural = "تنظیمات اطلاع رسانی"
+
 # --- مدل‌های پایه (استان و شهر) ---
 class Province(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name="نام استان")
@@ -109,10 +191,20 @@ class City(models.Model):
 
 # --- مدل کاربر ---
 class User(AbstractUser):
+
+    class PrederefNotifChoices(models.TextChoices):
+        MESSAGE = "MESSAGE","پیامک"
+        EMAIL = "EMAIL","ایمیل"
+        DISABLE = "DISABLE","غیرفعال"
+
     phone_regex = RegexValidator(regex=r'^09\d{9}$', message="شماره موبایل باید ۱۱ رقم بوده و با ۰۹ شروع شود.")
     phone_number = models.CharField(validators=[phone_regex], max_length=11, unique=True, verbose_name="شماره همراه")
+    address = models.TextField(null=True, blank=True, verbose_name="آدرس پستی")
+    postal_code = models.CharField(max_length=10, null=True, blank=True, verbose_name="کد پستی")
     province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="استان")
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="شهر")
+    prefered_notification = models.CharField(max_length=8,choices=PrederefNotifChoices,default=PrederefNotifChoices.MESSAGE)
+    #اطلاع رسانی های پستیلاین شامل اعلان های ثبت سفارش / پاسخ داده شدن تیک ها / ارسال کد های پیگیری پستی یا کد های پیگیری سفارش هستند
 
     def clean(self):
         super().clean()
@@ -193,6 +285,27 @@ class Product(models.Model):
     def get_composition_list(self):
         if not self.is_mixed: return None
         return self.components.all().order_by('-percentage')
+    
+    @property
+    def sales_count(self):
+        """
+        تعداد دفعاتی که این محصول در سفارشات معتبر ثبت شده است.
+        """
+        valid_statuses = ['PROCESSING', 'SHIPPED', 'DELIVERED']
+        # از orderitem_set برای دسترسی معکوس از محصول به اقلام سفارش استفاده می‌کنیم
+        return self.orderitem_set.filter(order__status__in=valid_statuses).count()
+
+    @property
+    def total_volume_sold(self):
+        """
+        مجموع مقدار فروخته شده (مجموع کیلوگرم یا تعداد بسته‌ها)
+        """
+        valid_statuses = [ 'PROCESSING', 'SHIPPED', 'DELIVERED']
+        result = self.orderitem_set.filter(
+            order__status__in=valid_statuses
+        ).aggregate(total=Sum('quantity'))
+        
+        return result['total'] or 0
 # --- مدل اجزای تشکیل‌دهنده ---
 class ProductComponent(models.Model):
     PROCESSING_CHOICES = [('RAW', 'خام'), ('ROASTED', 'شور/بو داده')]
@@ -235,11 +348,14 @@ class ProductImage(models.Model):
 # ... (کدهای قبلی مدل Product و ... )
 
 # --- ۶. مدل‌های سفارش (Order System) ---
+import string
+import random
 from decimal import Decimal
+# ... سایر ایمپورت‌ها ...
 
 class Order(models.Model):
     STATUS_CHOICES = [
-        ('CART', 'سبد خرید (در انتظار تکمیل)'),        # <--- وضعیت جدید
+        ('CART', 'سبد خرید (در انتظار تکمیل)'),
         ('PENDING', 'در انتظار پرداخت (تایید شده)'),
         ('PROCESSING', 'در حال پردازش (تایید پرداخت)'),
         ('SHIPPED', 'ارسال شده'),
@@ -248,9 +364,13 @@ class Order(models.Model):
     ]
 
     customer = models.ForeignKey(User, on_delete=models.CASCADE, related_name='orders', verbose_name="مشتری")
+    
+    # فیلد کد پیگیری اختصاصی و یکتای سایت (اضافه شده)
+    order_number = models.CharField(max_length=20, unique=True, null=True, blank=True, verbose_name="شماره سفارش")
+    
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='PENDING', verbose_name="وضعیت")
     
-    # اطلاعات گیرنده (بدون شهر و استان طبق درخواست)
+    # اطلاعات گیرنده (بدون شهر و استان طبق ساختار جدید)
     receiver_name = models.CharField(max_length=100, verbose_name="نام گیرنده")
     receiver_phone = models.CharField(max_length=15, verbose_name="شماره تماس گیرنده")
     address = models.TextField(verbose_name="آدرس دقیق پستی")
@@ -267,10 +387,25 @@ class Order(models.Model):
     # سایر فیلدها
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ثبت")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="آخرین بروزرسانی")
+    
+    # کدی که اداره پست برای پیگیری می‌دهد
     tracking_code = models.CharField(max_length=50, blank=True, null=True, verbose_name="کد پیگیری پستی")
 
-    def __str__(self):
-        return f"سفارش #{self.id} - {self.customer.get_full_name()}"
+# در فایل models.py - متد save در کلاس Order
+
+    def save(self, *args, **kwargs):
+        # تولید خودکار شماره سفارش ۵ رقمی عددی
+        if not self.order_number:
+            while True:
+                # تولید یک عدد تصادفی بین 10000 تا 99999
+                random_code = random.randint(10000, 99999)
+                new_number = f"PST-{random_code}"
+                
+                if not Order.objects.filter(order_number=new_number).exists():
+                    self.order_number = new_number
+                    break
+                    
+        super().save(*args, **kwargs)
 
     def calculate_total(self):
         """محاسبه مجدد قیمت کل سفارش"""
@@ -279,10 +414,15 @@ class Order(models.Model):
         self.total_price = items_total + shipping
         self.save()
 
+    def __str__(self):
+        # نمایش شماره سفارش اختصاصی در پنل ادمین
+        return f"سفارش {self.order_number} - {self.customer.get_full_name()}"
+
     class Meta:
         verbose_name = "سفارش"
         verbose_name_plural = "سفارشات"
         ordering = ['-created_at']
+
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items', verbose_name="سفارش")
@@ -302,10 +442,7 @@ class OrderItem(models.Model):
         return f"{self.product.name} ({self.quantity} {unit})"
 
     def get_cost(self):
-        """
-        محاسبه قیمت: مقدار * قیمت واحد
-        """
-        # اصلاح باگ: اگر قیمت یا مقدار هنوز وارد نشده (مثل ردیف‌های خالی در ادمین)، صفر برگردان
+        """محاسبه قیمت: مقدار * قیمت واحد"""
         if not self.price or not self.quantity:
             return 0
             
@@ -316,7 +453,7 @@ class OrderItem(models.Model):
         if not self.price:
             self.price = self.product.price
         super().save(*args, **kwargs)
-        # آپدیت قیمت کل سفارش
+        # آپدیت قیمت کل سفارش به محض ذخیره آیتم جدید
         self.order.calculate_total()
 
     class Meta:

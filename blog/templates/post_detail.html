@@ -1,0 +1,235 @@
+{% extends "patterns/main_base.html" %}
+{% load static %}
+
+{% block title %}{{ post.title }}{% endblock %}
+{% block description %}{{ post.meta_description|default:post.title }}{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'blog/css/blog.css' %}">
+{% endblock %}
+
+{% block content %}
+<div id="readingProgressBar"></div>
+{% with author_resume=post.author.resume_set.first %}
+
+<section class="post-page-header">
+    <div class="post-container post-page-header__inner">
+        
+        <nav class="custom-breadcrumbs" aria-label="مسیر صفحه">
+            <a href="{% url 'index' %}" class="breadcrumb-item">
+                <i class="fa-regular fa-house-chimney"></i><span>خانه</span>
+            </a>
+            <span class="separator"><i class="fa-regular fa-chevron-left"></i></span>
+            <a href="{% url 'blog:blog_index' %}" class="breadcrumb-item">
+                <i class="fa-regular fa-newspaper"></i><span>وبلاگ</span>
+            </a>
+            {% if post.category %}
+            <span class="separator"><i class="fa-regular fa-chevron-left"></i></span>
+            <a href="{{ post.category.get_absolute_url }}" class="breadcrumb-item">
+                <i class="fa-regular fa-folder-open"></i><span>{{ post.category.title }}</span>
+            </a>
+            {% endif %}
+            <span class="separator"><i class="fa-regular fa-chevron-left"></i></span>
+            <span class="breadcrumb-item breadcrumb-item--current">
+                <i class="fa-regular fa-file-lines"></i><span>{{ post.title|truncatechars:30 }}</span>
+            </span>
+        </nav>
+
+        <div class="post-page-header__meta">
+            <h1 class="post-page-header__title">{{ post.title }}</h1>
+
+            {% if post.short_description or post.meta_description %}
+            <p class="post-page-header__excerpt">
+                {{ post.short_description|default:post.meta_description }}
+            </p>
+            {% endif %}
+
+            <div class="post-author-row">
+                {% if author_resume and author_resume.avatar %}
+                    <img src="{{ author_resume.avatar.url }}" alt="{{ author_resume.name }}" class="post-author-row__avatar">
+                {% elif post.author.profile.avatar %}
+                    <img src="{{ post.author.profile.avatar.url }}" alt="{{ post.author.get_full_name }}" class="post-author-row__avatar">
+                {% else %}
+                    <div class="post-author-row__avatar post-author-row__avatar--placeholder">
+                        <i class="fa-regular fa-user"></i>
+                    </div>
+                {% endif %}
+
+                <div class="post-author-row__info">
+                    <span class="post-author-row__name">
+                        نوشته شده توسط: 
+                        <strong>{% if author_resume %}{{ author_resume.name }}{% else %}{{ post.author.get_full_name|default:post.author.username }}{% endif %}</strong>
+                    </span>
+                    <div class="post-author-row__dates">
+                        <span class="post-author-row__date">
+                            <i class="fa-regular fa-calendar-days"></i> انتشار: {{ post.created_at|date:"Y/m/d" }}
+                        </span>
+                        {% if post.updated_at.date != post.created_at.date %}
+                        <span class="post-author-row__date">
+                            <i class="fa-regular fa-pen-to-square"></i> بروزرسانی: {{ post.updated_at|date:"Y/m/d" }}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+
+                {% if post.reading_time %}
+                <div class="post-reading-time">
+                    <i class="fa-slab-press fa-hourglass-half"></i>
+                    <span>{{ post.reading_time }} دقیقه مطالعه</span>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="post-page-header__cover">
+            {% if post.cover_image %}
+                <img src="{{ post.cover_image.url }}" alt="{{ post.title }}" class="post-cover-img">
+            {% else %}
+                <div class="post-cover-placeholder"><i class="fa-slab-press fa-image"></i></div>
+            {% endif %}
+        </div>
+
+    </div>
+</section>
+
+<div class="post-body-wrapper">
+    <div class="post-container post-body-grid">
+        
+        <main class="post-content-col" id="postContent">
+        {% for block in post.blocks.all %}
+            {% if block.block_type == 'h2' %}
+                <h2 id="heading-{{ forloop.counter }}" class="post-block post-block--h2 toc-heading">
+                    {{ block.content }}
+                </h2>
+            {% elif block.block_type == 'h3' %}
+                <h3 id="heading-{{ forloop.counter }}" class="post-block post-block--h3 toc-heading">
+                    {{ block.content }}
+                </h3>
+            {% elif block.block_type == 'quote' %}
+                <div class="post-block post-block--quote">
+                    <i class="fa-slab-press fa-quote-right quote-icon"></i>
+                    <div class="quote-text">{{ block.content }}</div>
+                </div>
+            {% elif block.block_type == 'p' %}
+                <p class="post-block post-block--p">{{ block.content|safe }}</p>
+            {% elif block.block_type == 'list' %}
+                <div class="post-block post-block--list raw-text-list">{{ block.content }}</div>
+            {% elif block.block_type == 'image' %}
+                <figure class="post-block post-block--image">
+                    {% if block.image %}
+                        <img src="{{ block.image.url }}" alt="{{ block.content|default:post.title }}">
+                    {% endif %}
+                    {% if block.content %}
+                        <figcaption>{{ block.content }}</figcaption>
+                    {% endif %}
+                </figure>
+            {% elif block.block_type == 'gallery' %}
+                <!-- این آیتم توسط JS پردازش و در صورت توالی، گروه بندی می‌شود -->
+                <figure class="raw-gallery-item" data-caption="{{ block.content|default:'' }}">
+                    {% if block.image %}
+                        <img src="{{ block.image.url }}" alt="Gallery Image">
+                    {% endif %}
+                </figure>
+            {% else %}
+                <div class="post-block post-block--generic">{{ block.content|safe }}</div>
+            {% endif %}
+        {% empty %}
+            <p>محتوایی برای این مقاله ثبت نشده است.</p>
+        {% endfor %}
+
+            {# ── بخش ۱: کارت رزومه ── #}
+            {% if author_resume %}
+            <a href="{{ author_resume.get_absolute_url }}" class="author-resume-card">
+                <div class="author-resume-card__top-row">
+                    <div class="author-identity">
+                        {% if author_resume.avatar %}
+                            <img src="{{ author_resume.avatar.url }}" alt="{{ author_resume.name }}" class="author-avatar">
+                        {% else %}
+                            <div class="author-avatar placeholder-avatar"><i class="fa-slab-press fa-user"></i></div>
+                        {% endif %}
+                        <div class="author-texts">
+                            <span class="author-label">درباره نویسنده</span>
+                            <h4 class="author-name">{{ author_resume.name }}</h4>
+                            <span class="author-role">{{ author_resume.title }}</span>
+                        </div>
+                    </div>
+                    <div class="author-socials">
+                        {% if author_resume.telegram_url %}<span class="social-icon telegram"><i class="fa-brands fa-telegram"></i></span>{% endif %}
+                        {% if author_resume.twitter_url %}<span class="social-icon x"><i class="fa-brands fa-x-twitter"></i></span>{% endif %}
+                        {% if author_resume.instagram_url %}<span class="social-icon instagram"><i class="fa-brands fa-instagram"></i></span>{% endif %}
+                    </div>
+                </div>
+                {% if author_resume.about_me %}
+                <div class="author-resume-card__bottom-row">
+                    <p>{{ author_resume.about_me|truncatechars:180 }}</p>
+                </div>
+                {% endif %}
+            </a>
+            {% endif %}
+
+            {# ── بخش ۳: اشتراک گذاری (عرض کامل) ── #}
+            <div class="post-share-minimal">
+                <span class="share-title">اشتراک‌گذاری مقاله</span>
+                <div class="share-actions">
+                    <a href="https://t.me/share/url?url={{ request.build_absolute_uri }}&text={{ post.title|urlencode }}" target="_blank" class="share-btn share-telegram" title="تلگرام">
+                        <i class="fa-brands fa-telegram"></i>
+                    </a>
+                    <a href="https://twitter.com/intent/tweet?url={{ request.build_absolute_uri }}&text={{ post.title|urlencode }}" target="_blank" class="share-btn share-x" title="ایکس">
+                        <i class="fa-brands fa-x-twitter"></i>
+                    </a>
+                    <button class="share-btn share-link" title="کپی لینک" id="copy-link-btn" data-url="{{ request.build_absolute_uri }}">
+                        <i class="fa-regular fa-link"></i>
+                    </button>
+                </div>
+            </div>
+
+            {# ── بخش ۲: برچسب‌ها ── #}
+            {% if post.tags.all %}
+            <div class="post-tags-container">
+                <div class="post-tags-header">
+                    <i class="fa-slab-press fa-tags"></i>هشتگ ها :
+                </div>
+                <div class="post-tags-list">
+                    {% for tag in post.tags.all %}
+                        <a href="#" class="tag-item">#{{ tag.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+        </main>
+
+        <aside class="post-sidebar-col" id="postSidebar">
+            <div class="sidebar-widget sidebar-widget--toc" id="tocWidget">
+                <div class="sidebar-widget__header">
+                    <i class="fa-regular fa-list-ul"></i>
+                    <span>فهرست مطالب</span>
+                </div>
+                <nav class="toc-list" id="tocList" aria-label="فهرست مطالب"></nav>
+            </div>
+        </aside>
+
+    </div>
+</div>
+{% endwith %}
+
+<div class="copy-toast" id="copyToast">
+    <i class="fa-regular fa-circle-check"></i> لینک مقاله کپی شد!
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    const djangoTOCData = [
+        {% for block in post.blocks.all %}
+            {% if block.block_type == 'h2' %}
+                { id: "heading-{{ forloop.counter }}", text: "{{ block.content|escapejs }}", level: 2 },
+            {% elif block.block_type == 'h3' %}
+                { id: "heading-{{ forloop.counter }}", text: "{{ block.content|escapejs }}", level: 3 },
+            {% endif %}
+        {% endfor %}
+    ];
+</script>
+<script src="{% static 'blog/js/blog.js' %}"></script>
+{% endblock %}

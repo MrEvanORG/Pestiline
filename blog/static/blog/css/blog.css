@@ -1,0 +1,324 @@
+:root {
+    --post-primary: var(--primary, #123524);
+    --post-secondary: var(--secondary, #85A947);
+    --post-text: #333;
+    --post-muted: #666;
+    --post-border: #e8e8e8;
+    --post-bg-light: #fbfbfb;
+    --post-radius: 12px;
+}
+
+/* ── کانتینر اصلی و فاصله‌ها ── */
+.post-container {
+    width: 100%;
+    max-width: 1280px; /* این عدد استاندارد اکثر قالب‌هاست، هماهنگ با main.css شما */
+    margin: 0 auto;
+    padding: 0 2rem; /* فاصله از طرفین در دسکتاپ */
+}
+
+/* ── نوار پیشرفت مطالعه ── */
+#readingProgressBar {
+    position: fixed;
+    /* اگر منوی شما ثابت است و ارتفاع مشخصی دارد (مثلاً 70px)، top را روی آن عدد تنظیم کنید: */
+    top:89px; /* این مقدار را با ارتفاع منوی main_base خود جایگزین کنید */
+    right: 0;
+    width: 0%;
+    height: 4px;
+    background-color: var(--post-primary); /* رنگ اصلی */
+    z-index: 9999;
+    transition: width 0.1s ease-out;
+}
+
+@media (max-width:992px) {
+    #readingProgressBar {
+        top:74px;
+    }
+}
+
+/* ── هدر مقاله ── */
+.post-page-header { background: #fff; padding: 3rem 0; border-bottom: 1px solid var(--post-border); }
+.post-page-header__inner {
+    display: grid;
+    grid-template-areas: "breadcrumb cover" "meta cover";
+    grid-template-columns: 1.2fr 1fr;
+    gap: 1.5rem 4rem;
+    align-items: start;
+}
+
+.custom-breadcrumbs { grid-area: breadcrumb; }
+.post-page-header__meta { grid-area: meta; display: flex; flex-direction: column; gap: 1rem; }
+.post-page-header__cover { grid-area: cover; }
+.post-page-header__title { font-size: 2.2rem; color: var(--post-primary); line-height: 1.5; margin: 0; }
+.post-page-header__excerpt { font-size: 1.1rem; color: var(--post-muted); line-height: 1.8; margin: 0 0 1rem; text-align: justify; }
+
+.post-author-row { display: flex; align-items: center; flex-wrap: wrap; gap: 1.2rem; padding-top: 1rem; border-top: 1px solid var(--post-border); }
+.post-author-row__avatar { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; }
+.post-author-row__avatar--placeholder { background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #999; font-size: 1.2rem; }
+.post-author-row__info { display: flex; flex-direction: column; gap: 6px; }
+.post-author-row__name { font-size: 0.95rem; color: var(--post-muted); }
+.post-author-row__name strong { color: var(--post-primary); }
+.post-author-row__dates { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; font-size: 0.8rem; color: #888; }
+
+/* استایل جدید زمان مطالعه */
+.post-reading-time {
+    margin-right: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(133, 169, 71, 0.1); /* رنگ پس زمینه لایت بر اساس secondary */
+    color: var(--post-primary);
+    padding: 8px 16px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.85rem;
+    border: 1px solid rgba(133, 169, 71, 0.2);
+}
+
+.post-cover-img { width: 100%; aspect-ratio: 16/10; object-fit: cover; border-radius: var(--post-radius); box-shadow: 0 8px 24px rgba(0,0,0,0.06);transition:transform 0.5s cubic-bezier(0.25, 0.45, 0.45, 0.95)}
+.post-cover-img:hover{transform:scale()}
+/* ── بدنه مقاله ── */
+.post-body-wrapper { padding: 4rem 0; background: transparent; }
+.post-body-grid { display: grid; grid-template-columns: 7fr 3fr; gap: 4rem; align-items: start; }
+
+/* سایدبار و TOC */
+.post-sidebar-col { position: sticky; top: 120px; }
+.sidebar-widget { background: #fff; border: 1px solid var(--post-border); border-radius: var(--post-radius); }
+.sidebar-widget__header { padding: 15px 20px; background: #fafafa; font-weight: bold; color: var(--post-primary); display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--post-border); border-radius: var(--post-radius) var(--post-radius) 0 0; }
+.toc-list { padding: 10px 0; max-height: 70vh; overflow-y: auto; }
+.toc-item { display: block; padding: 10px 20px; font-size: 0.9rem; color: var(--post-muted); border-right: 3px solid transparent; transition: 0.2s; text-decoration: none; }
+.toc-item:hover, .toc-item.active { color: var(--post-primary); font-weight: bold; background: rgba(0,0,0,0.02); border-right-color: var(--post-secondary); }
+.toc-item--h3 { padding-right: 35px; font-size: 0.85rem; opacity: 0.9; }
+
+/* محتوای اصلی */
+.post-content-col { min-width: 0; }
+.post-block--h2 { font-size: 1.8rem; color: var(--post-primary); margin: 3rem 0 1rem; scroll-margin-top: 120px; }
+.post-block--h3 { font-size: 1.4rem; color: var(--post-primary); margin: 2.5rem 0 1rem; scroll-margin-top: 120px; }
+.post-block--p { font-size: 1.1rem; line-height: 2.1; color: var(--post-text); margin-bottom: 1.5rem; text-align: justify; }
+.post-block--image img { width: 100%; border-radius: var(--post-radius); margin-bottom: 10px; }
+.post-block--image figcaption { text-align: center; font-size: 0.85rem; color: #888; }
+
+/* استایل جدید شیک و مینیمال برای نقل قول */
+/* ── استایل جدید نقل قول ── */
+/* ── استایل جدید نقل قول با کلاسیک FA ── */
+.post-block--quote {
+    margin: 2.5rem 0;
+    position: relative;
+    /* بدون کادر (border) */
+}
+
+/* استایل آیکون Font Awesome */
+.post-block--quote .quote-icon {
+    display: block;
+    font-size: 2rem;
+    color: var(--post-secondary);
+    margin-bottom: 15px;
+}
+
+/* پس‌زمینه و شیفت به جلو برای متن */
+.post-block--quote .quote-text {
+    background-color: #f6f8f7; /* پس‌زمینه متمایز */
+    padding: 1.5rem 2rem;
+    margin-right: 3rem; /* شیفت به جلو (راست) معادل یک تب */
+    border-radius: 8px;
+    font-size: 1.1rem;
+    line-height: 2;
+    color: var(--post-primary);
+}
+
+/* =========================================
+   استایل‌های لیست موردی (List Block)
+   ========================================= */
+/* باکس کلی لیست (اختیاری: برای جدا کردن لیست از متن اصلی) */
+.post-block--list {
+    background-color: var(--bg-surface, #fbfbfb);
+    padding: 1.5rem 2rem;
+    border-radius: 12px;
+    margin: 2rem 0;
+    border: 1px solid rgba(0,0,0,0.03);
+}
+
+/* ساختار اصلی لیست */
+.post-list-elegant {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+/* استایل هر آیتم (مورد) */
+.post-list-elegant li {
+    position: relative;
+    padding-right: 24px; /* ایجاد فضا برای دایره سمت راست */
+    margin-bottom: 1.2rem;
+    font-size: 1.05rem;
+    line-height: 1.2;
+    color: var(--text-dark, #333);
+    transition: all 0.3s ease;
+}
+
+/* حذف فاصله از پایین برای آخرین آیتم */
+.post-list-elegant li:last-child {
+    margin-bottom: 0;
+}
+
+/* استایل دایره و ظرافت‌های آن */
+.post-list-elegant li::before {
+    content: '';
+    position: absolute;
+    right: 4px; /* تنظیم موقعیت دایره در راست */
+    top: 0.4rem; /* هم‌تراز کردن با وسط خط اول متن */
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background-color: var(--primary, #2ecc71); /* رنگ اصلی شما */
+    /* ایجاد یک حلقه ظریف با فاصله دور دایره */
+    outline: 2px solid var(--primary, #2ecc71);
+    outline-offset: 2px;
+    opacity: 0.8;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+}
+
+
+
+/* =========================================
+   استایل‌های گالری هوشمند (Smart Gallery)
+   ========================================= */
+.post-gallery-wrapper {
+    margin: 2.5rem 0;
+    width: 100%;
+}
+
+.post-gallery-grid {
+    display: grid;
+    gap: 15px;
+    border-radius: 16px;
+    overflow: hidden;
+}
+
+.post-gallery-grid figure {
+    margin: 0;
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    height: 100%;
+}
+
+.post-gallery-grid img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease;
+    min-height: 200px;
+}
+
+.post-gallery-grid figure:hover img {
+    transform: scale(1.08);
+}
+
+/* ساختار داینامیک بر اساس تعداد تصاویر */
+.post-gallery-grid[data-count="2"] {
+    grid-template-columns: 1fr 1fr;
+}
+
+.post-gallery-grid[data-count="3"] {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+.post-gallery-grid[data-count="4"] {
+    grid-template-columns: repeat(2, 1fr);
+}
+
+.post-gallery-grid[data-count="5"] {
+    grid-template-columns: repeat(6, 1fr);
+}
+.post-gallery-grid[data-count="5"] figure:nth-child(1),
+.post-gallery-grid[data-count="5"] figure:nth-child(2) {
+    grid-column: span 3;
+}
+.post-gallery-grid[data-count="5"] figure:nth-child(n+3) {
+    grid-column: span 2;
+}
+
+.post-gallery-grid[data-count="6"] {
+    grid-template-columns: repeat(3, 1fr);
+}
+
+/* ریسپانسیو گالری برای موبایل و تبلت */
+@media (max-width: 768px) {
+    .post-gallery-grid[data-count="3"],
+    .post-gallery-grid[data-count="4"],
+    .post-gallery-grid[data-count="5"],
+    .post-gallery-grid[data-count="6"] {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .post-gallery-grid[data-count="5"] figure:nth-child(n) {
+        grid-column: span 1; /* لغو استایل‌های دسکتاپ */
+    }
+    .post-gallery-grid[data-count="5"] figure:last-child {
+        grid-column: span 2; /* عکس پنجم عرض کامل در یک ردیف */
+    }
+}
+
+@media (max-width: 480px) {
+    .post-gallery-grid[data-count] {
+        grid-template-columns: 1fr !important; /* همه چیز در موبایل یک ستونه */
+    }
+    .post-gallery-grid[data-count="5"] figure:last-child {
+        grid-column: span 1;
+    }
+}
+
+
+
+/* ترتیب انتهای مقاله: ۱.کارت نویسنده، ۲.تگ‌ها، ۳.اشتراک گذاری */
+.author-resume-card { display: block; margin-top: 4rem; background: #fff; border: 1px solid var(--post-border); border-radius: var(--post-radius); padding: 2rem; text-decoration: none; transition: 0.3s; box-shadow: 0 4px 15px rgba(0,0,0,0.02); }
+.author-resume-card:hover { border-color: var(--post-secondary); box-shadow: 0 10px 25px rgba(0,0,0,0.06); transform: translateY(-3px); }
+.author-resume-card__top-row { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1.5rem; }
+.author-identity { display: flex; align-items: center; gap: 1rem; }
+.author-avatar, .placeholder-avatar { width: 70px; height: 70px; border-radius: 50%; object-fit: cover; }
+.placeholder-avatar { background: #f0f0f0; display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 1.5rem; }
+.author-label { font-size: 0.75rem; color: #999; text-transform: uppercase; letter-spacing: 1px; }
+.author-name { margin: 3px 0; font-size: 1.2rem; color: var(--post-primary); }
+.author-role { font-size: 0.85rem; color: var(--post-secondary); font-weight: 600; }
+.author-socials { display: flex; gap: 10px; }
+.social-icon { width: 35px; height: 35px; border-radius: 50%; background: #f5f5f5; color: var(--post-muted); display: flex; align-items: center; justify-content: center; transition: 0.3s; }
+.author-resume-card__bottom-row p { margin: 0; color: var(--post-muted); font-size: 0.95rem; line-height: 1.8; text-align: justify; }
+
+.post-tags-container { margin-top: 2rem; display: flex; align-items: flex-start; gap: 1rem; }
+.post-tags-header { color: var(--post-secondary); font-weight: bold; margin-top: 5px; }
+.post-tags-list { display: flex; flex-wrap: wrap; gap: 10px; }
+.tag-item { background: #fff; border: 1px solid var(--post-border); color: var(--post-muted); padding: 6px 16px; border-radius: 50px; font-size: 0.85rem; transition: 0.2s; text-decoration: none; }
+.tag-item:hover { background: var(--post-secondary); color: #fff; border-color: var(--post-secondary); }
+
+/* عرض کامل برای اشتراک گذاری */
+.post-share-minimal { 
+    margin-top: 2rem; 
+    background: #fff; 
+    padding: 1.5rem 2rem; 
+    border-radius: var(--post-radius); 
+    border: 1px solid var(--post-border); 
+    display: flex; 
+    justify-content: space-between; 
+    align-items: center; 
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.02);
+}
+.share-title { font-weight: bold; font-size: 1rem; color: var(--post-primary); }
+.share-actions { display: flex; gap: 15px; }
+.share-btn { width: 40px; height: 40px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; border: none; font-size: 1.2rem; cursor: pointer; text-decoration: none; transition: 0.2s; }
+.share-btn:hover { transform: translateY(-3px); }
+.share-telegram { background: #0088cc; }
+.share-x { background: #0f1419; }
+.share-link { background: #777; }
+
+.copy-toast { position: fixed; bottom: 30px; left: 50%; transform: translateX(-50%) translateY(100px); background: #333; color: #fff; padding: 12px 25px; border-radius: 50px; opacity: 0; transition: 0.4s; z-index: 1000; display: flex; gap: 8px; pointer-events: none; }
+.copy-toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+
+@media (max-width: 991px) {
+    .post-page-header__inner { grid-template-areas: "breadcrumb" "cover" "meta"; grid-template-columns: 1fr; padding: 0 1rem; }
+    .post-body-grid { grid-template-columns: 1fr; gap: 2rem; padding: 0 1rem; }
+    .post-sidebar-col { position: static; order: -1; }
+    .author-resume-card__top-row { flex-direction: column; gap: 1.5rem; }
+    .author-socials { width: 100%; justify-content: flex-end; border-top: 1px solid var(--post-border); padding-top: 1rem; }
+    .post-share-minimal { flex-direction: column; gap: 1rem; text-align: center; }
+}

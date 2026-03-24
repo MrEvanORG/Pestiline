@@ -1,0 +1,69 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تنظیم رمز عبور جدید | پستیلاین</title>
+    <link href="{% static 'products/css/Vazirmatn.css' %}" rel="stylesheet" type="text/css" />
+    <link rel="stylesheet" href="{% static 'products/css/all_awesome.css' %}"/>
+    <link rel="stylesheet" href="{% static 'products/css/main.css' %}"/> 
+    <link rel="stylesheet" href="{% static 'products/css/auth.css' %}"/> 
+</head>
+<body class="auth-page">
+
+    <div class="auth-container">
+        <div class="auth-logo">
+            <a href="{% url 'index' %}">
+                <img src="{% static 'products/img/light-logo.svg' %}" alt="پستیلاین">
+            </a>
+        </div>
+
+        <div class="auth-card">
+            <div style="text-align: center; margin-bottom: 25px;">
+                <div style="width: 60px; height: 60px; background: #eef5e6; color: var(--secondary); border-radius: 50%; font-size: 1.8rem; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px;">
+                    <i class="fa-slab-press fa-regular fa-lock-keyhole"></i>
+                </div>
+                <h2 style="font-size: 1.4rem; color: var(--primary); margin-bottom: 5px; font-weight: 900;">رمز عبور جدید</h2>
+                <p style="font-size: 0.9rem; color: #666;">لطفاً رمز عبور جدید و قدرتمندی برای حساب خود انتخاب کنید.</p>
+            </div>
+
+            <form method="POST" id="reset-password-form" class="auth-form active" novalidate>
+                {% csrf_token %}
+                
+                <div class="error-box global-error {% if form.non_field_errors %}show{% endif %}">
+                    {{ form.non_field_errors.0 }}
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fa-slab-press fa-regular fa-key"></i> رمز عبور جدید</label>
+                    <div class="password-wrapper">
+                        {{ form.password }}
+                        <i class="fa-slab-press fa-regular fa-eye-slash toggle-password" onclick="togglePassword('{{ form.password.id_for_label }}', this)"></i>
+                    </div>
+                    <span class="error-box {% if form.password.errors %}show{% endif %}" id="error-password">
+                        {{ form.password.errors.0 }}
+                    </span>
+                </div>
+                
+                <div class="form-group">
+                    <label><i class="fa-slab-press fa-regular fa-check-double"></i> تکرار رمز عبور جدید</label>
+                    <div class="password-wrapper">
+                        {{ form.confirm_password }}
+                        <i class="fa-slab-press fa-regular fa-eye-slash toggle-password" onclick="togglePassword('{{ form.confirm_password.id_for_label }}', this)"></i>
+                    </div>
+                    <span class="error-box {% if form.confirm_password.errors %}show{% endif %}" id="error-confirm_password">
+                        {{ form.confirm_password.errors.0 }}
+                    </span>
+                </div>
+                
+                <button type="submit" class="btn-auth" id="btn-submit-reset" disabled>
+                    <i class="fa-slab-press fa-regular fa-floppy-disk"></i> ذخیره رمز و ورود
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script src="{% static 'products/js/auth_reset.js' %}"></script>
+</body>
+</html>

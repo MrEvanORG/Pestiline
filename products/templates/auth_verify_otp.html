@@ -1,78 +1,58 @@
+{% extends "patterns/auth_base.html" %}
 {% load static %}
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>تایید شماره همراه | پستیلاین</title>
-    <link href="{% static 'products/css/Vazirmatn.css' %}" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="{% static 'products/css/all_awesome.css' %}"/>
-    <link rel="stylesheet" href="{% static 'products/css/main.css' %}"/> 
-    <link rel="stylesheet" href="{% static 'products/css/auth.css' %}"/> 
-</head>
-<body class="auth-page">
-
-    <div class="auth-container">
-        <div class="auth-logo">
-            <a href="/">
-                <img src="{% static 'products/img/light-logo.svg' %}" alt="پستیلاین">
+{% block title %}تایید شماره همراه | پستیلاین{% endblock %}
+{% block description %}لطفا کد ارسال شده به شماره وارده را وارد نمایید .{% endblock %}
+{% block content %}
+<div class="auth-card otp-card">
+    <div class="otp-header">
+        <div class="icon-circle">
+            <i class="fa-slab-press fa-regular fa-shield-check"></i>
+        </div>
+        <h2>کد تایید را وارد کنید</h2>
+        <p>
+            کد ۶ رقمی ارسال شده به <strong dir="ltr" id="user-phone-display">{{ user_phone }}</strong>
+            <br>
+            <a href="javascript:history.back()" class="edit-number-link">
+                <i class="fa-regular fa-pen-to-square"></i> اصلاح شماره
             </a>
-        </div>
-
-        <div class="auth-card otp-card">
-            <div class="otp-header">
-                <div class="icon-circle">
-                    <i class="fa-slab-press fa-regular fa-shield-check"></i>
-                </div>
-                <h2>کد تایید را وارد کنید</h2>
-                <p>
-                    کد ۶ رقمی ارسال شده به <strong dir="ltr" id="user-phone-display">{{ user_phone }}</strong>
-                    <br>
-                    <a href="javascript:history.back()" class="edit-number-link">
-                        <i class="fa-regular fa-pen-to-square"></i> اصلاح شماره
-                    </a>
-                </p>
-            </div>
-
-            <form id="otp-form" class="auth-form active" novalidate>
-                
-                <div class="otp-wrapper" dir="ltr">
-                    <input type="tel" id="otp-real-input" class="otp-real-input" 
-                           maxlength="6" autocomplete="one-time-code" inputmode="numeric" autofocus>
-                    
-                    <div class="otp-display" id="otp-display">
-                        <div class="otp-box"></div>
-                        <div class="otp-box"></div>
-                        <div class="otp-box"></div>
-                        <div class="otp-box"></div>
-                        <div class="otp-box"></div>
-                        <div class="otp-box"></div>
-                    </div>
-                </div>
-                
-                <span class="error-box center-text" id="otp-error"></span>
-
-                <div class="resend-wrapper">
-                    <span id="timer-text" class="timer-text">
-                        ارسال مجدد کد تا <span id="countdown"></span> دیگر
-                    </span>
-                    <button type="button" id="resend-btn" class="btn-resend" disabled>
-                        <i class="fa-regular fa-rotate-right"></i> ارسال مجدد کد
-                    </button>
-                </div>
-
-                <button type="submit" class="btn-auth" id="verify-btn">
-                    تایید و ورود
-                </button>
-            </form>
-        </div>
+        </p>
     </div>
 
-    <script>
-        {% comment %} // اگر تایمر صفر باشد یعنی زمان تمام شده و دکمه ارسال مجدد باید فعال شود {% endcomment %}
-        const SERVER_TIMER_REMAINING = {{ timer_duration|default:0 }};
-    </script>
-    
-    <script src="{% static 'products/js/otp.js' %}"></script>
-</body>
-</html>
+    <form id="otp-form" class="auth-form active" novalidate>
+        
+        <div class="otp-wrapper" dir="ltr">
+            <input type="tel" id="otp-real-input" class="otp-real-input" 
+                    maxlength="6" autocomplete="one-time-code" inputmode="numeric" autofocus>
+            
+            <div class="otp-display" id="otp-display">
+                <div class="otp-box"></div>
+                <div class="otp-box"></div>
+                <div class="otp-box"></div>
+                <div class="otp-box"></div>
+                <div class="otp-box"></div>
+                <div class="otp-box"></div>
+            </div>
+        </div>
+        
+        <span class="error-box center-text" id="otp-error"></span>
+
+        <div class="resend-wrapper">
+            <span id="timer-text" class="timer-text">
+                ارسال مجدد کد تا <span id="countdown"></span> دیگر
+            </span>
+            <button type="button" id="resend-btn" class="btn-resend" disabled>
+                <i class="fa-regular fa-rotate-right"></i> ارسال مجدد کد
+            </button>
+        </div>
+
+        <button type="submit" class="btn-auth" id="verify-btn">
+            تایید و ورود
+        </button>
+    </form>
+</div>
+{% endblock %}
+{% block script %}
+{% comment %} // اگر تایمر صفر باشد یعنی زمان تمام شده و دکمه ارسال مجدد باید فعال شود {% endcomment %}
+<script>const SERVER_TIMER_REMAINING = {{ timer_duration|default:0 }};</script>
+<script src="{% static 'products/js/otp.js' %}"></script>
+{% endblock %}

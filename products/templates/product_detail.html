@@ -1,6 +1,7 @@
 {% extends 'patterns/main_base.html' %}
 {% load static %}
 {% load humanize %}
+{% load custom_filters %}
 
 {% block title %}{{ product.name }} | پستیلاین{% endblock %}
 {% block description %}{{ product.description|truncatewords:30 }}{% endblock %}
@@ -23,7 +24,7 @@
             <span>محصولات</span>
         </a>
         <span class="separator"><i class="fa-slab-press fa-regular fa-chevron-left"></i></span>
-        <span class="breadcrumb-item active">
+        <span class="breadcrumb-item">
             <i class="fa-slab-press fa-regular fa-tag"></i>
             <span>{{ product.name }}</span>
         </span>
@@ -44,7 +45,9 @@
                         </div>
                         {% endfor %}
                     {% else %}
-                        <div class="slide-item"><div class="no-image-placeholder">تصویر ندارد</div></div>
+                        <div class="no-img-placeholder" style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; color:#ccc; font-size:3rem;">
+                            <i class="fa-slab-press fa-regular fa-image"></i>
+                        </div>
                     {% endif %}
                 </div>
             </div>
@@ -99,7 +102,7 @@
                     </div>
                     <div class="text-content">
                         <span class="title">وضعیت موجودی</span>
-                        <span class="subtitle {% if product.stock > 0 %}instock{% else %}outstock{% endif %}">
+                        <span class="subtitle {% if product.stock > 0 %}{% else %}outstock{% endif %}">
                             {% if product.stock > 0 %}موجود در انبار پستیلاین{% else %}فعلاً ناموجود{% endif %}
                         </span>
                     </div>
@@ -108,16 +111,16 @@
 
             <div class="product-specs-box">
                 <div class="detail-spec-row">
-                    <span class="spec-label"><i class="fa-slab-press fa-regular fa-seedling"></i> نوع محصول:</span>
+                    <span class="spec-label"><i class="fa-slab-press fa-regular fa-seedling"></i> نوع محصول :</span>
                     <span class="spec-value">{{ product.get_dynamic_title }}</span>
                 </div>
                 <div class="detail-spec-row">
-                    <span class="spec-label"><i class="fa-slab-press fa-regular fa-fire-burner"></i> فرآوری:</span>
+                    <span class="spec-label"><i class="fa-slab-press fa-regular fa-fire-burner"></i> فرآوری :</span>
                     <span class="spec-value">{{ product.get_dynamic_processing }}</span>
                 </div>
                 {% if product.is_mixed %}
                 <div class="composition-wrapper">
-                    <span class="comp-header">ترکیبات دقیق:</span>
+                    <span class="comp-header">مقدار تشکیل دهنده :</span>
                     <div class="comp-tags">
                         {% for comp in product.get_composition_list %}
                         <span class="comp-tag">
@@ -138,10 +141,13 @@
             <div class="input-control-wrapper">
                 {% if product.sale_method == 'PACKAGED' %}
                     <label class="input-label">تعداد بسته:</label>
-                    <div class="counter-control">
+                    <div class="counter-control" style="margin-bottom:12.5px;">
                         <button onclick="updateQty(1)"><i class="fa-slab-press fa-regular fa-plus"></i></button>
                         <input type="text" id="qtyInput" value="1" readonly>
                         <button onclick="updateQty(-1)"><i class="fa-slab-press fa-regular fa-minus"></i></button>
+                    </div>
+                    <div class="product-specs-box" style="color:#666;font-size:small;padding:10px">
+                        لازم به ذکر است وزن هر بسته {{product.package_weight|format_weight}} میباشد
                     </div>
                 {% else %}
                     <label class="input-label">وزن (کیلوگرم):</label>
@@ -208,7 +214,7 @@
                 </div>
 
                 {% if rp.get_quality_badge.class == 'luxury' %}
-                    <div class="badge-hanging">ویژه</div>
+                    <div class="badge-hanging">اعلاء</div>
                 {% endif %}
 
                 <button class="info-btn" onclick="toggleDetails(this)">
@@ -220,7 +226,9 @@
                         {% if rp.images.first %}
                             <img src="{{ rp.images.first.image.url }}" alt="{{ rp.name }}">
                         {% else %}
-                            <div class="no-img-placeholder"><i class="fa-slab-press fa-regular fa-image"></i></div>
+                            <div class="no-img-placeholder" style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; color:#ccc; font-size:3rem;">
+                                <i class="fa-slab-press fa-regular fa-image"></i>
+                            </div>
                         {% endif %}
                     </div>
                     
@@ -252,7 +260,7 @@
             </article>
             {% endfor %}
 
-            <a href="{% url 'index' %}#products" class="see-more-card {{ see_more_span }}">
+            <a href="{% url 'shop' %}" class="see-more-card {{ see_more_span }}">
                 <div class="see-more-content">
                     <div class="icon-wrapper">
                         <i class="fa-slab-press fa-regular fa-arrow-left"></i>

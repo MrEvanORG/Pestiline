@@ -1,0 +1,117 @@
+{% extends 'patterns/main_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}اطلاعات ارسال | پستیلاین{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'products/css/checkout.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="checkout-container">
+    <div class="checkout-header large">
+        <h1><i class="fa-slab-press fa-regular fa-map-location-dot"></i> اطلاعات گیرنده و ارسال</h1>
+    </div>
+
+
+    <form id="checkoutForm" method="POST" class="checkout-grid" novalidate>
+        {% csrf_token %}
+        <input type="hidden" name="save_info" id="saveInfoInput" value="false">
+        
+        <div class="checkout-form-section">
+            <div class="form-card">
+                <h3>اطلاعات گیرنده سفارش</h3>
+                
+                <div class="form-check-group mb-4">
+                    <input type="checkbox" id="selfReceiver" name="is_self_receiver" checked>
+                    <label for="selfReceiver">گیرنده سفارش خودم هستم</label>
+                </div>
+
+                <div class="row-inputs" id="receiverFields">
+                    <div class="input-group">
+                        <label>نام و نام خانوادگی گیرنده</label>
+                        <input type="text" id="recName" name="receiver_name" value="{{ user.get_full_name }}" class="disabled-input" data-validate="name" readonly>
+                        <span class="error-box" id="error-recName"></span>
+                    </div>
+                    <div class="input-group">
+                        <label>شماره تماس گیرنده</label>
+                        <input type="tel" id="recPhone" name="receiver_phone" value="{{ user.phone_number }}" class="disabled-input" data-validate="phone" readonly>
+                        <span class="error-box" id="error-recPhone"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-card mt-4">
+                <h3>آدرس دقیق پستی</h3>
+                
+                <div class="input-group mb-3">
+                    <label>آدرس کامل تحویل</label>
+                    <textarea name="address" id="recAddress" rows="3" data-validate="address" 
+                    placeholder="مثلاً استان {{ user.province.name|default:'تهران' }} شهر {{ user.city.name|default:'تهران' }} خیابان ستارخان ، کوچه ۵ ، پلاک ۲۶">{{ user.address|default_if_none:'' }}</textarea>
+                    <span class="error-box" id="error-recAddress"></span>
+                </div>
+
+                <div class="input-group">
+                    <label>کد پستی (۱۰ رقمی)</label>
+                    <input type="text" name="postal_code" id="recPostal" value="{{ user.postal_code|default_if_none:'' }}" data-validate="postal" placeholder="بدون خط تیره وارد کنید" maxlength="10">
+                    <span class="error-box" id="error-recPostal"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="cart-summary-box">
+            <h3>جزئیات سفارش</h3>
+            <div class="summary-text-sm">تعداد کالا: {{ order.items.count }} قلم</div>
+            
+            <div class="summary-row mt-3">
+                <span>مبلغ کل:</span>
+                <span><strong>{{ order.total_price|intcomma }}</strong> تومان</span>
+            </div>
+            <div class="summary-row">
+                <span>هزینه ارسال:</span>
+                {% if all_free_shipping %}
+                    <span class="text-success fw-bold">رایگان</span>
+                {% else %}
+                    <span class="text-warning">محاسبه پس از بررسی آدرس</span>
+                {% endif %}
+            </div>
+            <div class="summary-divider"></div>
+            <div class="payment-notice">
+                <i class="fa-slab-press fa-regular fa-phone-volume"></i>
+                همکاران ما پس از بررسی فاکتور برای هماهنگی ارسال با شما تماس خواهند گرفت.
+            </div>
+
+            <button type="button" class="btn-primary-block mt-3 bg-success" id="btnSubmitOrder">
+                <i class="fa-slab-press fa-regular fa-check-circle"></i> ثبت نهایی سفارش
+            </button>
+            <a href="{% url 'cart_page' %}" class="btn-back-link">بازگشت به سبد خرید</a>
+        </div>
+    </form>
+</div>
+
+<div class="delete-modal-overlay" id="saveInfoModal">
+    <div class="delete-modal-box">
+        <div class="modal-icon" style="color: var(--secondary);"><i class="fa-slab-press fa-regular fa-floppy-disk"></i></div>
+        <h3 id="modalSaveTitle">ذخیره اطلاعات ارسال؟</h3>
+        <p id="modalSaveText" style="font-size: 0.95rem; line-height: 1.6;">آیا مایلید این آدرس و کد پستی برای سفارش‌های بعدی در پروفایل شما ذخیره شود تا نیازی به وارد کردن مجدد نداشته باشید؟</p>
+        <div class="modal-actions" style="flex-direction: column; gap: 10px;">
+            <button class="btn-confirm-delete" id="modalSaveBtn" style="background: var(--primary); box-shadow: none;" onclick="submitForm(true)">بله، ذخیره کن</button>
+            <button class="btn-cancel" onclick="submitForm(false)">خیر، فقط سفارش ثبت شود</button>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    const USER_DATA = {
+        fullName: "{{ user.get_full_name|escapejs }}",
+        phone: "{{ user.phone_number|escapejs }}",
+        savedAddress: "{{ user.address|default_if_none:''|escapejs }}",
+        savedPostal: "{{ user.postal_code|default_if_none:''|escapejs }}"
+    };
+</script>
+<script src="{% static 'products/js/checkout.js' %}"></script>
+{% endblock %}

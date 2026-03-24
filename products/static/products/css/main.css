@@ -17,7 +17,41 @@ a { text-decoration: none; color: inherit; transition: var(--transition); }
 ul { list-style: none; }
 button { cursor: pointer; border: none; font-family: inherit; }
 img { max-width: 100%; display: block; }
+/* --- Breadcrumbs --- */
+.custom-breadcrumbs {
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    border-radius: 50px;
+    width: fit-content;
+    max-width: 100%;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+    border: 1px solid #eee;
+    background-color: #fff;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+.custom-breadcrumbs::-webkit-scrollbar { display: none; }
 
+.breadcrumb-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: #666;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    padding: 4px 8px;
+    border-radius: 12px;
+}
+.breadcrumb-item i { font-size: 0.95rem; color: #aaa; }
+.breadcrumb-item:hover { color: var(--primary); background-color: #f9f9f9; border-radius: 40px; }
+.breadcrumb-item:hover i { color: var(--primary); }
+
+.separator { color: #ccc; font-size: 0.7rem; }
 /* =========================================
    2. هدر و نویگیشن (Header & Nav)
    ========================================= */
@@ -701,6 +735,7 @@ body.menu-open .mobile-sidebar { right: 0; }
 .footer-links li { margin-bottom: 10px; }
 .footer-links a { color: #b0b0b0; transition: 0.3s; display: inline-block; }
 .footer-links a:hover { color: var(--secondary); transform: translateX(-1px); }
+.footer-links a.active{color: var(--secondary)}
 
 
 

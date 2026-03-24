@@ -1,7 +1,8 @@
 import os
-from django.db.models.signals import post_delete, pre_save
+from django.db.models.signals import post_delete, pre_save , post_save
 from django.dispatch import receiver
-from .models import ProductImage
+from .models import ProductImage , Order , User
+from .notifications import  new_user_notif , new_order_notif
 
 @receiver(post_delete, sender=ProductImage)
 def delete_product_image_file(sender, instance, **kwargs):
@@ -30,16 +31,14 @@ def delete_old_image_on_update(sender, instance, **kwargs):
         if os.path.isfile(old_file.path):
             os.remove(old_file.path)
 
-# ... (کدهای قبلی signals)
-from .models import Order
-from .addons import send_order_status_sms
+@receiver(pre_save,sender=User)
+def new_user_registered(sender , instance , **kwargs):
+    if not instance.pk: #تشخیص ایجاد کاربر
+        new_user_notif(instance)
 
-@receiver(pre_save, sender=Order)
-def order_status_change_handler(sender, instance, **kwargs):
-    """
-    بررسی تغییر وضعیت سفارش و ارسال پیامک
-    """
-    # اگر سفارش جدید است (هنوز ID ندارد)، کاری نداریم
+@receiver(pre_save,sender=Order)
+def new_order_submitted(sender , instance , **kwargs):
+
     if not instance.pk:
         return
 
@@ -50,10 +49,9 @@ def order_status_change_handler(sender, instance, **kwargs):
         new_status = instance.status
 
         # اگر وضعیت تغییر کرده است
-        if old_status != new_status:
-            # ارسال پیامک فقط برای حالت‌های مشخص شده
-            if new_status in ['PROCESSING', 'SHIPPED', 'CANCELED']:
-                send_order_status_sms(instance.customer, instance.id, new_status)
-                
+        if old_status == 'CART' and new_status == 'PENDING':
+            new_order_notif(instance)
+
     except Order.DoesNotExist:
         pass
+

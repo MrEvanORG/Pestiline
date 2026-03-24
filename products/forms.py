@@ -2,7 +2,7 @@ from django import forms
 from django.core.validators import RegexValidator
 from django.core.exceptions import ValidationError
 from .models import User, Province, City  # فرض بر این است که مدل‌ها در همین اپ هستند
-
+import re
 # ==========================================
 # 1. تعریف اعتبارسنج‌های سراسری (Validators)
 # ==========================================
@@ -147,3 +147,132 @@ class UserLoginForm(forms.Form):
             translation_table = str.maketrans('۰۱۲۳۴۵۶۷۸۹', '0123456789')
             phone = phone.translate(translation_table)
         return phone
+    
+
+# ... سایر ایمپورت‌های قبلی ...
+
+class CheckoutForm(forms.Form):
+    is_self_receiver = forms.BooleanField(required=False)
+    receiver_name = forms.CharField(required=False)
+    receiver_phone = forms.CharField(required=False)
+    address = forms.CharField(
+        min_length=10, 
+        error_messages={'min_length': 'آدرس پستی بسیار کوتاه است. لطفاً آدرس دقیق را وارد کنید.'}
+    )
+    postal_code = forms.CharField(
+        max_length=10, 
+        min_length=10, 
+        error_messages={
+            'min_length': 'کد پستی باید دقیقاً ۱۰ رقم باشد.', 
+            'max_length': 'کد پستی باید دقیقاً ۱۰ رقم باشد.'
+        }
+    )
+    save_info = forms.BooleanField(required=False)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        is_self = cleaned_data.get('is_self_receiver')
+        
+        # اگر گیرنده شخص دیگری است، نام و شماره تلفن او باید اعتبارسنجی شود
+        if not is_self:
+            name = cleaned_data.get('receiver_name', '').strip()
+            phone = cleaned_data.get('receiver_phone', '').strip()
+            
+            # اعتبارسنجی نام گیرنده
+            if not name or len(name) < 3:
+                self.add_error('receiver_name', 'نام گیرنده باید حداقل ۳ حرف باشد.')
+            elif not re.match(r'^[\u0600-\u06FF\s]+$', name):
+                self.add_error('receiver_name', 'نام گیرنده فقط باید شامل حروف فارسی باشد.')
+                
+            # اعتبارسنجی شماره تماس گیرنده
+            if not phone:
+                self.add_error('receiver_phone', 'شماره تماس گیرنده الزامی است.')
+            else:
+                translation_table = str.maketrans('۰۱۲۳۴۵۶۷۸۹', '0123456789')
+                phone = phone.translate(translation_table)
+                cleaned_data['receiver_phone'] = phone
+                if not re.match(r'^(09)\d{9}$', phone):
+                    self.add_error('receiver_phone', 'شماره تماس نامعتبر است (مثال: 0912...).')
+
+        # اعتبارسنجی و تبدیل کد پستی
+        postal = cleaned_data.get('postal_code')
+        if postal:
+            translation_table = str.maketrans('۰۱۲۳۴۵۶۷۸۹', '0123456789')
+            postal = postal.translate(translation_table)
+            cleaned_data['postal_code'] = postal
+            if not re.match(r'^\d{10}$', postal):
+                self.add_error('postal_code', 'کد پستی باید دقیقاً ۱۰ رقم باشد.')
+        
+        return cleaned_data
+    
+# در فایل forms.py کدهای زیر را به انتها اضافه کنید:
+
+# در فایل forms.py بخش SetNewPasswordForm را جایگزین کنید:
+
+class SetNewPasswordForm(forms.Form):
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'حداقل ۶ کاراکتر (انگلیسی + عدد/نماد)',
+            'id': 'new-pass', 
+            'data-validate': 'password'
+        }),
+        label="رمز عبور جدید"
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={
+            'placeholder': 'تکرار رمز عبور جدید',
+            'id': 'confirm-new-pass', 
+            'data-validate': 'confirm'
+        }),
+        label="تکرار رمز عبور جدید"
+    )
+
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        if password:
+            try:
+                # استفاده از همان اعتبارسنج سخت‌گیرانه ثبت‌نام
+                password_complexity_validator(password)
+            except ValidationError as e:
+                raise ValidationError(e.message)
+        return password
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get('password')
+        confirm_password = cleaned_data.get('confirm_password')
+
+        if password and confirm_password:
+            if password != confirm_password:
+                self.add_error('confirm_password', 'رمز عبور و تکرار آن مطابقت ندارند.')
+        
+        return cleaned_data
+    password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'placeholder': 'حداقل ۶ کاراکتر'}),
+        label="رمز عبور جدید"
+    )
+    confirm_password = forms.CharField(
+        widget=forms.PasswordInput(attrs={'placeholder': 'تکرار رمز عبور جدید'}),
+        label="تکرار رمز عبور جدید"
+    )
+
+    def clean_password(self):
+        password = self.cleaned_data.get('password')
+        if password:
+            try:
+                # استفاده از اعتبارسنج پیچیدگی که در بالای forms.py تعریف کرده‌اید
+                password_complexity_validator(password)
+            except ValidationError as e:
+                raise ValidationError(e.message)
+        return password
+
+    def clean(self):
+        cleaned_data = super().clean()
+        password = cleaned_data.get('password')
+        confirm_password = cleaned_data.get('confirm_password')
+
+        if password and confirm_password:
+            if password != confirm_password:
+                self.add_error('confirm_password', 'رمز عبور و تکرار آن مطابقت ندارند.')
+        
+        return cleaned_data

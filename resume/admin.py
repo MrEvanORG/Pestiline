@@ -20,7 +20,7 @@ class ResumeAdmin(admin.ModelAdmin):
     inlines = [WorkExperienceInline, EducationInline]
     fieldsets = (
         ('اطلاعات شخصی', {
-            'fields': ('slug','is_confirmed','role','name', 'title', 'avatar', 'about_me', 'age', 'email', 'phone_number', 'address')
+            'fields': ('related_user','slug','is_confirmed','role','name', 'title', 'avatar', 'about_me', 'age', 'email', 'phone_number', 'address')
         }),
         ('فایل‌ها', {
             'fields': ('resume_file',)

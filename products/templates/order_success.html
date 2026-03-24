@@ -1,0 +1,49 @@
+{% extends 'patterns/main_base.html' %}
+{% load static %}
+{% load humanize %}
+
+{% block title %}سفارش ثبت شد | پستیلاین{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'products/css/checkout.css' %}">
+{% endblock %}
+
+{% block content %}
+<div class="checkout-container order-success-wrapper">
+    <div class="success-minimal-card">
+        
+        <div class="minimal-check-icon">
+            <i class="fa-slab-press fa-light fa-circle-check"></i>
+        </div>
+        
+        <h1 class="success-title">سفارش با موفقیت ثبت شد</h1>
+        <p class="success-subtitle">از انتخاب پستیلاین سپاسگزاریم.</p>
+        
+        <div class="order-details-box">
+            <div class="order-detail-row">
+                <span>شماره سفارش:</span>
+                <strong dir="ltr">{{ order.order_number }}</strong>
+            </div>
+            <div class="order-detail-row">
+                <span>مبلغ سفارش:</span>
+                <strong>{{ order.total_price|intcomma }} تومان</strong>
+            </div>
+            <div class="order-detail-row">
+                <span>وضعیت:</span>
+                <span class="text-warning" style="font-size: 0.85rem;">در انتظار بررسی</span>
+            </div>
+        </div>
+        
+        <div class="success-notice">
+            <i class="fa-slab-press fa-regular fa-bell-ring"></i>
+            <p>همکاران ما به زودی جهت هماهنگی نهایی و ارسال فاکتور پرداخت با شماره <b>{{ user.phone_number }}</b> تماس خواهند گرفت.</p>
+        </div>
+
+        <div class="success-actions">
+            <a href="{% url 'dashboard' %}" class="btn-outline-primary">پیگیری سفارش در پنل</a>
+            <a href="{% url 'index' %}" class="btn-primary-block minimal-btn">بازگشت به فروشگاه</a>
+        </div>
+        
+    </div>
+</div>
+{% endblock %}

@@ -1,5 +1,6 @@
 {% extends "patterns/main_base.html" %}
 {% load static %}
+{% load humanize %}
 {% block description %}پستیلاین بازار تخصصی خرید و فروش پسته ؛ بهترین قیمت ، بهترین کیفیت ، خرید مستقیم پسته از کشاورزان رفسنجان و سرتاسر کشور .{% endblock %}
 {% block title %}خرید و فروش پسته به صورت آنلاین | پستیلاین {% endblock title %}
 {% block content %}
@@ -8,7 +9,7 @@
     <div class="hero-content">
         <h1>پستیلاین بازار تخصصی خرید و فروش پسته</h1>
         <p>بهترین قیمت و کیفیت با خرید مستقیم از کشاورز</p>
-        <a href="#products" class="btn-hero">
+        <a href="{% url 'shop' %}" class="btn-hero">
             مشاهده محصولات
             <i class="fa-sharp fa-regular fa-arrow-left"></i>
         </a>
@@ -56,30 +57,52 @@
 
     <div class="products-grid">
         
+        {% for p in featured_products %}
         <article class="product-card">
             <div class="ribbon-diagonal-stack">
-                <div class="diag-ribbon economy">اقتصادی</div>
-                <div class="diag-ribbon offer">ارسال رایگان</div>
-                <div class="diag-ribbon official">محصول پستیلاین</div>
+                {% if p.get_quality_badge.class == 'economy' %}
+                    <div class="diag-ribbon economy">اقتصادی</div>
+                {% endif %}
+                {% if p.is_free_shipping %}
+                    <div class="diag-ribbon offer">ارسال رایگان</div>
+                {% endif %}
+                {% if p.seller.is_superuser %}
+                    <div class="diag-ribbon official">محصول پستیلاین</div>
+                {% endif %}
             </div>
-            <div class="badge-hanging">ویژه</div>
+
+            {% if p.get_quality_badge.class == 'luxury' %}
+                <div class="badge-hanging">اعلاء</div>
+            {% endif %}
+
             <button class="info-btn" onclick="toggleDetails(this)">
                 <i class="fa-slab-press fa-regular fa-info"></i>
             </button>
             
-            <div class="product-img">
-                <img src="{% static 'products/img/home/product.webp' %}" alt="پسته اکبری اعلا">
-            </div>
-            
-            <div class="product-content">
-                <h3 class="p-title">پسته اکبری اعلا</h3>
-                <div class="p-meta">
-                    <span class="p-price">۹۸۰,۰۰۰ تومان</span>
-                    <span class="p-unit">بسته‌ای (۱ کیلو)</span>
+            <a href="{% url 'product_detail' p.slug %}" class="product-link-wrapper">
+                <div class="product-img">
+                    {% if p.images.first %}
+                        <img src="{{ p.images.first.image.url }}" alt="{{ p.name }}">
+                    {% else %}
+                        <div class="no-img-placeholder" style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; color:#ccc; font-size:3rem;">
+                            <i class="fa-slab-press fa-regular fa-image"></i>
+                        </div>
+                    {% endif %}
                 </div>
-                <button class="btn-add">
-                    <i class="fa-slab-press fa-regular fa-basket-shopping" style="margin-left: 5px;"></i>افزودن به سبد خرید                
-                </button>
+                
+                <div class="product-content">
+                    <h3 class="p-title">{{ p.name }}</h3>
+                    <div class="p-meta">
+                        <span class="p-price">{{ p.price|intcomma }} تومان</span>
+                        <span class="p-unit">{% if p.sale_method == 'PACKAGED' %}بسته‌ای{% else %}کیلویی{% endif %}</span>
+                    </div>
+                </div>
+            </a>
+            
+            <div style="padding: 0 1.5rem 1.5rem;">
+                <a href="{% url 'product_detail' p.slug %}" class="btn-add">
+                    <i class="fa-slab-press fa-regular fa-basket-shopping" style="margin-left: 5px;"></i>مشاهده و خرید
+                </a>
             </div>
 
             <div class="details-overlay">
@@ -88,107 +111,14 @@
                 </span>
                 <h4 class="details-title">مشخصات فنی</h4>
                 <div class="details-scroll-area">
-                    <div class="spec-row"><span class="spec-label">نوع:</span><span class="spec-val">اکبری</span></div>
-                    <div class="spec-row"><span class="spec-label">فرآوری:</span><span class="spec-val">شور زعفرانی</span></div>
-                    <div class="spec-row"><span class="spec-label">انس:</span><span class="spec-val">۲۰-۲۲</span></div>
-                    <p class="spec-desc">محصول برتر پستیلاین با تضمین کیفیت و ارسال رایگان برای خریدهای اول.</p>
+                    <div class="spec-row"><span class="spec-label">نوع:</span><span class="spec-val">{{ p.get_dynamic_title }}</span></div>
+                    <div class="spec-row"><span class="spec-label">فرآوری:</span><span class="spec-val">{{ p.get_dynamic_processing }}</span></div>
                 </div>
             </div>
         </article>
-
-        <article class="product-card">
-            <div class="ribbon-diagonal-stack">
-                <div class="diag-ribbon economy">اقتصادی</div>
-            </div>
-            <button class="info-btn" onclick="toggleDetails(this)">
-                <i class="fa-slab-press fa-regular fa-info"></i>
-            </button>
-            <div class="product-img">
-                <img src="{% static 'products/img/home/product.webp' %}" alt="پسته فندقی">
-            </div>
-            <div class="product-content">
-                <h3 class="p-title">پسته فندقی ریز</h3>
-                <div class="p-meta">
-                    <span class="p-price">۶۵۰,۰۰۰ تومان</span>
-                    <span class="p-unit">کیلویی</span>
-                </div>
-                <button class="btn-add">
-                    <i class="fa-slab-press fa-regular fa-basket-shopping" style="margin-left: 5px;"></i>افزودن به سبد خرید
-                </button>
-            </div>
-            <div class="details-overlay">
-                <span class="close-details" onclick="toggleDetails(this)">
-                    <i class="fa-slab-press fa-regular fa-xmark"></i>
-                </span>
-                <h4 class="details-title">مشخصات فنی</h4>
-                <div class="details-scroll-area">
-                    <div class="spec-row"><span class="spec-label">نوع:</span><span class="spec-val">فندقی</span></div>
-                    <div class="spec-row"><span class="spec-label">فرآوری:</span><span class="spec-val">خام</span></div>
-                </div>
-            </div>
-        </article>
-
-        <article class="product-card">
-            <div class="ribbon-diagonal-stack">
-                <div class="diag-ribbon offer">ارسال رایگان</div>
-            </div>
-            <button class="info-btn" onclick="toggleDetails(this)">
-                <i class="fa-slab-press fa-regular fa-info"></i>
-            </button>
-            <div class="product-img">
-                <img src="{% static 'products/img/home/product.webp' %}" alt="پسته احمدآقایی">
-            </div>
-            <div class="product-content">
-                <h3 class="p-title">پسته احمدآقایی</h3>
-                <div class="p-meta">
-                    <span class="p-price">۸۹۰,۰۰۰ تومان</span>
-                    <span class="p-unit">کیلویی</span>
-                </div>
-                <button class="btn-add">
-                    <i class="fa-slab-press fa-regular fa-basket-shopping" style="margin-left: 5px;"></i> افزودن به سبد
-                </button>
-            </div>
-            <div class="details-overlay">
-                <span class="close-details" onclick="toggleDetails(this)">
-                        <i class="fa-slab-press fa-regular fa-xmark"></i>
-                </span>
-                <h4 class="details-title">مشخصات فنی</h4>
-                <div class="details-scroll-area">
-                    <div class="spec-row"><span class="spec-label">نوع:</span><span class="spec-val">احمدآقایی</span></div>
-                    <div class="spec-row"><span class="spec-label">فرآوری:</span><span class="spec-val">شور</span></div>
-                </div>
-            </div>
-        </article>
-
-            <article class="product-card">
-            <div class="badge-hanging">ویژه</div>
-            <button class="info-btn" onclick="toggleDetails(this)">
-                <i class="fa-slab-press fa-regular fa-info"></i>
-            </button>
-            <div class="product-img">
-                <img src="{% static 'products/img/home/product.webp' %}" alt="پسته کله قوچی">
-            </div>
-            <div class="product-content">
-                <h3 class="p-title">پسته کله قوچی</h3>
-                <div class="p-meta">
-                    <span class="p-price">۹۲۰,۰۰۰ تومان</span>
-                    <span class="p-unit">کیلویی</span>
-                </div>
-                <button class="btn-add">
-                    <i class="fa-slab-press fa-regular fa-basket-shopping" style="margin-left: 5px;"></i> افزودن به سبد
-                </button>
-            </div>
-            <div class="details-overlay">
-                <span class="close-details" onclick="toggleDetails(this)">
-                        <i class="fa-slab-press fa-regular fa-xmark"></i>
-                </span>
-                <h4 class="details-title">مشخصات فنی</h4>
-                <div class="details-scroll-area">
-                    <div class="spec-row"><span class="spec-label">نوع:</span><span class="spec-val">کله قوچی</span></div>
-                    <div class="spec-row"><span class="spec-label">سایز:</span><span class="spec-val">درشت</span></div>
-                </div>
-            </div>
-        </article>
+        {% empty %}
+            <p style="text-align: center; grid-column: 1/-1; color: #777;">در حال حاضر محصولی برای نمایش وجود ندارد.</p>
+        {% endfor %}
 
     </div>
 </main>

@@ -9,25 +9,25 @@
             <h4><i class="fa-slab-press fa-regular fa-link margin-left-5"></i> دسترسی سریع</h4>
             <ul class="footer-links">
                 <li>
-                    <a href="#">
+                    <a href="{% if request.path == '/' %}#{% else %}{% url 'index' %}{% endif %}">
                         <i class="fa-slab-press fa-regular fa-house"></i>
                         صفحه اصلی
                     </a>
                 </li>
                 <li>
-                    <a href="#products">
+                    <a href="{% if request.path == '/shop/' %}#{% else %}{% url 'shop' %}{% endif %}">
                         <i class="fa-slab-press fa-regular fa-cart-shopping"></i>
-                        محصولات
+                        فروشگاه
                     </a>
                 </li>
                 <li>
-                    <a href="#blog">
+                    <a href="{% if request.path == '/blog/' %}#{% else %}{% url 'blog:blog_index' %}{% endif %}">
                         <i class="fa-slab-press fa-regular fa-newspaper"></i>
                         وبلاگ آموزشی
                     </a>
                 </li>
                 <li>
-                    <a href="#mix">
+                    <a href="#">
                         <i class="fa-slab-press fa-regular fa-headset"></i>
                         پشتیبانی
                     </a>
