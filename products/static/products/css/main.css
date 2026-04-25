@@ -2,6 +2,69 @@
    1. متغیرها و تنظیمات پایه (Variables & Reset)
    ========================================= */
 @import url('root/light_root.css');
+/* ===============================
+   Mobile UI Reset
+   Android + iOS + Chrome
+   =============================== */
+
+/* حذف highlight آبی tap در موبایل */
+* {
+    -webkit-tap-highlight-color: transparent;
+}
+
+
+input,
+textarea,
+select {
+    font-size: 16px;
+}
+
+
+a,
+button,
+input,
+textarea,
+select {
+    outline: none;
+}
+
+
+button,
+a {
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+/* بهبود تجربه tap */
+a,
+button {
+    touch-action: manipulation;
+}
+
+/* اسکرول نرم موبایل */
+html {
+    -webkit-overflow-scrolling: touch;
+    scroll-behavior: smooth;
+}
+
+/* لینک‌ها بدون رنگ tap */
+a {
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+}
+
+
+
+/* جلوگیری از خاکستری شدن لینک بعد از tap در اندروید */
+a:active {
+    background-color: transparent;
+}
+
+/* دکمه‌ها شبیه اپلیکیشن */
+button {
+    -webkit-appearance: none;
+    appearance: none;
+}
+
 
 * { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
 
@@ -17,6 +80,7 @@ a { text-decoration: none; color: inherit; transition: var(--transition); }
 ul { list-style: none; }
 button { cursor: pointer; border: none; font-family: inherit; }
 img { max-width: 100%; display: block; }
+
 /* --- Breadcrumbs --- */
 .custom-breadcrumbs {
     font-weight: 700;
@@ -24,7 +88,7 @@ img { max-width: 100%; display: block; }
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
-    border-radius: 50px;
+    border-radius: 20px !important;
     width: fit-content;
     max-width: 100%;
     margin-bottom: 2rem;
@@ -294,7 +358,7 @@ body.menu-open .mobile-sidebar { right: 0; }
 .products-section { padding: 4rem 5%; }
 .section-title { text-align: center; margin-bottom: 3rem; }
 .section-title h2 { color: var(--primary); margin-bottom: 10px; }
-.title-line { width: 180px; height: 3px; background: var(--secondary); margin: 0 auto; }
+.title-line { width: 180px; height: 4px; background: var(--secondary); margin: 0 auto; }
 
 .products-grid {
     display: grid;
@@ -664,14 +728,10 @@ body.menu-open .mobile-sidebar { right: 0; }
     text-align: center; margin-bottom: 3.5rem; max-width: 800px; margin-left: auto; margin-right: auto;
 }
 .blog-header h2 {
-    color: var(--primary); font-size: 2.2rem; margin-bottom: 2rem; position: relative; display: inline-block;
+    color: var(--primary); font-size: 2.2rem; margin-bottom:10px; position: relative; display: inline-block;
     display: flex; align-items: center; justify-content: center; /* تراز آیکون تیتر */
 }
-.blog-header h2::after {
-    content: ''; display: block; width: 50%; height: 3px; background: var(--secondary);
-    margin: 5px auto 0; border-radius: 2px; position: absolute; bottom: -10px; right: 25%;
-}
-.blog-header p { color: #666; font-size: 1.1rem; line-height: 1.8; }
+.blog-header p { color: #666; font-size: 1.1rem; line-height: 1.8;margin-top:15px }
 
 .blog-grid {
     display: grid; grid-template-columns: 1fr; gap: 30px;
@@ -808,8 +868,7 @@ body.menu-open .mobile-sidebar { right: 0; }
     .header-logo-link.mobile-hidden {
         display: block !important; /* نمایش لوگو در تبلت */
         position: absolute;
-        left: 50%;
-        transform: translateX(-50%);
+        transform: translateX(-40%);
         z-index: 5;
     }
 

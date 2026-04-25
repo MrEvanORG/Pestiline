@@ -1,13 +1,38 @@
 {% extends "admin/base.html" %}
 {% load static %}
-{% block branding %}
+{% load custom_filters %}
+{% comment %} {% block branding %}
 <h1 id="site-name">
     <a href="{% url 'admin:index' %}">{{ site_header }}</a>
 </h1>
-{% endblock %}
+{% endblock %} {% endcomment %}
 {% block extrastyle %}
     {{ block.super }}     
     <link rel="stylesheet" href="{% static 'products/css/root/admin_root.css' %}">
     <link rel="stylesheet" href="{% static 'products/css/Vazirmatn.css' %}">
     <link rel="stylesheet" href="{% static 'products/css/custom_admin.css' %}">
+    <link rel="icon" href="{% static 'products/img/fav-admin.svg' %}" type="image/svg+xml">
+{% endblock %}
+
+{% block extrahead %}
+{{ block.super }}
+<script src="{% static 'products/js/custom_admin.js' %}"></script>
+{% endblock %}
+
+{% block branding %}
+<div id="branding-wrapper">
+    <h1 id="site-name">
+        <a href="{% url 'admin:index' %}">
+            {{ site_header|default:_('Django administration') }}
+        </a>
+    </h1>
+    
+    <!-- بخش نمایش تاریخ و ساعت -->
+    <div id="admin-datetime-header" dir="rtl">
+        <span id="jalali-date-text">{% get_jalali_admin_time %}</span>
+        <span>-</span>
+        <span id="jalali-time-text">--:--:--</span>
+    </div>
+</div>
+
 {% endblock %}

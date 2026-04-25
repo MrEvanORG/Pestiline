@@ -111,11 +111,11 @@
 
             <div class="product-specs-box">
                 <div class="detail-spec-row">
-                    <span class="spec-label"><i class="fa-slab-press fa-regular fa-seedling"></i> نوع محصول :</span>
+                    <span class="spec-label"><i class="fa-slab-press fa-regular fa-seedling"></i>نوع محصول :&nbsp;</span>
                     <span class="spec-value">{{ product.get_dynamic_title }}</span>
                 </div>
                 <div class="detail-spec-row">
-                    <span class="spec-label"><i class="fa-slab-press fa-regular fa-fire-burner"></i> فرآوری :</span>
+                    <span class="spec-label"><i class="fa-slab-press fa-regular fa-fire-burner"></i>فرآوری :&nbsp;</span>
                     <span class="spec-value">{{ product.get_dynamic_processing }}</span>
                 </div>
                 {% if product.is_mixed %}
@@ -188,6 +188,7 @@
                     </div>
                 </button>
             </div>
+            <div id="completeCart" class="complete-cart" style="display: none;"><a href={% url 'cart_page' %}>تکمیل سبد خرید</a></div>
         </div>
     </div>
 

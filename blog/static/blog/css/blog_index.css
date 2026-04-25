@@ -1,0 +1,526 @@
+/* =========================================
+   متغیرها و تنظیمات پایه (Blog Index)
+   ========================================= */
+:root {
+    --blog-primary: var(--primary, #123524);
+    --blog-secondary: var(--secondary, #85A947);
+    --blog-surface: #ffffff;
+    --blog-bg: #f8f9fa;
+    --blog-text: #333333;
+    --blog-muted: #777777;
+    --blog-border: #eaeaea;
+    --blog-radius: 16px;
+    --transition-fast: 0.2s ease;
+    --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+body {
+    background-color: var(--blog-bg);
+}
+
+.container {
+    width: 100%;
+    /* max-width: 1800px;    */
+    margin: 0 auto;
+    padding: 0 5%; /* فاصله ۵ درصدی از کناره‌ها */
+}
+
+.section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+}
+
+.section-header h2 {
+    font-size: 2.2rem;
+    color: var(--blog-primary);
+    margin-bottom: 0.5rem;
+    font-weight: 800;
+}
+
+
+.section-header p {
+    color: var(--blog-muted);
+    font-size: 1.1rem;
+}
+
+/* =========================================
+   ۱. بخش هیرو (Hero Section)
+   ========================================= */
+.blog-hero {
+    position: relative;
+    padding: 6rem 0;
+    background: linear-gradient(135deg, var(--blog-primary) 0%, #0d261a 100%);
+    color: #fff;
+    text-align: center;
+    overflow: hidden;
+    margin-bottom: 4rem;
+}
+
+.blog-hero-pattern {
+    position: absolute;
+    inset: 0;
+    opacity: 0.05;
+    background-image: radial-gradient(#fff 1px, transparent 4px);
+    background-size: 30px 30px;
+    z-index: 1;
+}
+
+.blog-hero-content {
+    position: relative;
+    z-index: 2;
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+
+.blog-hero-title {
+    font-size: 3.5rem;
+    font-weight: 900;
+    margin-top:35px;
+    margin-bottom: 1rem;
+    letter-spacing: -1px;
+}
+
+.blog-hero-title span {
+    color: var(--blog-secondary);
+}
+
+.blog-hero-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.9;
+    margin-bottom: 2.5rem;
+    line-height: 1.8;
+}
+
+/* فرم جستجوی هیرو */
+.blog-search-form {
+    display: flex;
+    background: #fff;
+    padding: 8px;
+    border-radius: 50px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+    max-width: 600px;
+    margin: 0 auto;
+    transition: var(--transition-smooth);
+}
+
+.blog-search-form:focus-within {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(0,0,0,0.25);
+}
+
+.blog-search-form input {
+    font-family: Vazirmatn;
+    flex: 1;
+    border: none;
+    background: transparent;
+    padding: 10px 20px;
+    font-size: 1rem;
+    color: var(--blog-text);
+    outline: none;
+}
+
+.blog-search-form button {
+    background: var(--blog-secondary);
+    color: #fff;
+    border: none;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.blog-search-form button:hover {
+    background: var(--blog-primary);
+    transform: scale(1.05);
+}
+
+/* =========================================
+   ۲. ویترین دسته‌بندی‌ها (Categories Grid) - بازطراحی شده
+   ========================================= */
+
+.blog-categories-showcase {
+    margin-bottom: 6rem;
+}
+
+/* سیستم گرید هوشمند: حداکثر 4 ستون */
+.blog-categories-grid {
+    display: grid;
+    /* ایجاد ستون‌های منعطف با حداقل عرض 260 پیکسل */
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 25px;
+}
+
+/* در صفحات بزرگتر از 1200 پیکسل، دقیقاً 4 ستون ایجاد می‌کند تا کارت‌ها خیلی کشیده نشوند */
+@media (min-width: 1200px) {
+    .blog-categories-grid {
+        grid-template-columns: repeat(4, 1fr);
+    }
+}
+
+.modern-cat-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    border-radius: var(--blog-radius);
+    overflow: hidden;
+    text-decoration: none;
+    aspect-ratio: 4/5; /* نسبت تصویر جذاب (کمی بلندتر از مربع) */
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    transition: var(--transition-smooth);
+    background-color: var(--blog-primary);
+}
+
+/* هاور کارت‌های دسته‌بندی */
+.modern-cat-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 20px 40px rgba(18, 53, 36, 0.15);
+}
+
+.modern-cat-bg.all{
+    background: repeating-linear-gradient(135deg, var(--blog-primary), var(--blog-primary) 10px, #0e2a1d 10px, #0e2a1d 20px);
+}
+
+.modern-cat-bg,
+.modern-cat-bg-img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 1;
+}
+
+.modern-cat-card:hover .modern-cat-bg-img,
+.modern-cat-card:hover .modern-cat-bg {
+    transform: scale(1.1); /* زوم ملایم تصویر در هاور */
+}
+
+/* لایه تاریک گرادیانت برای خوانایی متن */
+.modern-cat-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.3) 50%, rgba(0,0,0,0) 100%);
+    z-index: 2;
+    transition: var(--transition-fast);
+}
+
+.modern-cat-content {
+    position: relative;
+    z-index: 3;
+    padding: 25px;
+    color: #fff;
+}
+
+.modern-cat-content h3 {
+    font-size: 1.4rem;
+    font-weight: 800;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.modern-cat-content p {
+    font-size: 0.95rem;
+    opacity: 0.85;
+    margin: 0;
+    line-height: 1.5;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* استایل ویژه کارت "همه مقالات" */
+.modern-cat-card.active-cat .modern-cat-overlay {
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.1) 100%);
+}
+.modern-cat-icon {
+    margin-bottom: 15px;
+    color: #fff;
+    opacity: 0.9;
+}
+
+/* =========================================
+   ۳. گرید مقالات (Blog Grid) - 3 ستونه
+   ========================================= */
+.blog-main-content {
+    margin-bottom: 6rem;
+}
+
+.blog-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr); /* ۳ ستون ثابت در دسکتاپ */
+    gap: 30px;
+}
+
+.blog-card {
+    background: var(--blog-surface);
+    border-radius: var(--blog-radius);
+    border: 1px solid var(--blog-border);
+    overflow: hidden;
+    transition: var(--transition-smooth);
+    display: flex;
+    flex-direction: column;
+}
+
+.blog-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.06);
+    border-color: transparent;
+}
+
+.blog-img-wrapper {
+    position: relative;
+    aspect-ratio: 16/10;
+    overflow: hidden;
+}
+
+.blog-img-wrapper img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+.blog-card:hover .blog-img-wrapper img {
+    transform: scale(1.05);
+}
+
+/* تگ دسته‌بندی روی عکس مقاله */
+.blog-tag {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: var(--blog-secondary);
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 30px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    z-index: 2;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.blog-content {
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.blog-date {
+    font-size: 0.85rem;
+    color: var(--blog-muted);
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.blog-title {
+    font-size: 1.3rem;
+    font-weight: 800;
+    line-height: 1.5;
+    margin-bottom: 12px;
+}
+
+.blog-title a {
+    color: var(--blog-primary);
+    text-decoration: none;
+    transition: var(--transition-fast);
+}
+
+.blog-excerpt {
+    color: var(--blog-muted);
+    font-size: 0.95rem;
+    line-height: 1.8;
+    margin-bottom: 20px;
+    text-align: justify;
+    flex-grow: 1;
+}
+.read-more-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: var(--blog-primary);
+    font-weight: 700;
+    font-size: 0.95rem;
+    text-decoration: none;
+    transition: var(--transition-fast);
+    padding-top: 15px;
+    border-top: 1px solid var(--blog-border);
+}
+
+.read-more-btn svg {
+    transition: transform 0.3s ease;
+}
+
+.read-more-btn:hover svg {
+    transform: translateX(-5px); /* حرکت فلش به سمت چپ در زبان فارسی */
+}
+
+/* =========================================
+   ۴. خبرنامه (Newsletter)
+   ========================================= */
+.blog-newsletter {
+    margin-bottom: 4rem;
+}
+
+.newsletter-wrapper {
+    background: linear-gradient(135deg, var(--blog-primary), #1a4a35);
+    border-radius: 24px;
+    padding: 4rem 3rem;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 3rem;
+    box-shadow: 0 20px 40px rgba(18, 53, 36, 0.2);
+    position: relative;
+    overflow: hidden;
+}
+
+/* پترن پس‌زمینه خبرنامه */
+.newsletter-wrapper::after {
+    content: '';
+    position: absolute;
+    right: -10%;
+    top: -50%;
+    width: 50%;
+    height: 200%;
+    background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, transparent 60%);
+    pointer-events: none;
+}
+
+.newsletter-text {
+    flex: 1;
+    z-index: 2;
+}
+
+.newsletter-text h3 {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 10px;
+}
+
+.newsletter-text p {
+    font-size: 1.1rem;
+    opacity: 0.85;
+}
+
+.newsletter-action-area {
+    flex: 1;
+    max-width: 450px;
+    z-index: 2;
+    background: rgba(255,255,255,0.1);
+    padding: 25px;
+    border-radius: 16px;
+    backdrop-filter: blur(10px);
+}
+
+.subscribe-toggle {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.toggle-btn {
+    cursor: pointer;
+    padding: 6px 16px;
+    border-radius: 30px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(255,255,255,0.2);
+    transition: var(--transition-fast);
+}
+
+.toggle-btn.active {
+    background: var(--blog-secondary);
+    color: #fff;
+    border-color: var(--blog-secondary);
+}
+
+.newsletter-form {
+    display: flex;
+    gap: 10px;
+}
+
+.newsletter-form input {
+    font-family: Vazirmatn;
+    flex: 1;
+    padding: 12px 20px;
+    border-radius: 10px;
+    border: none;
+    font-size: 1rem;
+    outline: none;
+}
+
+.btn-subscribe {
+    background: var(--blog-secondary);
+    color: #fff;
+    border: none;
+    padding: 0 25px;
+    border-radius: 10px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition-fast);
+}
+
+.btn-subscribe:hover {
+    background: #73933c; /* کمی تیره‌تر از secondary */
+}
+
+/* =========================================
+   رسپانسیو (Responsive)
+   ========================================= */
+@media (max-width: 1200px) {
+    .blog-hero-title { font-size: 3rem; }
+    .blog-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 992px) {
+    /* در تبلت‌ها، خبرنامه روی هم قرار می‌گیرد */
+    .newsletter-wrapper {
+        flex-direction: column;
+        text-align: center;
+        padding: 3rem 2rem;
+    }
+    .newsletter-action-area {
+        width: 100%;
+        max-width: 100%;
+    }
+    .subscribe-toggle {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 768px) {
+    .blog-hero { padding: 4rem 0; }
+    .blog-hero-title { font-size: 2.2rem; }
+    .blog-hero-subtitle { font-size: 1rem; }
+    
+    /* گرید دسته‌بندی‌ها در تبلت کوچک و موبایل: 2 ستونه */
+    .blog-categories-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+    
+    /* گرید مقالات در موبایل: 1 ستونه */
+    .blog-grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 480px) {
+    .container { padding: 0 1rem; }
+    /* گرید دسته‌بندی‌ها در موبایل خیلی کوچک: 1 ستونه */
+    .blog-categories-grid {
+        grid-template-columns: 1fr;
+    }
+    .newsletter-form { flex-direction: column; }
+    .btn-subscribe { padding: 15px; width: 100%; }
+}

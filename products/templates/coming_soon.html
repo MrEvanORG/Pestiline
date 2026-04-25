@@ -5,12 +5,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>پستیلاین | به زودی بازمیگردیم</title>
-    
+    <title>{% if seo_title %}{{seo_title}}{% else %}پستیلاین | به زودی بازمیگردیم{% endif %}</title>
+    <meta name="description" content="{% if seo_description %}{{seo_description}}{% else %}تیم پستیلاین در حال آماده‌سازی نسخه‌ای بی‌نظیر، سریع و هوشمند است. از شکیبایی شما سپاسگزاریم، به زودی با قدرتی بیشتر برمی‌گردیم.{% endif %}">
     <link href="{% static 'products/css/Vazirmatn.css' %}" rel="stylesheet" type="text/css" />
-    
     <link rel="stylesheet" href="{% static 'products/css/all_awesome.css' %}">
     <link rel="stylesheet" href="{% static 'products/css/root/light_root.css' %}">
     <link rel="stylesheet" href="{% static 'products/css/status_page.css' %}">
+    <link rel="icon" href="{% static 'products/img/fav.svg' %}" type="image/svg+xml">
 </head>
 <body>
 <div class="cs-bg"></div>

@@ -16,10 +16,22 @@ Including another URLconf
 """
 from django.urls import path , include
 from products.admin import super_admin_site
+from django.conf import settings as django_settings
+from django.contrib.sitemaps.views import sitemap
+from seo.sitemaps import StaticViewSitemap , ProductSitemap , ResumeSitemap , BlogPostSitemap ,CategorySitemap
+
+sitemaps = {
+    'static': StaticViewSitemap,
+    'products':ProductSitemap,
+    "blogposts":BlogPostSitemap,
+    "categories":CategorySitemap,
+    "resumes": ResumeSitemap,
+}
 
 urlpatterns = [
     path('', include('products.urls')),
-    path('secure_admin_login_auth/', super_admin_site.urls),
+    path(f'{django_settings.ADMIN_URL}/', super_admin_site.urls),
+    path(f'{django_settings.SITEMAP_URL}.xml', sitemap, {'sitemaps': sitemaps}, name='django.contrib.sitemaps.views.sitemap'),
     path('resume/',include('resume.urls')),
     path('blog/',include('blog.urls')),
 ]

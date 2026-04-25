@@ -1,0 +1,184 @@
+{% extends 'patterns/main_base.html' %}
+{% load static %}
+{% load custom_filters %}
+
+{% block title %}مجله پستیلاین | مقالات و تازه‌ها{% endblock title %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'blog/css/blog_index.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- ۱. بخش هیرو وبلاگ -->
+<section class="blog-hero">
+    <div class="blog-hero-pattern"></div>
+    <div class="container">
+        <div class="blog-hero-content">
+            <h1 class="blog-hero-title">مجله <span>پستیلاین</span></h1>
+            
+            <p class="blog-hero-subtitle">دنیایی از طعم، سلامتی و دانستنی‌های جذاب درباره پسته و خشکبار. با ما همراه باشید.</p>
+            
+            <form class="blog-search-form" action="" method="GET">
+                <input type="text" name="q" placeholder="دنبال چه مطلبی می‌گردید؟ (مثلا: خواص پسته)" required>
+                <button type="submit" aria-label="جستجو">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                </button>
+            </form>
+        </div>
+    </div>
+</section>
+
+<!-- ۲. ویترین مدرن دسته‌بندی‌ها (سیستم Grid جدید) -->
+<section class="blog-categories-showcase">
+    <div class="container">
+        <div class="section-header">
+            <h2>موضوعات مجله</h2>
+            <div class="title-line" style="width:250px"></div>
+        </div>
+        
+        <!-- جایگزینی اسکرول افقی با Grid هوشمند -->
+        <div class="blog-categories-grid">
+            
+            <!-- کارت همه مقالات -->
+            <a href="{% url 'blog:blog_index' %}" class="modern-cat-card active-cat">
+                
+                <div class="modern-cat-bg all"></div>
+                {% comment %} <div class="modern-cat-bg" style="background: radial-gradient(circle at 50% 0%, var(--blog-secondary) 0%, var(--blog-primary) 60%, #0a1f15 100%);"></div> {% endcomment %}
+                {% comment %} <div class="modern-cat-bg" style="background: linear-gradient(135deg, var(--blog-primary), var(--blog-secondary));"></div> {% endcomment %}
+                <div class="modern-cat-overlay"></div>
+                <div class="modern-cat-content">
+                    <div class="modern-cat-icon">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="3" width="7" height="7" rx="1"></rect><rect x="14" y="14" width="7" height="7" rx="1"></rect><rect x="3" y="14" width="7" height="7" rx="1"></rect></svg>
+                    </div>
+                    <h3>همه مقالات</h3>
+                    
+                    <p>نمایش تمامی مطالب مجله تخصصی پستیلاین</p>
+                </div>
+            </a>
+            
+            <!-- نمایش داینامیک دسته‌بندی‌ها -->
+            {% for cat in categories %}
+                <a href="{% url 'blog:category_detail' cat.slug %}" class="modern-cat-card">
+                    {% if cat.banner_image %}
+                        <img src="{{ cat.banner_image.url }}" alt="{{ cat.banner_alt }}" class="modern-cat-bg-img" loading="lazy">
+                    {% else %}
+                        <div class="modern-cat-bg" style="background: linear-gradient(135deg, #1e4d36, #2a6a4a);"></div>
+                    {% endif %}
+                    
+                    <div class="modern-cat-overlay"></div>
+                    <div class="modern-cat-content">
+                        <h3>{{ cat.title }}</h3>
+                        <p>{{ cat.description|default:"مطالب تخصصی و جذاب" }}</p>
+                    </div>
+                </a>
+            {% endfor %}
+            
+        </div>
+    </div>
+</section>
+
+<!-- ۳. گرید مقالات (۳ ستونه) -->
+<section class="blog-main-content">
+    <div class="container">
+        <div class="section-header">
+            <h2>تازه‌ترین مقالات</h2>
+            <div class="title-line" style="width:250px"></div>
+        </div>
+
+        <div class="blog-grid">
+            {% for post in posts %}
+                <article class="blog-card">
+                    <div class="blog-img-wrapper">
+                        <span class="blog-tag">{{ post.category.title }}</span>
+                        <a href="{% url 'blog:post_detail' post.category.slug post.slug %}">
+                            <img src="{{ post.cover_image.url }}" alt="{{ post.cover_image_alt|default:post.title }}" loading="lazy">
+                        </a>
+                    </div>
+                    <div class="blog-content">
+                        <span class="blog-date"><i class="fa-slab-press fa-calendar"></i> {{ post.created_at|to_jalali:"persian_date" }}</span>
+                        <h3 class="blog-title">
+                            <a href="{% url 'blog:post_detail' post.category.slug post.slug %}">{{ post.title }}</a>
+                        </h3>
+                        <p class="blog-excerpt">{{ post.meta_description|default:"خلاصه‌ای برای این مقاله ثبت نشده است..." }}</p>
+                        <a href="{% url 'blog:post_detail' post.category.slug post.slug %}" class="read-more-btn">
+                            خواندن کامل مقاله
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                        </a>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="empty-state">
+                    <p>هنوز مقاله‌ای منتشر نشده است!</p>
+                </div>
+            {% endfor %}
+        </div>
+
+        <!-- صفحه‌بندی (Pagination) -->
+        {% if page_obj.has_other_pages %}
+           <nav class="pagination-wrapper" style="margin-top: 40px; display: flex; justify-content: center;">
+               <!-- کدهای صفحه‌بندی شما در اینجا قرار می‌گیرد -->
+           </nav>
+        {% endif %}
+    </div>
+</section>
+
+<!-- ۴. بخش خبرنامه (مدیریت فضا + انتخاب ایمیل/شماره) -->
+<section class="blog-newsletter">
+    <div class="container">
+        <div class="newsletter-wrapper">
+            <div class="newsletter-text">
+                <h3>از تخفیف‌ها و مقالات جدید جا نمانید!</h3>
+                <p>هفته‌ای یکبار بهترین مطالب و کدهای تخفیف را دریافت کنید.</p>
+            </div>
+            
+            <div class="newsletter-action-area">
+                <!-- دکمه‌های انتخاب ایمیل یا پیامک -->
+                <div class="subscribe-toggle">
+                    <label class="toggle-btn active">
+                        <input type="radio" name="sub_type" value="email" checked hidden> 
+                        <span>با ایمیل</span>
+                    </label>
+                    <label class="toggle-btn">
+                        <input type="radio" name="sub_type" value="phone" hidden>
+                        <span>با پیامک</span>
+                    </label>
+                </div>
+
+                <form class="newsletter-form" action="" method="POST">
+                    {% csrf_token %}
+                    <input type="email" id="subscribe_input" name="contact_info" placeholder="آدرس ایمیل شما..." required>
+                    <button type="submit" class="btn-subscribe">عضویت</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock content %}
+
+{% block script %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const radios = document.querySelectorAll('input[name="sub_type"]');
+        const inputField = document.getElementById('subscribe_input');
+        const labels = document.querySelectorAll('.toggle-btn');
+
+        radios.forEach(radio => {
+            radio.addEventListener('change', function() {
+                // آپدیت ظاهر دکمه‌ها
+                labels.forEach(lbl => lbl.classList.remove('active'));
+                this.closest('label').classList.add('active');
+
+                // تغییر نوع و placeholder اینپوت
+                if (this.value === 'email') {
+                    inputField.type = 'email';
+                    inputField.placeholder = 'آدرس ایمیل شما...';
+                } else {
+                    inputField.type = 'tel';
+                    inputField.placeholder = 'شماره موبایل (مثلا 0912...)';
+                }
+            });
+        });
+    });
+</script>
+{% endblock %}

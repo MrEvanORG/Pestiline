@@ -17,10 +17,14 @@ class EducationInline(admin.TabularInline):
 class ResumeAdmin(admin.ModelAdmin):
     list_display = ('name', 'title', 'email', 'phone_number')
     search_fields = ('name', 'title')
+    readonly_fields = ('visit_count',)
     inlines = [WorkExperienceInline, EducationInline]
     fieldsets = (
+        ('اطلاعات سیستم', {
+            'fields': ('slug','is_confirmed','seo_priority','changefreq','visit_count')
+        }),
         ('اطلاعات شخصی', {
-            'fields': ('related_user','slug','is_confirmed','role','name', 'title', 'avatar', 'about_me', 'age', 'email', 'phone_number', 'address')
+            'fields': ('related_user','role','name', 'title', 'avatar', 'about_me', 'age', 'email', 'phone_number', 'address')
         }),
         ('فایل‌ها', {
             'fields': ('resume_file',)

@@ -403,7 +403,7 @@ document.addEventListener('DOMContentLoaded', () => {
         e.target.style.opacity = '0.7';
         
         // ۴. ارسال درخواست به سرور
-        fetch('/api/auth/request-otp/', {
+        fetch('/api/auth/request_otp/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

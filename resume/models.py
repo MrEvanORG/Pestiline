@@ -4,6 +4,8 @@ from django.urls import reverse
 from django.utils.text import slugify
 from django.core.exceptions import ValidationError
 from products.models import User
+from seo.models import ChangeFreqChoices
+from django.core.validators import MinValueValidator, MaxValueValidator
 # ایمپورت تابع فشرده‌سازی از محصولات
 from products.models import compress_image 
 from .addons import persian_slugify
@@ -40,10 +42,26 @@ class Resume(models.Model):
         uxui_designer = "uxui_designer", "طراح Ui/Ux"
         sql_designer = "sql_designer", "طراح پایگاه داده"
 
+    is_confirmed = models.BooleanField(default=True, verbose_name='وضعیت نمایش و انتشار در سایت مپ')
+    
+    seo_priority = models.DecimalField(
+        max_digits=2, 
+        decimal_places=1, 
+        default=0.4,  # <--- مقدار جدید
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+        verbose_name='اولویت سئو'
+    )
+    changefreq = models.CharField(
+        max_length=20, 
+        choices=ChangeFreqChoices.choices, 
+        default=ChangeFreqChoices.MONTHLY,  # <--- مقدار جدید
+        verbose_name='فرکانس تغییر'
+    )
     slug = models.SlugField(allow_unicode=True, unique=True, blank=True, verbose_name='اسلاگ رزومه')
     related_user = models.ForeignKey(User,null=True,blank=True,on_delete=models.SET_NULL,verbose_name='مرتبط با کاربر')
     role = models.CharField(max_length=20, choices=RoleType, default=RoleType.developer, verbose_name='نقش')
-    is_confirmed = models.BooleanField(default=False, verbose_name='وضعیت نمایش')
+
+    # تغییر دیفالت فرکانس تغییر برای محصول به WEEKLY
     name = models.CharField(max_length=100, verbose_name="نام")
     title = models.CharField(max_length=100, verbose_name="تخصص کوتاه (مثلا: برنامه‌نویس وب)")
     
@@ -71,6 +89,8 @@ class Resume(models.Model):
     telegram_url = models.URLField(max_length=200, blank=True, null=True, verbose_name="لینک تلگرام")
     instagram_url = models.URLField(max_length=200, blank=True, null=True, verbose_name="لینک اینستاگرام")
     github_url = models.URLField(max_length=200, blank=True, null=True, verbose_name="لینک گیت‌هاب")
+
+    visit_count = models.PositiveIntegerField(default=0)
 
     def __str__(self):
         return self.name

@@ -1,9 +1,14 @@
-from django.shortcuts import render
+import jdatetime
+from django.db.models import F
+from resume.models import Resume
 from django.utils import timezone
+from django.utils import timezone
+from django.core.cache import cache
+from django.shortcuts import render
+from products.models import SiteSettings 
+from .addons import get_client_fingerprint
 from django.urls import resolve, Resolver404
 from django.conf import settings as django_settings
-from .models import SiteSettings
-from resume.models import Resume
 
 class SiteStatusMiddleware:
     def __init__(self, get_response):
@@ -18,7 +23,7 @@ class SiteStatusMiddleware:
                 return self.get_response(request)
             
             if settings.bypass_for_staff and request.user.is_authenticated and request.user.is_staff:
-                return self.get_response(request)
+                return self.get_response(request) 
             # -----------------------------------------------
 
             current_path = request.path
@@ -26,7 +31,7 @@ class SiteStatusMiddleware:
             if current_path.startswith(django_settings.STATIC_URL) or current_path.startswith(django_settings.MEDIA_URL):
                 return self.get_response(request)
 
-            if current_path.startswith('/secure_admin_login_auth'):
+            if current_path.startswith(f'/{django_settings.ADMIN_URL}'):
                 return self.get_response(request)
 
             allowed_paths = [
@@ -72,3 +77,74 @@ class SiteStatusMiddleware:
             else:
                 context['is_expired'] = True
         return context
+    
+class SiteViewCounterMiddleware:
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
+        response = self.get_response(request)
+
+        # عدم شمارش بازدید برای پنل ادمین، فایل‌های استاتیک و مدیا
+        if request.path.startswith(f'/{django_settings.ADMIN_URL}/') or request.path.startswith('/media/') or request.path.startswith('/static/'):
+            return response
+
+        fp = get_client_fingerprint(request)
+        cache_key = f"site_visit_fp:{fp}"
+
+        if cache.get(cache_key):
+            return response
+
+        cache.set(cache_key, True, timeout=86400)
+
+        today_gregorian = timezone.localdate()
+        settings_obj = SiteSettings.objects.first()
+
+        if not settings_obj:
+            SiteSettings.objects.create(
+                total_views=1, 
+                today_views=1, 
+                this_week_views=1,
+                this_month_views=1, 
+                this_year_views=1, 
+                last_reset_date=today_gregorian
+            )
+            return response
+
+        last_date_gregorian = settings_obj.last_reset_date
+        
+        update_fields = {
+            'total_views': F('total_views') + 1,
+            'today_views': F('today_views') + 1,
+            'this_week_views': F('this_week_views') + 1,
+            'this_month_views': F('this_month_views') + 1,
+            'this_year_views': F('this_year_views') + 1,
+        }
+
+        # بررسی تغییر تاریخ برای صفر کردن شمارنده‌ها
+        if last_date_gregorian != today_gregorian:
+            # ۱. تبدیل تاریخ‌های میلادی به شمسی برای مقایسه
+            j_today = jdatetime.date.fromgregorian(date=today_gregorian)
+            j_last_date = jdatetime.date.fromgregorian(date=last_date_gregorian)
+
+            update_fields['today_views'] = 1  # type: ignore # چون روز عوض شده، شمارنده امروز از ۱ شروع می‌شود
+            
+            # ۲. بررسی تغییر هفته شمسی (شنبه تا جمعه)
+            # متد isocalendar در jdatetime بر اساس تقویم شمسی عمل می‌کند
+            if j_last_date.isocalendar()[1] != j_today.isocalendar()[1] or j_last_date.year != j_today.year:
+                update_fields['this_week_views'] = 1 # type: ignore
+                
+            # ۳. بررسی تغییر ماه شمسی
+            if j_last_date.month != j_today.month or j_last_date.year != j_today.year:
+                update_fields['this_month_views'] = 1 # type: ignore
+                
+            # ۴. بررسی تغییر سال شمسی
+            if j_last_date.year != j_today.year:
+                update_fields['this_year_views'] = 1 # type: ignore
+            
+            update_fields['last_reset_date'] = today_gregorian # type: ignore
+
+        # اجرای یک کوئری update بهینه برای تمام تغییرات
+        SiteSettings.objects.update(**update_fields)
+
+        return response

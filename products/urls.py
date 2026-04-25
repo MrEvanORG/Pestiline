@@ -5,6 +5,10 @@ from . import views , addons
 
 urlpatterns = [
     path('', views.index_page, name='index'),
+
+    path('ai_assitant/', views.ai_page, name='ai_assistant'),
+    path('mixer/', views.mixer_page, name='mixer'),
+
     path('about_us/', views.aboutus_page, name='about_us'),
     path('shop/', views.aboutus_page, name='shop'),
 

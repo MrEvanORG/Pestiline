@@ -3,7 +3,7 @@ import time
 from decimal import Decimal
 from django.urls import reverse 
 from django.contrib import messages
-from django.db.models import Count, Q
+from django.db.models import Count, Q , F
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login
 from django.views.decorators.http import require_POST
@@ -11,7 +11,9 @@ from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect, get_object_or_404
 from .models import User, Province, City, Product, Order, OrderItem
 from .forms import UserRegisterForm, UserLoginForm ,SetNewPasswordForm
-from .addons import initiate_otp_process, get_otp_settings, get_remaining_otp_time
+from .addons import initiate_otp_process, get_otp_settings, get_remaining_otp_time , get_client_fingerprint
+from blog.models import BlogPost
+from django.core.cache import cache
 #-----------------------------------------------------------------------------------
 def index_page(request): 
     # وضعیت‌های معتبر برای محاسبه یک فروش موفق
@@ -21,8 +23,13 @@ def index_page(request):
     featured_products = Product.objects.filter(active_status=True).annotate(
         total_sales=Count('orderitem', filter=Q(orderitem__order__status__in=valid_statuses))
     ).order_by('-visit_count', '-total_sales')[:4]
+
+    blogposts = BlogPost.objects.filter(is_published=True)\
+            .select_related('category', 'author')\
+            .order_by('-created_at')[:3]
     
     context = {
+        'posts':blogposts,
         'featured_products': featured_products
     }
     return render(request, 'index.html', context)
@@ -500,7 +507,6 @@ def resend_otp_api(request):
              return JsonResponse({'success': False, 'message': 'لطفاً صبر کنید.', 'ttl': result['ttl']}, status=429)
         return JsonResponse({'success': False, 'message': 'خطا در ارسال.'}, status=500)
     
-
 @require_POST
 def request_otp_api(request):
     """API درخواست ارسال کد OTP برای ورود یا فراموشی رمز از صفحه لاگین"""
@@ -542,12 +548,13 @@ def product_detail(request, slug):
     # دریافت محصول فعال
     product = get_object_or_404(Product, slug=slug, active_status=True)
     
-    # 1. منطق بازدید (Session Based)
-    session_key = f'viewed_product_{product.id}'
-    if not request.session.get(session_key, False):
-        product.visit_count += 1
-        product.save()
-        request.session[session_key] = True
+    user_fingerprint = get_client_fingerprint(request)
+    view_key = f"viewed:product:{product.id}:fp:{user_fingerprint}" # type: ignore
+    
+    if not cache.get(view_key):
+        cache.set(view_key, True, timeout=86400) 
+        
+        Product.objects.filter(pk=product.id).update(visit_count=F('visit_count') + 1) # type: ignore
 
     # 2. بررسی وضعیت سبد خرید (آیا محصول در سبد هست؟ مقدارش چقدره؟)
     in_cart = False
@@ -824,3 +831,9 @@ def order_success_page(request, order_number):
     # جستجو بر اساس order_number اختصاصی
     order = get_object_or_404(Order, order_number=order_number, customer=request.user)
     return render(request, 'order_success.html', {'order': order})
+
+def ai_page(request):
+    return render(request,"developing.html",{"message":"ما در حال طراحی، برنامه‌نویسی و آماده‌سازی هوش مصنوعی پستیلاین هستیم تا تجربه بی‌نظیری را برای شما رقم بزنیم. به زودی با امکانات جدید در این صفحه میزبان شما خواهیم بود"})
+
+def mixer_page(request):
+    return render(request,"developing.html")

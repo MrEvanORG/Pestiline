@@ -5,7 +5,7 @@ using Django 6.0.1.
 import os
 from pathlib import Path
 from decouple import config
-#------------------------ BaseSettings ------------------------#
+# ------------------------ BaseSettings ------------------------#
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEV_MODE = config('DEV_MODE',cast=bool)
@@ -14,12 +14,18 @@ SMS_API = config('SMS_API')
 
 SECRET_KEY = config('DJANGO_SECRET_KEY')
 
+ADMIN_URL = config('ADMIN_URL')
+
+SITEMAP_URL = config('SITEMAP_URL')
+
 if DEV_MODE:
     DEBUG = True
 else :
     DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1','www.pestiline.ir','pestiline.ir']
+ALLOWED_HOSTS = ['127.0.0.1','10.142.128.235','www.pestiline.ir','pestiline.ir']
+
+CSRF_TRUSTED_ORIGINS = ['http://10.142.128.235']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -28,12 +34,13 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sitemaps', 
 
     'products.apps.ProductsConfig',
     'resume.apps.ResumeConfig',
     'seo.apps.SeoConfig',
 
-    # 'adminsortable2', 
+    'adminsortable2', 
     # pip install django-adminsortable2
 
     'blog.apps.BlogConfig',
@@ -53,6 +60,8 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     
     'products.middleware.SiteStatusMiddleware',
+    'products.middleware.SiteViewCounterMiddleware',#شمردن ویوهای سایت
+    
 ]
 
 ROOT_URLCONF = 'pestiline.urls'
@@ -68,7 +77,8 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'products.context_processors.site_settings',
-                'products.context_processors.cart_context'
+                'products.context_processors.cart_context',
+                'seo.context_processors.seo_processor'
             ],
         },
     },
@@ -76,6 +86,15 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'pestiline.wsgi.application'
 
+#---------------------------- Cashes --------------------------#
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+        'LOCATION': 'django_site_cache_table', # نام جدولی که جنگو می‌سازد
+    }
+}
+# python manage.py createcachetable
+#جایگزین ردیس موقت !
 #--------------------------- Databases ------------------------#
 # Database
 # https://docs.djangoproject.com/en/6.0/ref/settings/#databases
@@ -141,6 +160,7 @@ if not DEV_MODE :
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
+
 
 #----------------------- Persianolization ---------------------#
 # Internationalization

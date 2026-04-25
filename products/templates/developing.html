@@ -4,12 +4,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پستیلاین | در حال توسعه</title>
-    
+    <title>{% if seo_title %}{{seo_title}}{% else %}پستیلاین | درحال توسعه وبسایت{% endif %}</title>
+    <meta name="description" content="{% if seo_description %}{{seo_description}}{% else %}ما در حال طراحی و توسعه این بخش از وبسایت هستیم تا تجربه بی نظیری را برای شما رقم بزنیم به زودی با امکانات جدید در پستیلاین با شما خواهیم بود{% endif %}">
     <link href="{% static 'products/css/Vazirmatn.css' %}" rel="stylesheet" type="text/css" />
-    <link rel="stylesheet" href="{% static 'products/css/all_awesome.css' %}">
-    <link rel="stylesheet" href="{% static 'products/css/root/light_root.css' %}">
-    <link rel="stylesheet" href="{% static 'products/css/status_page.css' %}">
+    <link rel="stylesheet" href="{% static 'products/css/all_awesome.css' %}" type="text/css" />
+    <link rel="stylesheet" href="{% static 'products/css/root/light_root.css' %}" type="text/css" />
+    <link rel="stylesheet" href="{% static 'products/css/status_page.css' %}" type="text/css" />
+    <link rel="icon" href="{% static 'products/img/fav.svg' %}" type="image/svg+xml">
 </head>
 <body>
 <div class="cs-bg"></div>

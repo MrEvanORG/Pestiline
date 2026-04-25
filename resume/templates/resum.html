@@ -5,9 +5,8 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-
-    <title>{{ resume.name }} | {{ resume.title }} - رزومه و سوابق کاری</title>
-    <meta name="description" content="رزومه کامل {{ resume.name }}، {{ resume.title }}. مشاهده سوابق کاری، مهارت‌های فنی و راه‌های ارتباطی.">
+    <title>{% if seo_title %}{{seo_title}}{% else %}{{ resume.name }} | {{ resume.title }} - رزومه و سوابق کاری{% endif %}</title>
+    <meta name="description" content="{% if seo_description %}{{seo_description}}{% else %}رزومه کامل {{ resume.name }}، {{ resume.title }}. مشاهده سوابق کاری، مهارت‌های فنی و راه‌های ارتباطی.{% endif %}">
     <meta name="keywords" content="{{ resume.name }}, رزومه {{ resume.name }}, {{ resume.title }}, برنامه نویس, توسعه دهنده">
     <link rel="canonical" href="https://pestiline.ir/resume/{{ resume.slug }}/" />
 
@@ -88,7 +87,7 @@
                             {% if resume.twitter_url and "example" not in resume.twitter_url %}
                             <li class="nav-item">
                                 <a class="nav-link" href="{{ resume.twitter_url }}" title="Twitter" rel="noopener noreferrer" target="_blank">
-                                    <i class="fa fa-twitter"></i><span class="menu-title sr-only">Twitter</span>
+                                    <i class="fa-brands fa-x-twitter"></i><span class="menu-title sr-only">Twitter</span>
                                 </a>
                             </li>
                             {% endif %}
@@ -309,7 +308,7 @@
                         <ul class="nav justify-content-center" style="padding: 3px;">
                             {% if resume.twitter_url and "example" not in resume.twitter_url %}
                             <li class="nav-item">
-                                <a class="nav-link" href="{{ resume.twitter_url }}" title="Twitter"><i class="fab fa-twitter"></i></a>
+                                <a class="nav-link" href="{{ resume.twitter_url }}" title="Twitter"><i class="fab fa-x-twitter"></i></a>
                             </li>
                             {% endif %}
                             

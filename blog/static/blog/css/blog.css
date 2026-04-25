@@ -58,7 +58,13 @@
 .post-author-row__name { font-size: 0.95rem; color: var(--post-muted); }
 .post-author-row__name strong { color: var(--post-primary); }
 .post-author-row__dates { display: flex; align-items: center; gap: 15px; flex-wrap: wrap; font-size: 0.8rem; color: #888; }
-
+@media (max-width:480px){
+    .post-author-row__dates{
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0px;
+    }
+}
 /* استایل جدید زمان مطالعه */
 .post-reading-time {
     margin-right: auto;
@@ -73,9 +79,9 @@
     font-size: 0.85rem;
     border: 1px solid rgba(133, 169, 71, 0.2);
 }
-
-.post-cover-img { width: 100%; aspect-ratio: 16/10; object-fit: cover; border-radius: var(--post-radius); box-shadow: 0 8px 24px rgba(0,0,0,0.06);transition:transform 0.5s cubic-bezier(0.25, 0.45, 0.45, 0.95)}
-.post-cover-img:hover{transform:scale()}
+.post-page-header__cover{overflow: hidden;border-radius: var(--post-radius);}
+.post-cover-img { width: 100%; aspect-ratio: 16/10; object-fit: cover; border-radius: var(--post-radius); box-shadow: 0 8px 24px rgba(0,0,0,0.06);transition:transform 0.4s ease;}
+.post-cover-img:hover{transform:scale(1.08);}
 /* ── بدنه مقاله ── */
 .post-body-wrapper { padding: 4rem 0; background: transparent; }
 .post-body-grid { display: grid; grid-template-columns: 7fr 3fr; gap: 4rem; align-items: start; }
@@ -85,9 +91,10 @@
 .sidebar-widget { background: #fff; border: 1px solid var(--post-border); border-radius: var(--post-radius); }
 .sidebar-widget__header { padding: 15px 20px; background: #fafafa; font-weight: bold; color: var(--post-primary); display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--post-border); border-radius: var(--post-radius) var(--post-radius) 0 0; }
 .toc-list { padding: 10px 0; max-height: 70vh; overflow-y: auto; }
-.toc-item { display: block; padding: 10px 20px; font-size: 0.9rem; color: var(--post-muted); border-right: 3px solid transparent; transition: 0.2s; text-decoration: none; }
-.toc-item:hover, .toc-item.active { color: var(--post-primary); font-weight: bold; background: rgba(0,0,0,0.02); border-right-color: var(--post-secondary); }
-.toc-item--h3 { padding-right: 35px; font-size: 0.85rem; opacity: 0.9; }
+.toc-item { display: block; padding: 10px 20px; font-size: 0.9rem; color: var(--post-muted); border-right: 3px solid transparent; transition: 0.2s; text-decoration: none; font-weight: 600;border-bottom: 1px solid var(--post-border)}
+.toc-item:last-child{border-bottom:none}
+.toc-item:hover, .toc-item.active { color: var(--post-primary); font-weight: bold; background: rgba(0,0,0,0.02); border-right-color: var(--accent-brick); }
+.toc-item--h3 { padding-right: 37px; font-size: 0.85rem; opacity: 0.9; }
 
 /* محتوای اصلی */
 .post-content-col { min-width: 0; }

@@ -4,7 +4,7 @@ body,
 .form-row, 
 h1, h2, h3, h4, h5, h6, 
 input, select, textarea, button {
-    font-family: 'Vazir', Tahoma, sans-serif !important;
+    font-family: 'Vazirmatn', Tahoma, sans-serif !important;
 }
 
 
@@ -109,3 +109,39 @@ html[data-theme="dark"] {
 
     color-scheme: dark;
 }
+    #branding-wrapper {
+        display: flex;
+        align-items: center;
+        gap: 20px;
+    }
+    
+    #admin-datetime-header {
+        color: #e2e8f0;
+        font-size: 14px;
+        font-weight: 500;
+        background: rgba(0, 0, 0, 0.15);
+        padding: 6px 15px;
+        border-radius: 4px;
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+
+    #jalali-time-text {
+        font-weight: bold;
+        color:var(--accent); /* یک رنگ سبز ملایم برای ساعت تا جلب توجه کند */
+    }
+
+    /* تنظیمات موبایل: نمایش تاریخ زیر برندینگ */
+    @media (max-width: 768px) {
+        #branding-wrapper {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        #admin-datetime-header {
+            font-size: 13px;
+            padding: 4px 12px;
+        }
+    }

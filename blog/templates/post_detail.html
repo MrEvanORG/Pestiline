@@ -1,7 +1,8 @@
 {% extends "patterns/main_base.html" %}
 {% load static %}
+{% load custom_filters %}
 
-{% block title %}{{ post.title }}{% endblock %}
+{% block title %}{{ post.title }} | وبلاگ پستیلاین{% endblock %}
 {% block description %}{{ post.meta_description|default:post.title }}{% endblock %}
 
 {% block head %}
@@ -45,10 +46,10 @@
             {% endif %}
 
             <div class="post-author-row">
-                {% if author_resume and author_resume.avatar %}
+                {% if author_resume and author_resume.is_confirmed and author_resume.avatar %}
+                <a href="{{ author_resume.get_absolute_url }}">
                     <img src="{{ author_resume.avatar.url }}" alt="{{ author_resume.name }}" class="post-author-row__avatar">
-                {% elif post.author.profile.avatar %}
-                    <img src="{{ post.author.profile.avatar.url }}" alt="{{ post.author.get_full_name }}" class="post-author-row__avatar">
+                </a>
                 {% else %}
                     <div class="post-author-row__avatar post-author-row__avatar--placeholder">
                         <i class="fa-regular fa-user"></i>
@@ -62,11 +63,11 @@
                     </span>
                     <div class="post-author-row__dates">
                         <span class="post-author-row__date">
-                            <i class="fa-regular fa-calendar-days"></i> انتشار: {{ post.created_at|date:"Y/m/d" }}
+                            <i class="fa-regular fa-calendar-days"></i> انتشار: {{ post.created_at|to_jalali:"persian_date" }}
                         </span>
                         {% if post.updated_at.date != post.created_at.date %}
                         <span class="post-author-row__date">
-                            <i class="fa-regular fa-pen-to-square"></i> بروزرسانی: {{ post.updated_at|date:"Y/m/d" }}
+                            <i class="fa-regular fa-pen-to-square"></i> بروزرسانی: {{ post.updated_at|to_jalali:"persian_date" }}
                         </span>
                         {% endif %}
                     </div>
@@ -83,7 +84,8 @@
 
         <div class="post-page-header__cover">
             {% if post.cover_image %}
-                <img src="{{ post.cover_image.url }}" alt="{{ post.title }}" class="post-cover-img">
+                <!-- اضافه شدن alt کاور برای سئو -->
+                <img src="{{ post.cover_image.url }}" alt="{{ post.cover_image_alt|default:post.title }}" class="post-cover-img">
             {% else %}
                 <div class="post-cover-placeholder"><i class="fa-slab-press fa-image"></i></div>
             {% endif %}
@@ -114,22 +116,37 @@
                 <p class="post-block post-block--p">{{ block.content|safe }}</p>
             {% elif block.block_type == 'list' %}
                 <div class="post-block post-block--list raw-text-list">{{ block.content }}</div>
+            
             {% elif block.block_type == 'image' %}
                 <figure class="post-block post-block--image">
                     {% if block.image %}
+                        <!-- تنظیم alt تصویر تک -->
                         <img src="{{ block.image.url }}" alt="{{ block.content|default:post.title }}">
                     {% endif %}
                     {% if block.content %}
+                        <!-- اگر بخواهید محتوا زیر عکس هم چاپ شود -->
                         <figcaption>{{ block.content }}</figcaption>
                     {% endif %}
                 </figure>
+            
             {% elif block.block_type == 'gallery' %}
                 <!-- این آیتم توسط JS پردازش و در صورت توالی، گروه بندی می‌شود -->
                 <figure class="raw-gallery-item" data-caption="{{ block.content|default:'' }}">
                     {% if block.image %}
-                        <img src="{{ block.image.url }}" alt="Gallery Image">
+                        <!-- تنظیم alt تصویر گالری -->
+                        <img src="{{ block.image.url }}" alt="{{ block.content|default:'تصویر گالری مقاله' }}">
                     {% endif %}
                 </figure>
+
+            {% elif block.block_type == 'banner' %}
+                <!-- اضافه شدن هندلینگ بلاک بنر تبلیغاتی/CTA -->
+                <div class="post-block post-block--banner">
+                    {% if block.image %}
+                        <!-- تنظیم alt تصویر بنر -->
+                        <img src="{{ block.image.url }}" alt="{{ block.content|default:'بنر تبلیغاتی' }}">
+                    {% endif %}
+                </div>
+
             {% else %}
                 <div class="post-block post-block--generic">{{ block.content|safe }}</div>
             {% endif %}
@@ -138,7 +155,7 @@
         {% endfor %}
 
             {# ── بخش ۱: کارت رزومه ── #}
-            {% if author_resume %}
+            {% if author_resume and author_resume.is_confirmed %}
             <a href="{{ author_resume.get_absolute_url }}" class="author-resume-card">
                 <div class="author-resume-card__top-row">
                     <div class="author-identity">

@@ -3,7 +3,9 @@ from django.contrib.auth.admin import UserAdmin
 from django.core.exceptions import ValidationError
 from django.utils.html import format_html
 from .models import User, Product, ProductComponent, SiteSettings, ProductImage , MessageSiteSettings
-from .models import Order, OrderItem
+from .models import Order, OrderItem , Ticket , TicketMessage , NotificationLog
+from products.templatetags.custom_filters import to_jalali
+from django.db.models import Q
 
 # --- تنظیمات پنل مدیریت اختصاصی ---
 class PestilineAdminSite(admin.AdminSite):
@@ -16,7 +18,7 @@ class PestilineAdminSite(admin.AdminSite):
         for app in app_list:
             if app['app_label'] == 'products':
                 app['name'] = 'مدیریت محصولات'
-                custom_order = ['User', 'Product', 'Order', 'MessageSiteSettings','SiteSettings']
+                custom_order = ['User', 'Product', 'Order', 'Ticket','NotificationLog','MessageSiteSettings','SiteSettings']
                 app['models'].sort(key=lambda x: custom_order.index(x['object_name']) if x['object_name'] in custom_order else len(custom_order))
         return app_list
 
@@ -59,12 +61,15 @@ class ProductAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('name',)}
     
     # ۲. فیلدهای آمار فروش به بخش فقط خواندنی اضافه شدند تا در fieldsets قابل نمایش باشند
-    readonly_fields = ('visit_count', 'get_sales_count', 'get_total_volume')
+    readonly_fields = ('visit_count','get_sales_count', 'get_total_volume')
 
     # ۳. گروه‌بندی فیلدها (اضافه شدن آمار فروش به دسته‌بندی آمار سیستم)
     fieldsets = (
         ('اطلاعات پایه', {
-            'fields': ('name', 'slug', 'seller', 'active_status', 'description')
+            'fields': ('slug', 'active_status','seo_priority','changefreq','visit_count')
+        }),
+        ('اطلاعات محصول', {
+            'fields': ('name', 'seller', 'description')
         }),
         ('تنظیمات مالی و نوع فروش', {
             'fields': ('sale_method', 'price', 'package_weight', 'is_mixed')
@@ -75,8 +80,8 @@ class ProductAdmin(admin.ModelAdmin):
         ('اطلاعات ارسال', {
             'fields': ('is_free_shipping', 'time_tosend')
         }),
-        ('آمار سیستم', {
-            'fields': ('visit_count', 'get_sales_count', 'get_total_volume'),
+        ('آمار ', {
+            'fields': ( 'get_sales_count', 'get_total_volume'),
             'classes': ('collapse',) # به صورت پیش‌فرض بسته است
         }),
     )
@@ -126,35 +131,50 @@ class ProductAdmin(admin.ModelAdmin):
 @admin.register(User, site=super_admin_site)
 class CustomUserAdmin(UserAdmin):
     class Media:
-        js = ('js/admin_chained_cities.js',)
+        js = ('products/js/admin_chained_cities.js',)
     
     fieldsets = (
         ('اطلاعات ورود', {'fields': ('username', 'password'), 'classes': ('wide',)}),
         ('اطلاعات شخصی', {'fields': ('first_name', 'last_name', 'email', 'phone_number'), 'classes': ('extrapretty',)}),
         ('موقعیت جغرافیایی', {'fields': ('province', 'city','address','postal_code')}),
         ('سطوح دسترسی', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'), 'classes': ('collapse',)}),
-        ('تاریخ‌های مهم', {'fields': ('last_login', 'date_joined'), 'classes': ('collapse',)}),
+        ('تاریخ‌های مهم', {'fields': ('tj_last_login', 'tj_date_joined'), 'classes': ('collapse',)}),
     )
     list_display = ('username', 'phone_number', 'province', 'city', 'is_staff')
     list_filter = ('is_superuser','is_staff')
+    readonly_fields = ("tj_last_login","tj_date_joined")
+
+    def tj_last_login(self, obj):
+        return to_jalali(obj.last_login,form="persian_date_time")
+    tj_last_login.short_description = "آخرین ورود"
+
+    def tj_date_joined(self, obj):
+        return to_jalali(obj.date_joined,form="persian_date_time")
+    tj_date_joined.short_description = "تاریخ عضویت"
 
 @admin.register(MessageSiteSettings,site=super_admin_site)
 class MessageSiteSettingsAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('primary_line_number',)}),
-        ('ارسال پیامک به ادمین', {'fields': ('ta_new_user','ta_new_order','ta_cancell_order'),'classes': ('collapse',)}),
-        ('ارسال پیامک به کاربر', {'fields': ('tu_wellcome','tu_submit_order','tu_send_order'),'classes': ('collapse',)}),
+        ('ارسال پیامک به ادمین', {'fields': ('ta_new_user','ta_new_order','ta_cancell_order','ta_new_ticket','ta_new_ticketmessage'),'classes': ('collapse',)}),
+        ('ارسال پیامک به کاربر', {'fields': ('tu_wellcome','tu_submit_order','tu_send_order','tu_new_ticketmessage'),'classes': ('collapse',)}),
     )
     def has_delete_permission(self, request, obj=None): return False
     def has_add_permission(self, request): return not MessageSiteSettings.objects.exists()
 
 @admin.register(SiteSettings, site=super_admin_site)
 class SiteSettingsAdmin(admin.ModelAdmin):
+    readonly_fields = ('total_views','today_views','this_week_views','this_month_views','this_year_views','tj_last_reset_date')
     fieldsets = (
         ('وضعیت سایت', {'fields': ('status', 'maintenance_message','coming_soon_date','bypass_for_staff','bypass_for_superuser'),'classes': ('collapse',)}),
         ('سایر تنظیمات', {'fields': ('otp_time_interval',),'classes': ('collapse',)}),
         ('لینک های وبسایت', {'fields': ('link_phone1','link_phone2','link_prphone','link_mail','link_instagram','link_telegram','link_whatsapp','link_twitter','link_address','address_text'),'classes': ('collapse',)}),
+        ('بازدید های وبسایت', {'fields': ('total_views','today_views','this_week_views','this_month_views','this_year_views','tj_last_reset_date'),'classes': ('collapse',)}),
     )
+    def tj_last_reset_date(self,obj):
+        return to_jalali(obj.last_reset_date,form="persian_date")
+    tj_last_reset_date.short_description = "زمان آخرین ریست تاریخ"
+
     def has_delete_permission(self, request, obj=None): return False
     def has_add_permission(self, request): return not SiteSettings.objects.exists()
 
@@ -178,7 +198,7 @@ class OrderAdmin(admin.ModelAdmin):
     search_fields = ['order_number', 'customer__phone_number', 'customer__last_name', 'tracking_code']
     inlines = [OrderItemInline]
     # order_number باید فقط خواندنی باشد
-    readonly_fields = ['order_number', 'total_price', 'created_at', 'updated_at']
+    readonly_fields = ['order_number', 'total_price', 'tj_created_at', 'tj_updated_at']
     
     fieldsets = (
         ('اطلاعات کلی', {
@@ -191,9 +211,17 @@ class OrderAdmin(admin.ModelAdmin):
             'fields': ('shipping_cost', 'total_price')
         }),
         ('زمان‌بندی', {
-            'fields': ('created_at', 'updated_at')
+            'fields': ('tj_created_at', 'tj_updated_at')
         }),
     )
+
+    def tj_created_at(self,obj):
+        return to_jalali(obj.created_at,form="persian_date_time")
+    tj_created_at.short_description = "تاریخ ایجاد"
+
+    def tj_updated_at(self,obj):
+        return to_jalali(obj.updated_at,form="persian_date_time")
+    tj_updated_at.short_description = "آخرین آپدیت"
 
     def total_price_display(self, obj):
         return f"{int(obj.total_price):,} تومان"
@@ -202,3 +230,174 @@ class OrderAdmin(admin.ModelAdmin):
     def save_model(self, request, obj, form, change):
         super().save_model(request, obj, form, change)
         obj.calculate_total()
+
+from django.contrib import admin
+from .models import Ticket, TicketMessage, User
+from products.templatetags.custom_filters import to_jalali
+
+# --- اینلاین پیام‌های گفتگو ---
+class TicketMessageInline(admin.StackedInline):
+    model = TicketMessage
+    extra = 0
+    readonly_fields = ['tj_created_at']
+    fields = ['sender', 'reply_to', 'text', 'attachment',  'tj_created_at']
+
+    def tj_created_at(self, obj):
+        if obj.pk:
+            return to_jalali(obj.created_at, form="persian_date_time")
+        return "-"
+    tj_created_at.short_description = "زمان ارسال"
+
+    def formfield_for_foreignkey(self, db_field, request, **kwargs):
+        if request.resolver_match and request.resolver_match.kwargs.get('object_id'):
+            ticket_id = request.resolver_match.kwargs.get('object_id')
+            ticket = Ticket.objects.get(pk=ticket_id)
+            
+            # ۱. محدود کردن لیست پیام‌ها برای فیلد ریپلای
+            if db_field.name == "reply_to":
+                kwargs["queryset"] = TicketMessage.objects.filter(ticket_id=ticket_id).order_by('created_at')
+
+            # ۲. محدود کردن لیست کشویی فرستنده (Sender)
+            if db_field.name == "sender":
+                allowed_users_ids = [ticket.user.id]
+                if ticket.responder:
+                    allowed_users_ids.append(ticket.responder.id)
+                else:
+                    # اگر مسئولی نداره، ادمین فعلی رو تو لیست بذار تا بتونه پیام بده
+                    allowed_users_ids.append(request.user.id)
+                kwargs["queryset"] = User.objects.filter(id__in=allowed_users_ids)
+                
+        else:
+            if db_field.name == "reply_to":
+                kwargs["queryset"] = TicketMessage.objects.none()
+                
+        return super().formfield_for_foreignkey(db_field, request, **kwargs)
+
+class AdminUsersFilter(admin.SimpleListFilter):
+    # عنوانی که در پنل سمت راست (بخش فیلترها) نمایش داده می‌شود
+    title = 'ادمین / کارمند مرتبط'
+    
+    # نام پارامتری که در URL قرار می‌گیرد (مثلا ?staff_user=2)
+    parameter_name = 'staff_user'
+
+    def lookups(self, request, model_admin):
+        """
+        این متد گزینه‌هایی که در لیست فیلتر نمایش داده می‌شوند را مشخص می‌کند.
+        خروجی باید یک لیست از تاپل‌ها (Tuples) باشد: (value, display_name)
+        """
+        # فقط کاربرانی که کارمند یا سوپریوزر هستند را واکشی می‌کنیم
+        staff_users = User.objects.filter(Q(is_staff=True) | Q(is_superuser=True))
+        
+        # ساخت لیست تاپل‌ها برای نمایش در پنل
+        # اگر کاربر نام کامل داشت آن را نشان بده، وگرنه یوزرنیم
+        return [
+            (user.id, user.get_full_name() or user.username) 
+            for user in staff_users
+        ]
+
+    def queryset(self, request, queryset):
+        """
+        این متد دیتابیس را بر اساس گزینه انتخاب شده فیلتر می‌کند.
+        """
+        # اگر گزینه‌ای انتخاب شده بود (مقدار آن در self.value() قرار می‌گیرد)
+        if self.value():
+            # دقت کنید که نام فیلد در مدل شما چیست. 
+            # اگر فیلد مدل شما user است، مینویسیم user_id. 
+            # اگر responder است، مینویسیم responder_id
+            return queryset.filter(user_id=self.value())
+            
+        # اگر چیزی انتخاب نشده بود، همه را برگردان
+        return queryset
+# --- ادمین گفتگو و پشتیبانی ---
+@admin.register(Ticket, site=super_admin_site) # با فرض اینکه super_admin_site را ایمپورت کرده‌اید
+class TicketAdmin(admin.ModelAdmin):
+    # استفاده از متد کاستوم برای نمایش هشتگ
+    list_display = ('formatted_ticket_number', 'user', 'subject_type', 'status', 'responder', 'tj_updated_at')
+    list_filter = ('status',AdminUsersFilter, 'subject_type', 'created_at')
+    search_fields = ('ticket_number', 'user__username', 'user__phone_number', 'responder__username')
+    inlines = [TicketMessageInline]
+    
+    readonly_fields = ('formatted_ticket_number', 'responder', 'tj_created_at', 'tj_updated_at')
+
+    fieldsets = (
+        ('اطلاعات گفتگو', {
+            # بجای ticket_number فیلد کاستوم رو میذاریم
+            'fields': ('formatted_ticket_number', 'user', 'responder', 'subject_type', 'status')
+        }),
+        ('لینک‌های مرتبط', {
+            'fields': ('order', 'product'),
+            'classes': ('collapse',),
+            'description': 'این فیلدها با توجه به موضوع گفتگو پر می‌شوند.'
+        }),
+        ('زمان‌بندی', {
+            'fields': ('tj_created_at', 'tj_updated_at')
+        }),
+    )
+
+    # نمایش هشتگ در پنل
+    def formatted_ticket_number(self, obj):
+        if obj.ticket_number:
+            return f"#{obj.ticket_number}"
+        return "-"
+    formatted_ticket_number.short_description = "شماره پیگیری"
+    formatted_ticket_number.admin_order_field = 'ticket_number' # برای حفظ قابلیت مرتب‌سازی
+
+    def tj_created_at(self, obj):
+        return to_jalali(obj.created_at, form="persian_date_time")
+    tj_created_at.short_description = "تاریخ ایجاد"
+
+    def tj_updated_at(self, obj):
+        return to_jalali(obj.updated_at, form="persian_date_time")
+    tj_updated_at.short_description = "آخرین آپدیت"
+
+    # --- جادوی ثبت خودکار فرستنده ---
+    def save_formset(self, request, form, formset, change):
+        if formset.model == TicketMessage:
+            instances = formset.save(commit=False)
+            for instance in instances:
+                # اگر فیلد فرستنده خالی گذاشته شده بود، کاربری که لاگین هست رو به عنوان فرستنده بذار
+                if not instance.sender:
+                    instance.sender = request.user
+                instance.save()
+            formset.save_m2m()
+        else:
+            super().save_formset(request, form, formset, change)
+
+
+@admin.register(NotificationLog,site=super_admin_site)
+class NotificationLogAdmin(admin.ModelAdmin):
+    list_display = ('user', 'notification_type', 'status', 'tj_created_at')
+    list_filter = ('notification_type','related_event', 'status', 'created_at')
+    search_fields = ('user__username', 'user__phone_number', 'message_content', 'error_details')
+    
+    # نمایش فیلدها در صفحه جزئیات
+    fieldsets = (
+        ('اطلاعات گیرنده', {
+            'fields': ('user', 'notification_type','related_event')
+        }),
+        ('محتوای پیام', {
+            'fields': ('message_content',)
+        }),
+        ('وضعیت ارسال', {
+            'fields': ('status', 'error_details', 'tj_created_at')
+        }),
+    )
+
+    readonly_fields = ('tj_created_at',)
+    # readonly_fields = ('user', 'notification_type' 'message_content', 'status', 'error_details', 'tj_created_at')
+
+    # غیرفعال کردن قابلیت افزودن گزارش دستی از پنل ادمین
+    def has_add_permission(self, request):
+        return True
+
+    # غیرفعال کردن قابلیت ویرایش گزارش‌های ثبت شده
+    def has_change_permission(self, request, obj=None):
+        return False
+        
+    # در صورت نیاز می‌توانید حذف را هم غیرفعال کنید:
+    # def has_delete_permission(self, request, obj=None):
+    #     return False
+
+    def tj_created_at(self, obj):
+        return to_jalali(obj.created_at, form="persian_date_time")
+    tj_created_at.short_description = "زمان ارسال"

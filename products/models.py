@@ -1,18 +1,20 @@
 import os
-import uuid
 import sys
+import uuid
+import random
 from io import BytesIO
-from PIL import Image as PilImage
-from django.core.files.uploadedfile import InMemoryUploadedFile
+from decimal import Decimal
 from django.db import models
-from django.contrib.auth.models import AbstractUser
-from django.core.exceptions import ValidationError
-from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator
-from django.utils import timezone
-from django.contrib.auth import get_user_model
+from django.urls import reverse
 from django.db.models import Sum
-# --- توابع کمکی ---
-
+from PIL import Image as PilImage
+from django.utils import timezone
+from seo.models import ChangeFreqChoices
+from django.core.exceptions import ValidationError
+from django.contrib.auth.models import AbstractUser
+from django.core.files.uploadedfile import InMemoryUploadedFile
+from django.core.validators import MinValueValidator, MaxValueValidator, RegexValidator , FileExtensionValidator
+# --- گرفتن محل ذخیره عکس محصول ---
 def get_file_path(instance, filename):
     """
     ذخیره فایل در پوشه: media/products_photos/{product_id}/unique_name.jpg
@@ -22,6 +24,7 @@ def get_file_path(instance, filename):
     # تغییر مسیر به پوشه درخواستی شما
     return os.path.join(f'products_photos/{instance.product.id}/', filename)
 
+# --- تابع فشرده سازی عکس محصول ---
 def compress_image(image, max_size_kb=500, max_width=1200):
     im = PilImage.open(image)
     output = BytesIO()
@@ -58,6 +61,17 @@ def compress_image(image, max_size_kb=500, max_width=1200):
         sys.getsizeof(output), 
         None
     )
+
+# --- توابع کمکی فایل‌های پشتیبانی ---
+def ticket_file_upload_path(instance, filename):
+    return f'support_tickets/{instance.ticket.ticket_number}/{filename}'
+
+# --- توابع کمکی سایز فایل ضمائم پشتیبانی ---
+def validate_file_size(value):
+    limit = 5 * 1024 * 1024  # 5 مگابایت
+    if value.size > limit:
+        raise ValidationError('حجم فایل نباید بیشتر از 5 مگابایت باشد.')
+
 # --- تنظیمات سایت ---
 class SiteSettings(models.Model):
     SITE_STATUS_CHOICES = [
@@ -93,6 +107,13 @@ class SiteSettings(models.Model):
     link_address = models.CharField(max_length=100,verbose_name='لینک آدرس',null=True,blank=True)
     address_text = models.CharField(max_length=100,verbose_name='متن آدرس',null=True,blank=True)
 
+    total_views = models.PositiveIntegerField(default=0,verbose_name='تعداد کل بازدید ها')
+    today_views = models.PositiveIntegerField(default=0,verbose_name='بازدید های امروز')
+    this_week_views = models.PositiveIntegerField(default=0,verbose_name='بازدیدهای این هفته')
+    this_month_views = models.PositiveIntegerField(default=0,verbose_name='بازدید های این ماه')
+    this_year_views = models.PositiveIntegerField(default=0,verbose_name='بازدید های امسال')
+    last_reset_date = models.DateField(default=timezone.now)
+
     def save(self, *args, **kwargs):
         if not self.pk and SiteSettings.objects.exists():
             raise ValidationError("فقط یک تنظیمات کلی برای سایت می‌تواند وجود داشته باشد.")
@@ -105,6 +126,7 @@ class SiteSettings(models.Model):
         verbose_name = "تنظیمات سایت"
         verbose_name_plural = "تنظیمات سایت"
 
+# --- تنظیمات پیامکی سایت ---
 class MessageSiteSettings(models.Model):
     class NotifStatusChoices(models.TextChoices):
         DISABLE = "DISABLE","غیر فعال"
@@ -139,6 +161,20 @@ class MessageSiteSettings(models.Model):
         verbose_name='لغو سفارش',
         help_text='اطلاع رسانی به ادمین سیگنال لغو سفارش\nلغو سفارش توسط کاربر پس از تایید سبد خرید و قبل از پرداخت  هزینه .'
     )
+    ta_new_ticket = models.CharField(
+        max_length=8,
+        choices=NotifStatusChoices,
+        default=NotifStatusChoices.DISABLE,
+        verbose_name='تیکت جدید',
+        help_text='اطلاع رسانی به ادمین ایجاد تیکت جدید توسط کاربر .'
+    )
+    ta_new_ticketmessage = models.CharField(
+        max_length=8,
+        choices=NotifStatusChoices,
+        default=NotifStatusChoices.DISABLE,
+        verbose_name='پیام جدید روی تیکت',
+        help_text='اطلاع رسانی به ادمین ایجاد پیام روی تیکت قبلی .'   
+    )
     #---------- To User Message Section ----------
     tu_wellcome = models.CharField(
         max_length=8,
@@ -161,6 +197,13 @@ class MessageSiteSettings(models.Model):
         verbose_name='ارسال سفارش',
         help_text='اطلاع رسانی به کاربر پس از ارسال سفارش و ارسال کد پیگیری پستی'
     )
+    tu_new_ticketmessage = models.CharField(
+        max_length=8,
+        choices=NotifStatusChoices,
+        default=NotifStatusChoices.DISABLE,
+        verbose_name='پیام جدید روی تیکت',
+        help_text='اطلاع رسانی به کاربر ایجاد پیام روی تیکت ایجاد شده قبلی .'   
+    )
     
     primary_line_number = models.CharField(
         max_length=100,
@@ -168,7 +211,6 @@ class MessageSiteSettings(models.Model):
         blank=True,
         verbose_name='شماره ارسال پیامک',
     )
-
 
     def __str__(self):
         return "تنظیمات اطلاع رسانی پستیلاین"
@@ -180,14 +222,24 @@ class MessageSiteSettings(models.Model):
 # --- مدل‌های پایه (استان و شهر) ---
 class Province(models.Model):
     name = models.CharField(max_length=100, unique=True, verbose_name="نام استان")
-    def __str__(self): return self.name
-    class Meta: verbose_name = "استان"; verbose_name_plural = "استان‌ها"
+
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = "استان"
+        verbose_name_plural = "استان‌ها"
 
 class City(models.Model):
     province = models.ForeignKey(Province, on_delete=models.CASCADE, related_name='cities', verbose_name="استان")
     name = models.CharField(max_length=100, verbose_name="نام شهر")
-    def __str__(self): return f"{self.name} ({self.province.name})"
-    class Meta: verbose_name = "شهر"; verbose_name_plural = "شهرها"
+
+    def __str__(self):
+        return f"{self.name} ({self.province.name})"
+    
+    class Meta:
+        verbose_name = "شهر" 
+        verbose_name_plural = "شهرها"
 
 # --- مدل کاربر ---
 class User(AbstractUser):
@@ -213,8 +265,15 @@ class User(AbstractUser):
 
     REQUIRED_FIELDS = ['first_name', 'last_name', 'phone_number']
     
-    def __str__(self): return f"{self.get_full_name()} ({self.phone_number})"
-    class Meta: verbose_name = "کاربر"; verbose_name_plural = "کاربران"
+    def __str__(self):
+        return f"{self.get_full_name()} ({self.phone_number})"
+    
+    class Meta:
+        verbose_name = "کاربر" 
+        verbose_name_plural = "کاربران"
+
+from django.contrib.auth import get_user_model
+User = get_user_model() # type: ignore
 
 # --- مدل محصول ---
 class Product(models.Model):
@@ -222,7 +281,22 @@ class Product(models.Model):
     SALE_METHODS = [('PACKAGED', 'بسته‌ای'), ('BY_KILO', 'کیلویی')]
 
     slug = models.SlugField(max_length=255, unique=True, allow_unicode=True, verbose_name="آدرس یکتا (Slug)", null=True)
-    active_status = models.BooleanField(default=True, verbose_name='وضعیت نمایش محصول')
+    active_status = models.BooleanField(default=True, verbose_name='وضعیت نمایش محصول و انتشار سایت مپ',help_text='برای سئو بهتر بجای غیرفعال کردن محصول را ناموجود کنید.')
+    seo_priority = models.DecimalField(
+        max_digits=2, 
+        decimal_places=1, 
+        default=0.8,  # <--- مقدار جدید
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+        verbose_name='اولویت سئو'
+    )
+
+    # تغییر دیفالت فرکانس تغییر برای محصول به WEEKLY
+    changefreq = models.CharField(
+        max_length=20, 
+        choices=ChangeFreqChoices.choices, 
+        default=ChangeFreqChoices.MONTHLY,  # <--- مقدار جدید
+        verbose_name='فرکانس تغییر'
+    )
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products', verbose_name="فروشنده", help_text='فروشنده ابرکاربر پستیلاین تلقی میشود .')
     name = models.CharField(max_length=255, verbose_name="نام محصول")
     sale_method = models.CharField(max_length=20, choices=SALE_METHODS, verbose_name="نوع فروش")
@@ -231,24 +305,23 @@ class Product(models.Model):
     stock = models.FloatField(verbose_name="موجودی", help_text='درصورت ناموجود بودن محصول عدد 0 وارد شود')
     min_order = models.FloatField(default=1, verbose_name="کف سفارش", help_text='تعداد بسته یا کیلوگرم')
     max_order = models.FloatField(default=100, verbose_name="سقف سفارش", help_text='تعداد بسته یا کیلوگرم')
-    description = models.TextField(blank=True, null=True, verbose_name="توضیحات کامل محصول")
+    description = models.TextField(blank=True, null=True, verbose_name="توضیحات کامل محصول",help_text='اختیاری')
     visit_count = models.PositiveIntegerField(default=0, verbose_name="تعداد بازدید")
     is_mixed = models.BooleanField(default=False, verbose_name="آیا محصول ترکیبی است؟")
     is_free_shipping = models.BooleanField(default=False, verbose_name='دارای ارسال رایگان است ؟')
     time_tosend = models.CharField(null=True, max_length=50, verbose_name='متن مدت زمان ارسال', help_text='مثلا : تحویل به پست تا 3 روز کاری')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="تاریخ بروزرسانی")
+
+
     
-    # --- فیلد جدید ---
 
     def clean(self):
         if self.sale_method == 'PACKAGED' and not self.package_weight:
             raise ValidationError("برای فروش بسته‌ای، وارد کردن وزن هر بسته الزامی است.")
 
-    def __str__(self): return self.name
-    class Meta: verbose_name = "محصول"; verbose_name_plural = "محصولات"
-
     # متدهای کمکی
     def get_dynamic_title(self):
-        comps = self.components.all()
+        comps = self.components.all() # type: ignore
         if not comps.exists(): return self.name
         type_map = dict(self.PISTACHIO_TYPES)
         shell_map = dict(ProductComponent.SHELL_CHOICES)
@@ -256,14 +329,14 @@ class Product(models.Model):
         shells = [shell_map.get(c.shell_status) for c in comps]
         unique_shells = set(shells)
         if len(unique_shells) == 1:
-            joined_types = " و ".join(types)
+            joined_types = " و ".join(types) # type: ignore
             return f"پسته {joined_types} {shells[0]}"
         else:
             parts = [f"{type_map.get(c.pistachio_type)} {shell_map.get(c.shell_status)}" for c in comps]
             return "پسته " + " و ".join(parts)
 
     def get_dynamic_processing(self):
-        comps = self.components.all()
+        comps = self.components.all() # type: ignore
         if not comps.exists(): return ""
         proc_map = dict(ProductComponent.PROCESSING_CHOICES)
         procs = [proc_map.get(c.processing) for c in comps]
@@ -275,7 +348,7 @@ class Product(models.Model):
             return " و ".join(parts)
 
     def get_quality_badge(self):
-        comps = self.components.all()
+        comps = self.components.all() # type: ignore
         qualities = [c.quality for c in comps]
         if 'LUXARY' in qualities: return {'text': 'دستچین اعلاء', 'class': 'luxury'}
         elif 'STANDARD' in qualities: return {'text': 'استاندارد', 'class': 'standard'}
@@ -306,6 +379,17 @@ class Product(models.Model):
         ).aggregate(total=Sum('quantity'))
         
         return result['total'] or 0
+    
+    def get_absolute_url(self):
+        return reverse("product_detail", args=[self.slug])
+    
+    def __str__(self):
+        return self.name
+    
+    class Meta:
+        verbose_name = "محصول" 
+        verbose_name_plural = "محصولات"
+
 # --- مدل اجزای تشکیل‌دهنده ---
 class ProductComponent(models.Model):
     PROCESSING_CHOICES = [('RAW', 'خام'), ('ROASTED', 'شور/بو داده')]
@@ -345,14 +429,7 @@ class ProductImage(models.Model):
     def __str__(self): return f"عکس {self.product.name}"
     class Meta: verbose_name = "تصویر محصول"; verbose_name_plural = "گالری تصاویر"
 
-# ... (کدهای قبلی مدل Product و ... )
-
-# --- ۶. مدل‌های سفارش (Order System) ---
-import string
-import random
-from decimal import Decimal
-# ... سایر ایمپورت‌ها ...
-
+# --- مدل سفارشات ---
 class Order(models.Model):
     STATUS_CHOICES = [
         ('CART', 'سبد خرید (در انتظار تکمیل)'),
@@ -423,7 +500,7 @@ class Order(models.Model):
         verbose_name_plural = "سفارشات"
         ordering = ['-created_at']
 
-
+# --- آیتم های یک سفارش ---
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='items', verbose_name="سفارش")
     product = models.ForeignKey(Product, on_delete=models.PROTECT, verbose_name="محصول")
@@ -459,3 +536,213 @@ class OrderItem(models.Model):
     class Meta:
         verbose_name = "قلم سفارش"
         verbose_name_plural = "اقلام سفارش"
+
+# --- مدل اصلی گفتگو (تیکت) ---
+class Ticket(models.Model):
+    SUBJECT_CHOICES = [
+        ('ORDER_TRACKING', 'پیگیری سفارش'),
+        ('FEEDBACK', 'انتقاد و پیشنهاد'),
+        ('COLLABORATION', 'درخواست همکاری'),
+        ('OUT_OF_STOCK', 'سفارش محصول ناموجود'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('OPEN', 'باز (در انتظار پاسخ)'),
+        ('ANSWERED', 'پاسخ داده شده'),
+        ('CLOSED', 'بسته شده'),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='tickets', verbose_name="کاربر")
+    responder = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='assigned_tickets', verbose_name="پاسخ‌دهنده (مسئول)")
+    
+    ticket_number = models.CharField(max_length=20, unique=True, null=True, blank=True, verbose_name="شماره پیگیری")
+    
+    subject_type = models.CharField(max_length=20, choices=SUBJECT_CHOICES, verbose_name="موضوع گفتگو")
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='OPEN', verbose_name="وضعیت")
+    
+    order = models.ForeignKey('Order', on_delete=models.PROTECT, null=True, blank=True, related_name='tickets', verbose_name="سفارش مرتبط", help_text='فقط برای موضوع پیگیری سفارش')
+    product = models.ForeignKey('Product', on_delete=models.PROTECT, null=True, blank=True, related_name='tickets', verbose_name="محصول مرتبط", help_text='فقط برای محصول ناموجود')
+    
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ایجاد")
+    updated_at = models.DateTimeField(auto_now=True, verbose_name="آخرین بروزرسانی")
+
+    def clean(self):
+        if self.subject_type == 'ORDER_TRACKING':
+            if not self.order:
+                raise ValidationError({"order": "برای پیگیری سفارش، انتخاب سفارش مورد نظر الزامی است."})
+            if self.order.customer != self.user:
+                raise ValidationError({"order": "شما تنها می‌توانید سفارشات خود را پیگیری کنید."})
+
+        elif self.subject_type == 'OUT_OF_STOCK':
+            if not self.product:
+                raise ValidationError({"product": "انتخاب محصول الزامی است."})
+
+        if self.subject_type != 'ORDER_TRACKING':
+            self.order = None
+        if self.subject_type != 'OUT_OF_STOCK':
+            self.product = None
+
+    def save(self, *args, **kwargs):
+        if not self.ticket_number:
+            while True:
+                random_code = random.randint(100000, 999999)
+                new_number = f"{random_code}"
+                if not Ticket.objects.filter(ticket_number=new_number).exists():
+                    self.ticket_number = new_number
+                    break
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        # اضافه شدن علامت # به نمایش شماره تیکت
+        return f"گفتگو #{self.ticket_number} - {self.user.get_full_name() or self.user.username}"
+
+    class Meta:
+        verbose_name = "گفتگو و پشتیبانی"
+        verbose_name_plural = "گفتگوها و پشتیبانی"
+        ordering = ['-updated_at']
+
+# --- مدل پیام‌های درون گفتگو ---
+class TicketMessage(models.Model):
+    ticket = models.ForeignKey(Ticket, on_delete=models.CASCADE, related_name='messages', verbose_name="گفتگو")
+    
+    # فیلد sender را blank=True کردیم تا در ادمین بتوان خالی گذاشت تا سیستم خودش پر کند
+    sender = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True, related_name='sent_messages', verbose_name="فرستنده")
+    
+    reply_to = models.ForeignKey('self', on_delete=models.SET_NULL, null=True, blank=True, related_name='replies', verbose_name="در پاسخ به")
+    text = models.TextField(verbose_name="متن پیام")
+    attachment = models.FileField(
+        upload_to=ticket_file_upload_path, null=True, blank=True, 
+        validators=[FileExtensionValidator(allowed_extensions=['pdf', 'jpg', 'jpeg', 'png']), validate_file_size],
+        verbose_name="فایل ضمیمه", help_text="حداکثر ۵ مگابایت. فرمت: PDF, JPG, PNG,JPEG"
+    )
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="زمان ارسال")
+
+    def is_admin_reply(self):
+        if self.sender.is_superuser or self.sender.is_staff :
+            return True
+        return False
+
+    def clean(self):
+        if self.reply_to and self.reply_to.ticket != self.ticket:
+            raise ValidationError({"reply_to": "پیام ریپلای شده باید متعلق به همین گفتگو باشد."})
+
+        # --- لاجیک اعتبارسنجی فرستنده پیام ---
+        if self.sender and hasattr(self, 'ticket'):
+            valid_senders = [self.ticket.user] # کاربر صاحب تیکت همیشه مجاز است
+            
+            if self.ticket.responder:
+                valid_senders.append(self.ticket.responder) # ادمین مسئول هم مجاز است
+            
+            if self.sender not in valid_senders:
+                # اگر ادمینی هنوز مسئول نشده (تیکت جدیده)، اولین ادمینی که جواب بده مجازه
+                if not self.ticket.responder and (self.sender.is_staff or self.sender.is_superuser):
+                    pass 
+                else:
+                    raise ValidationError({"sender": "فقط کاربر ایجاد کننده گفتگو و ادمین مسئول مجاز به ارسال پیام در این چت هستند."})
+
+    def save(self, *args, **kwargs):
+
+        if self.is_admin_reply():
+            self.ticket.status = 'ANSWERED'
+            if not self.ticket.responder:
+                self.ticket.responder = self.sender
+        else:
+            self.ticket.status = 'OPEN'
+            
+        self.ticket.save()
+
+        super().save(*args, **kwargs)
+
+    def __str__(self):
+        # بررسی اینکه اگر sender نال بود ارور ندهد
+        if self.sender:
+            if self.sender.is_superuser or self.sender.is_staff: 
+                return f"ادمین: {self.text[:30]}"
+            else:
+                return f"کاربر: {self.text[:30]}"
+        return f"سیستم: {self.text[:30]}"
+
+    class Meta:
+        verbose_name = "پیام"
+        verbose_name_plural = "پیام‌ها"
+        ordering = ['created_at']
+
+# --- مدل لاگ های اطلاع رسانی ---
+class NotificationLog(models.Model):
+
+    class EventChoices(models.TextChoices):
+        NEW_USER_TA = "NEW_USER_TA","به ادمین کاربر جدید"
+        NEW_USER_TU = "NEW_USER_TU","به کاربر خوشامدگویی"
+
+        NEW_ORDER_TA = "NEW_ORDER_TA","به ادمین سفارش جدید"
+        NEW_ORDER_TU = "NEW_ORDER_TU","به کاربر سفارش ثبت شد"
+        CANCELL_ORDER_TA = "CANCELL_ORDER_TA","به ادمین سفارش لغو شد"
+        CANCELL_ORDER_TU = "CANCELL_ORDER_TU","به کاربر سفارش لغو شد"
+        SENT_ORDER_TU = "SENT_ORDER_TU","به کاربر سفارش ارسال شد"
+
+        NEW_TICKET_TA = "NEW_TICKET_TA","به ادمین تیکت جدید"
+        MSG_TICKET_TA = "MSG_TICKET_TA","به ادمین پیام جدید در تیکت"
+        MSG_TICKET_TU = "MSG_TICKET_TU","به کاربر پیام جدید در تیکت"
+
+        NEW_RESUMEMSG_TA = "NEW_RESUMEMSG","به ادمین پیام در رزومه"
+
+        OTHER = "OTHER","سایر"
+
+    
+    NOTIFICATION_TYPES = [
+        ('SMS', 'پیامک'),
+        ('EMAIL', 'ایمیل'),
+    ]
+    
+    STATUS_CHOICES = [
+        ('SUCCESS', 'موفق'),
+        ('FAILED', 'ناموفق'),
+    ]
+
+    user = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='notifications', 
+        verbose_name="کاربر"
+    )
+    
+    notification_type = models.CharField(
+        max_length=10, 
+        choices=NOTIFICATION_TYPES, 
+        verbose_name="نوع اطلاع‌رسانی"
+    )
+    
+    related_event = models.CharField(
+       max_length=32,
+       choices=EventChoices,
+       verbose_name="مرتبط با رویداد",
+       default="OTHER"
+   ) 
+    # اسنپ‌شات متن پیام
+    message_content = models.TextField(verbose_name="متن پیام / اسنپ‌شات")
+    
+    status = models.CharField(
+        max_length=10, 
+        choices=STATUS_CHOICES, 
+        default='SUCCESS', 
+        verbose_name="وضعیت ارسال"
+    )
+    
+    # متن کوتاه برای دلیل خطا
+    error_details = models.CharField(
+        max_length=255, 
+        null=True, 
+        blank=True, 
+        verbose_name="دلیل خطا",
+        help_text="فقط در صورت ناموفق بودن ارسال پر شود."
+    )
+    
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name="زمان ارسال")
+
+    def __str__(self):
+        return f"{self.get_notification_type_display()} به {self.user} - {self.get_status_display()}" # type: ignore
+
+    class Meta:
+        verbose_name = "گزارش اطلاع‌رسانی"
+        verbose_name_plural = "گزارش‌های اطلاع‌رسانی"
+        ordering = ['-created_at'] # همیشه جدیدترین‌ها اول نمایش داده شوند

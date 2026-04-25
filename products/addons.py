@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from django.utils import timezone
 from django.views.decorators.http import require_http_methods
 from .models import Province, City, SiteSettings
+import hashlib
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +29,6 @@ def load_cities(request):
 # ==========================================
 # موتور ماژولار OTP
 # ==========================================
-
 def get_client_ip(request):
     x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
     if x_forwarded_for:
@@ -36,6 +36,17 @@ def get_client_ip(request):
     else:
         ip = request.META.get('REMOTE_ADDR')
     return ip
+
+def get_client_fingerprint(request):
+
+    user_ip = get_client_ip(request)
+    
+    user_agent = request.META.get('HTTP_USER_AGENT', '')
+
+    raw_identifier = f"{user_ip}-{user_agent}"
+    fingerprint = hashlib.md5(raw_identifier.encode('utf-8')).hexdigest()
+
+    return fingerprint
 
 def get_otp_settings():
     try:

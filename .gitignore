@@ -45,3 +45,5 @@ products/migrations/0025_sitesettings_link_prphone.py
 /seo/__pycache__
 resume/migrations/0003_resume_related_user.py
 resume/migrations/0002_alter_resume_resume_file.py
+/blog/migrations/__pycache__
+/products/templatetags/__pycache__

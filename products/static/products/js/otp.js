@@ -83,7 +83,7 @@ function verifyCode(code) {
     realInput.disabled = true;
 
     // ارسال درخواست واقعی به جنگو
-    fetch('/api/auth/verify-code/', {
+    fetch('/api/auth/verify_code/', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

@@ -4,7 +4,8 @@ from django.db import models
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from django.db.models import Max 
-
+from seo.models import ChangeFreqChoices
+from django.core.validators import MinValueValidator, MaxValueValidator
 # وارد کردن تابع فشرده‌ساز از اپلیکیشن محصولات
 from products.models import compress_image 
 
@@ -35,12 +36,24 @@ def get_post_block_image_path(instance, filename):
 # ==========================================
 
 class Category(models.Model):
-    title = models.CharField(max_length=100, verbose_name="عنوان دسته‌بندی")
     slug = models.SlugField(max_length=100, unique=True, allow_unicode=True, verbose_name="آدرس (Slug)")
-    description = models.TextField(blank=True, verbose_name="توضیحات سئو")
-    
-    # فیلد جدید بنر دسته‌بندی
+    seo_priority = models.DecimalField(
+        max_digits=2, 
+        decimal_places=1, 
+        default=0.7, 
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+        verbose_name='اولویت سئو'
+    )
+    changefreq = models.CharField(
+        max_length=20, 
+        choices=ChangeFreqChoices.choices, 
+        default=ChangeFreqChoices.WEEKLY,  
+        verbose_name='فرکانس تغییر'
+    )
+    title = models.CharField(max_length=100, verbose_name="عنوان دسته‌بندی")
+    description = models.TextField(blank=True, verbose_name="توضیحات")
     banner_image = models.ImageField(upload_to=get_blog_category_image_path, blank=True, null=True, verbose_name="تصویر بنر")
+    banner_alt = models.CharField(max_length=100,verbose_name='توضیح alt بنر (ضروری برای سئو)',default="عکس بنر وبلاگ")
 
     class Meta:
         verbose_name = "دسته‌بندی"
@@ -83,7 +96,7 @@ class Tag(models.Model):
 class BlogPost(models.Model):
     title = models.CharField(max_length=200, verbose_name="عنوان مقاله (H1)")
     slug = models.SlugField(max_length=200, unique=True, allow_unicode=True, verbose_name="آدرس مقاله")
-    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name='posts', verbose_name="دسته‌بندی")
+    category = models.ForeignKey(Category, on_delete=models.PROTECT, related_name='posts', verbose_name="دسته‌بندی")
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='blog_posts', verbose_name="نویسنده")
     
     # متادیتا و سئو
@@ -98,12 +111,27 @@ class BlogPost(models.Model):
     
     # تغییر مسیر آپلود عکس
     cover_image = models.ImageField(upload_to=get_blog_post_image_path, verbose_name="تصویر کاور")
+    cover_image_alt = models.CharField(max_length=100,verbose_name='alt تصویر کاور',null=True,blank=True)
     
     # فیلد جدید شمارش بازدید
     view_count = models.PositiveIntegerField(default=0, verbose_name="تعداد بازدید")
     
     # وضعیت و تاریخ
     is_published = models.BooleanField(default=True, verbose_name="وضعیت انتشار")
+    seo_priority = models.DecimalField(
+        max_digits=2, 
+        decimal_places=1, 
+        default=0.7, 
+        validators=[MinValueValidator(0.0), MaxValueValidator(1.0)],
+        verbose_name='اولویت سئو'
+    )
+
+    changefreq = models.CharField(
+        max_length=20, 
+        choices=ChangeFreqChoices.choices, 
+        default=ChangeFreqChoices.MONTHLY, 
+        verbose_name='فرکانس تغییر'
+    )
     created_at = models.DateTimeField(auto_now_add=True, verbose_name="تاریخ ایجاد")
     updated_at = models.DateTimeField(auto_now=True, verbose_name="تاریخ بروزرسانی")
 
@@ -137,17 +165,16 @@ class BlogPost(models.Model):
         })
 
 
-
 class PostBlock(models.Model):
-    post = models.ForeignKey('BlogPost', on_delete=models.CASCADE, related_name='blocks')
+    post = models.ForeignKey('BlogPost', on_delete=models.CASCADE, related_name='blocks',verbose_name="مرتبط با پست")
     block_type = models.CharField(max_length=20, choices=[
         ('h2', 'تیتر H2'), ('h3', 'تیتر H3'), ('p', 'پاراگراف'),
         ('quote', 'نقل قول'), ('image', 'تصویر تک'),
         ('gallery', 'گالری (تصویر در گرید)'), ('list', 'لیست موردی'),
         ('banner', 'بنر تبلیغاتی/CTA')
-    ])
-    content = models.TextField(blank=True, null=True)
-    image = models.ImageField(upload_to='blog_photos/blocks/', blank=True, null=True)
+    ],verbose_name='نوع بلاک محتوایی')
+    content = models.TextField(blank=True, null=True,verbose_name='محتوا',help_text='در حالت عکس/گالری/CTA این فیلد به عنوان alt مدیا قرار میگیرد')
+    image = models.ImageField(upload_to='blog_photos/blocks/', blank=True, null=True,verbose_name='تصویر')
     # فیلد ترتیب با مقدار پیش‌فرض بالا
     order = models.PositiveIntegerField(default=0, verbose_name="ترتیب نمایش")
 
@@ -159,6 +186,8 @@ class PostBlock(models.Model):
         return []
 
     class Meta:
+        verbose_name = "بلاک محتوا"
+        verbose_name_plural = "بلاک های محتوا"
         ordering = ['order'] # ترتیب نمایش در دیتابیس همیشه بر اساس این فیلد باشد
 
     def save(self, *args, **kwargs):
