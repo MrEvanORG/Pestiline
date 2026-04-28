@@ -13,58 +13,56 @@
     <link rel="icon" href="{% static 'products/img/fav.svg' %}" type="image/svg+xml">
 </head>
 <body>
-<div class="cs-bg"></div>
-<div class="cs-overlay"></div>
+    <div class="scroll-wrapper">
+        <div class="cs-layout">
+            
+            <div class="cs-content-side">
+                <img src="{% static 'products/img/light-logo-to.svg' %}" alt="پستیلاین" class="cs-logo">
+                <h1 class="cs-title">در حال <span>ارتقاء</span><br>سیستم هستیم</h1>
+                
+                <p class="cs-desc">
+                    {{ message|default:"ما در حال ارتقاء سرورها و افزودن امکانات جدید به پستیلاین هستیم. این فرآیند زمان زیادی نخواهد برد. از صبر و همراهی شما سپاسگزاریم." }}
+                </p>
 
-<div class="cs-layout">
-    
-    <div class="cs-content-side">
-        <img src="{% static 'products/img/light-logo-to.svg' %}" alt="پستیلاین" class="cs-logo">
-        <h1 class="cs-title">در حال <span>ارتقاء</span><br>سیستم هستیم</h1>
-        
-        <p class="cs-desc">
-            {{ message|default:"ما در حال ارتقاء سرورها و افزودن امکانات جدید به پستیلاین هستیم. این فرآیند زمان زیادی نخواهد برد. از صبر و همراهی شما سپاسگزاریم." }}
-        </p>
-
-        <button onclick="location.reload();" class="btn-retry-glass">
-            <i class="fas fa-sync-alt"></i> تلاش مجدد
-        </button>
-    </div>
-
-    <div class="cs-maintenance-side">
-        
-        <div class="maintenance-glass-box">
-            <div class="maintenance-icon-wrapper">
-                <i class="fas fa-cog m-gear-1"></i>
-                <i class="fas fa-cog m-gear-2"></i>
+                <button onclick="location.reload();" class="btn-retry-glass">
+                    <i class="fas fa-sync-alt"></i> تلاش مجدد
+                </button>
             </div>
-            <h3 class="m-glass-title">فرآیند بروزرسانی</h3>
-            <p class="m-glass-subtitle">به زودی در دسترس خواهیم بود</p>
-        </div>
 
-        {% if site_settings %}
-        <div class="cs-social-bar">
-            {% if site_settings.link_instagram %}
-                <a href="{{ site_settings.link_instagram }}" target="_blank" class="cs-social-link" title="اینستاگرام"><i class="fab fa-instagram"></i></a>
-            {% endif %}
-            {% if site_settings.link_telegram %}
-                <a href="{{ site_settings.link_telegram }}" target="_blank" class="cs-social-link" title="تلگرام"><i class="fab fa-telegram-plane"></i></a>
-            {% endif %}
-            {% if site_settings.link_whatsapp %}
-                <a href="{{ site_settings.link_whatsapp }}" target="_blank" class="cs-social-link" title="واتس‌اپ"><i class="fab fa-whatsapp"></i></a>
-            {% endif %}
-            {% if site_settings.link_twitter %}
-                <a href="{{ site_settings.link_twitter }}" target="_blank" class="cs-social-link" title="توییتر"><i class="fab fa-x-twitter"></i></a>
-            {% endif %}
-            {% if site_settings.link_prphone %}
-                <a href="tel:{{ site_settings.link_prphone }}" class="cs-social-link" title="تماس با ما"><i class="fas fa-phone-alt"></i></a>
-            {% endif %}
+            <div class="cs-maintenance-side">
+                
+                <div class="maintenance-glass-box">
+                    <div class="maintenance-icon-wrapper">
+                        <i class="fas fa-cog m-gear-1"></i>
+                        <i class="fas fa-cog m-gear-2"></i>
+                    </div>
+                    <h3 class="m-glass-title">فرآیند بروزرسانی</h3>
+                    <p class="m-glass-subtitle">به زودی در دسترس خواهیم بود</p>
+                </div>
+
+                {% if site_settings %}
+                <div class="cs-social-bar">
+                    {% if site_settings.link_instagram %}
+                        <a href="{{ site_settings.link_instagram }}" target="_blank" class="cs-social-link" title="اینستاگرام"><i class="fab fa-instagram"></i></a>
+                    {% endif %}
+                    {% if site_settings.link_telegram %}
+                        <a href="{{ site_settings.link_telegram }}" target="_blank" class="cs-social-link" title="تلگرام"><i class="fab fa-telegram-plane"></i></a>
+                    {% endif %}
+                    {% if site_settings.link_whatsapp %}
+                        <a href="{{ site_settings.link_whatsapp }}" target="_blank" class="cs-social-link" title="واتس‌اپ"><i class="fab fa-whatsapp"></i></a>
+                    {% endif %}
+                    {% if site_settings.link_twitter %}
+                        <a href="{{ site_settings.link_twitter }}" target="_blank" class="cs-social-link" title="توییتر"><i class="fab fa-x-twitter"></i></a>
+                    {% endif %}
+                    {% if site_settings.link_prphone %}
+                        <a href="tel:{{ site_settings.link_prphone }}" class="cs-social-link" title="تماس با ما"><i class="fas fa-phone-alt"></i></a>
+                    {% endif %}
+                </div>
+                {% endif %}
+                
+            </div>
+
         </div>
-        {% endif %}
-        
     </div>
-
-</div>
-
 </body>
 </html>

@@ -83,6 +83,13 @@ class SiteSettings(models.Model):
     status = models.CharField(max_length=15, choices=SITE_STATUS_CHOICES, default='ACTIVE', verbose_name="وضعیت سایت")
     maintenance_message = models.TextField(blank=True, null=True, verbose_name="متن صفحه غیرفعال")
     coming_soon_date = models.DateTimeField(null=True, blank=True, verbose_name="تاریخ و زمان بازگشایی")
+    welcome_song = models.FileField(
+        upload_to='settings/audio/', 
+        null=True, 
+        blank=True, 
+        verbose_name="آهنگ صفحه Coming Soon",
+        help_text="فرمت MP3، حداکثر حجم 12 مگابایت. اگر خالی باشد، آهنگی پخش نخواهد شد."
+    )
     otp_time_interval = models.PositiveIntegerField(default=120, verbose_name="زمان انتظار ارسال مجدد کد (ثانیه)")
     bypass_for_staff = models.BooleanField(
         default=False, 
@@ -280,7 +287,7 @@ class Product(models.Model):
     PISTACHIO_TYPES = [('AKBARI', 'اکبری'), ('FANDOGHI', 'فندقی'), ('AHMAD_AGHAEI', 'احمدآقایی'), ('KALEH_GHOOCHI', 'کله قوچی')]
     SALE_METHODS = [('PACKAGED', 'بسته‌ای'), ('BY_KILO', 'کیلویی')]
 
-    slug = models.SlugField(max_length=255, unique=True, allow_unicode=True, verbose_name="آدرس یکتا (Slug)", null=True)
+    slug = models.SlugField(max_length=220, unique=True, allow_unicode=True, verbose_name="آدرس یکتا (Slug)", null=True)
     active_status = models.BooleanField(default=True, verbose_name='وضعیت نمایش محصول و انتشار سایت مپ',help_text='برای سئو بهتر بجای غیرفعال کردن محصول را ناموجود کنید.')
     seo_priority = models.DecimalField(
         max_digits=2, 
@@ -298,7 +305,7 @@ class Product(models.Model):
         verbose_name='فرکانس تغییر'
     )
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products', verbose_name="فروشنده", help_text='فروشنده ابرکاربر پستیلاین تلقی میشود .')
-    name = models.CharField(max_length=255, verbose_name="نام محصول")
+    name = models.CharField(max_length=220, verbose_name="نام محصول")
     sale_method = models.CharField(max_length=20, choices=SALE_METHODS, verbose_name="نوع فروش")
     price = models.DecimalField(max_digits=12, decimal_places=0, verbose_name="قیمت (تومان)", help_text='برای هر کیلوگرم یا هر بسته')
     package_weight = models.FloatField(null=True, blank=True, verbose_name="وزن هر بسته (کیلو)", help_text='درصورت فروش بسته ای وارد کنید')
@@ -730,7 +737,7 @@ class NotificationLog(models.Model):
     
     # متن کوتاه برای دلیل خطا
     error_details = models.CharField(
-        max_length=255, 
+        max_length=220, 
         null=True, 
         blank=True, 
         verbose_name="دلیل خطا",

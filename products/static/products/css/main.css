@@ -10,63 +10,17 @@
 /* حذف highlight آبی tap در موبایل */
 * {
     -webkit-tap-highlight-color: transparent;
+    margin: 0; padding: 0; box-sizing: border-box; outline: none;
 }
-
-
-input,
-textarea,
-select {
-    font-size: 16px;
-}
-
-
-a,
-button,
-input,
-textarea,
-select {
-    outline: none;
-}
-
-
-button,
-a {
-    -webkit-user-select: none;
-    user-select: none;
-}
-
-/* بهبود تجربه tap */
-a,
-button {
-    touch-action: manipulation;
-}
-
 /* اسکرول نرم موبایل */
 html {
     -webkit-overflow-scrolling: touch;
     scroll-behavior: smooth;
 }
-
-/* لینک‌ها بدون رنگ tap */
-a {
-    -webkit-tap-highlight-color: rgba(0,0,0,0);
-}
-
-
-
 /* جلوگیری از خاکستری شدن لینک بعد از tap در اندروید */
 a:active {
     background-color: transparent;
 }
-
-/* دکمه‌ها شبیه اپلیکیشن */
-button {
-    -webkit-appearance: none;
-    appearance: none;
-}
-
-
-* { margin: 0; padding: 0; box-sizing: border-box; outline: none; }
 
 body {
     font-family: var(--font-main);

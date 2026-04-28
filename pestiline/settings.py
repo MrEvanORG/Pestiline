@@ -2,6 +2,7 @@
 Django settings for pestiline project.
 using Django 6.0.1.
 """
+# accpeted max lenght = 250
 import os
 from pathlib import Path
 from decouple import config
@@ -9,6 +10,8 @@ from decouple import config
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 DEV_MODE = config('DEV_MODE',cast=bool)
+
+DEBUG_HOST = config('DEBUG_HOST',cast=bool)
 
 SMS_API = config('SMS_API')
 
@@ -20,12 +23,15 @@ SITEMAP_URL = config('SITEMAP_URL')
 
 if DEV_MODE:
     DEBUG = True
-else :
-    DEBUG = False
+else:
+    if DEBUG_HOST:
+        DEBUG = True
+    else:
+        DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1','10.142.128.235','www.pestiline.ir','pestiline.ir']
+ALLOWED_HOSTS = ['127.0.0.1','10.142.128.235','192.168.1.11','www.pestiline.ir','pestiline.ir']
 
-CSRF_TRUSTED_ORIGINS = ['http://10.142.128.235']
+CSRF_TRUSTED_ORIGINS = ['https://www.pestiline.ir','https://pestiline.ir/']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -59,8 +65,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     
-    'products.middleware.SiteStatusMiddleware',
     'products.middleware.SiteViewCounterMiddleware',#شمردن ویوهای سایت
+    'products.middleware.SiteStatusMiddleware',
     
 ]
 
@@ -115,11 +121,12 @@ else:
             'HOST': 'localhost',
             'PORT': '3306',
             'OPTIONS': {
-                'init_command': "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'"
+                'init_command': "SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci'",
+                'sql_mode': 'STRICT_TRANS_TABLES',
             },
         }
     }
-
+# ALTER DATABASE `your_database_name` CHARACTER SET utf8mb4 COLLATE utf8mb4_persian_ci;
 #------------------------ Authentications ---------------------#
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators

@@ -1,12 +1,16 @@
-import random
-import logging
 import time
+import secrets
+import logging
+import hashlib
+from django.utils import timezone
+import ghasedak_sms
 from django.core.cache import cache
 from django.http import JsonResponse
-from django.utils import timezone
-from django.views.decorators.http import require_http_methods
 from .models import Province, City, SiteSettings
-import hashlib
+from django.conf import settings as django_settings
+from django.views.decorators.http import require_http_methods
+
+sms_api = ghasedak_sms.Ghasedak(api_key=f'{django_settings.SMS_API}')
 
 logger = logging.getLogger(__name__)
 
@@ -97,25 +101,37 @@ def set_rate_limit(request, phone_number):
     cache.set(phone_key, expiry_time, timeout=timeout)
 
 def send_otp_simulation(phone_number):
-    """
-    شبیه‌سازی ارسال پیامک با احتمال خطا برای تست
-    """
-    otp_code = str(random.randint(100000, 999999))
-    
-    # فرض کنیم همیشه 200 است، مگر اینکه بخواهیم تست کنیم
-    # برای تست می‌توانید status_code را دستی تغییر دهید
-    status_code = 200
-    
-    if status_code == 200:
-        print(f"\n{'='*40}")
-        print(f"🚀 OTP SENT (SUCCESS)")
-        print(f"📱 To: {phone_number}")
-        print(f"🔑 Code: {otp_code}")
-        print(f"{'='*40}\n")
-    else:
-        print(f"\n❌ OTP FAILED TO SEND (Simulated Error)")
 
-    return otp_code, status_code
+    secure_random = secrets.SystemRandom()
+    otp_code = str(secure_random.randint(100000, 999999))
+    
+    if django_settings.DEV_MODE:
+        status_code = 200
+        if status_code == 200:
+            print(f"\n{'='*40}")
+            print(f"🚀 OTP SENT (SUCCESS)")
+            print(f"📱 To: {phone_number}")
+            print(f"🔑 Code: {otp_code}")
+            print(f"{'='*40}\n")
+        else:
+            print(f"\n❌ OTP FAILED TO SEND (Simulated Error)")
+        return otp_code, status_code
+    else:
+        newotpcommand = ghasedak_sms.SendOtpInput(
+            send_date=None,
+            receptors=[
+                ghasedak_sms.SendOtpReceptorDto(
+                    mobile=str(phone_number),
+                )
+            ],
+            template_name='pestiline',
+            inputs=[
+                ghasedak_sms.SendOtpInput.OtpInput(param='Code', value=str(otp_code)),
+            ],
+            udh=False
+        )
+        response = sms_api.send_otp_sms(newotpcommand)
+        return otp_code , response['statusCode'] # type: ignore
 
 def initiate_otp_process(request, phone_number, intent, extra_data=None):
     """

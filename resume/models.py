@@ -71,7 +71,7 @@ class Resume(models.Model):
     age = models.PositiveIntegerField(verbose_name="سن")
     email = models.EmailField(verbose_name="ایمیل")
     phone_number = models.CharField(max_length=20, verbose_name="شماره همراه")
-    address = models.CharField(max_length=255, verbose_name="آدرس")
+    address = models.CharField(max_length=220, verbose_name="آدرس")
     
     # اضافه شدن validator برای محدودیت حجم
     resume_file = models.FileField(upload_to='resumes/', validators=[validate_file_size], verbose_name="فایل رزومه (PDF)", null=True, blank=True)

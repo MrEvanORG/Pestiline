@@ -20,6 +20,9 @@ from django.conf import settings as django_settings
 from django.contrib.sitemaps.views import sitemap
 from seo.sitemaps import StaticViewSitemap , ProductSitemap , ResumeSitemap , BlogPostSitemap ,CategorySitemap
 
+from django.urls import re_path
+from django.views.static import serve
+
 sitemaps = {
     'static': StaticViewSitemap,
     'products':ProductSitemap,
@@ -35,3 +38,19 @@ urlpatterns = [
     path('resume/',include('resume.urls')),
     path('blog/',include('blog.urls')),
 ]
+
+if not django_settings.DEBUG:
+    urlpatterns += [
+        re_path(r'^media/(?P<path>.*)$', serve, {'document_root': django_settings.MEDIA_ROOT}),
+    ]
+# راه بیهنه : 
+# در محیط واقعی (سرور لینوکس)، این وظیفه‌ی وب‌سروری مثل Nginx یا Apache است که فایل‌های رسانه را مستقیماً به کاربر بدهد و اصلا درخواست به جنگو نرسد.
+
+# اگر از Nginx استفاده می‌کنید، باید این بلاک را به فایل کانفیگ سایت خود اضافه کنید:
+
+# nginx
+# location /media/ {
+#     alias /path/to/your/project/media/; # مسیر دقیق پوشه مدیا در سرور
+# }
+# بعد از اضافه کردن، Nginx را ری‌استارت کنید: sudo systemctl restart nginx
+

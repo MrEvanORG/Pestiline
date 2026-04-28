@@ -178,7 +178,7 @@ function setupTimer() {
         resendBtn.disabled = true;
         resendBtn.innerHTML = '<i class="fa-duotone fa-spinner-third fa-spin"></i> در حال ارسال...';
 
-        fetch('/api/auth/resend-code/', {
+        fetch('/api/auth/resend_code/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

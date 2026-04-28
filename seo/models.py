@@ -50,7 +50,7 @@ class StaticPageSEO(models.Model):
         return "تنظیمات سایت‌ مپ استاتیک"
 
 class CustomSeoData(models.Model):
-    path = models.CharField(max_length=254,unique=True,verbose_name='مسیر صفحه',help_text='مثال : /about_us/')
+    path = models.CharField(max_length=220,unique=True,verbose_name='مسیر صفحه',help_text='مثال : /about_us/')
     title = models.CharField(max_length=60,null=True,blank=True,verbose_name='تایتل صفحه',help_text='حداکثر 60 کاراکتر')
     meta_description = models.CharField(max_length=160,null=True,blank=True,verbose_name='توضیحات صفحه',help_text='حداکثر 160 کاراکتر\nدر صورت وارد نکردن این فیلد توضیحات پیشفرض صفحه نمایش داده خواهند شد.')
     

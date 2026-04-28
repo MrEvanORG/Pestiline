@@ -236,7 +236,6 @@ def auth_page(request):
         elif 'register_submit' in request.POST:
             register_form = UserRegisterForm(request.POST)
             if register_form.is_valid():
-                # ۱. دریافت داده‌های فرم
                 phone = register_form.cleaned_data['phone_number']
                 extra_data = {
                     'first_name': register_form.cleaned_data['first_name'],
@@ -247,50 +246,31 @@ def auth_page(request):
                     'otp_request': register_form.cleaned_data.get('otp_request')
                 }
 
-                # ۲. تصمیم‌گیری برای ارسال مجدد (جلوگیری از هدررفت هزینه پیامک)
-                should_send_new_otp = True
+                # =========================================================================
+                # راه حل قطعی: همیشه تابع اصلی را فراخوانی کنید.
+                # این تابع خودش به درستی و با اطمینان، محدودیت زمانی را مدیریت می‌کند.
+                # تمام منطق معیوب 'should_send_new_otp' حذف شده است.
+                # =========================================================================
+                result = initiate_otp_process(
+                    request, 
+                    phone_number=phone, 
+                    intent='register', 
+                    extra_data=extra_data
+                )
                 
-                if 'otp_context' in request.session:
-                    old_context = request.session['otp_context']
-                    # اگر شماره تغییر نکرده و پروسه قبلی هم ثبت‌نام بوده
-                    if old_context.get('phone_number') == phone and old_context.get('intent') == 'register':
-                        # چک کردن تایمر فعال
-                        ttl = get_remaining_otp_time(request, phone)
-                        if ttl > 0:
-                            should_send_new_otp = False
-                            # فقط اطلاعات (مثل نام یا شهر اصلاح شده) را آپدیت می‌کنیم
-                            request.session['otp_context']['extra_data'] = extra_data
-                            request.session.modified = True
-
-                # ۳. اجرای عملیات بر اساس تصمیم بالا
-                if should_send_new_otp:
-                    # تلاش برای ارسال پیامک جدید
-                    result = initiate_otp_process(
-                        request, 
-                        phone_number=phone, 
-                        intent='register', 
-                        extra_data=extra_data
-                    )
-                    
-                    # === بخش اصلاح شده برای نمایش خطا ===
-                    if result['success']:
-                        # موفقیت کامل -> برو به صفحه کد
-                        return redirect('verify_otp_page')
-                    
-                    elif result.get('rate_limited'):
-                        # محدودیت زمانی دارد اما خطا نیست -> برو به صفحه کد (تایمر را می‌بیند)
-                        return redirect('verify_otp_page')
-                    
-                    else:
-                        # خطای واقعی (مثلاً پنل پیامک 200 نداده) -> ریدارکت نکن!
-                        # نمایش خطا در همین صفحه
-                        register_form.add_error(None, result['message'])
-                
-                else:
-                    # نیاز به ارسال جدید نبود (تایمر فعال است) -> مستقیم برو
+                # بر اساس خروجی تابع امن، تصمیم بگیرید
+                if result['success']:
+                    # اگر کاربر در محدودیت زمانی بود اما اطلاعات فرم را تغییر داده بود، اطلاعات جدید را در سشن آپدیت کن
+                    if result.get('rate_limited') and 'otp_context' in request.session:
+                        request.session['otp_context']['extra_data'] = extra_data
+                        request.session.modified = True
+                        
                     return redirect('verify_otp_page')
-            
-            # اگر فرم نامعتبر بود یا خطای ارسال پیامک داشتیم، در تب ثبت‌نام بمان
+                else:
+                    # این حالت فقط زمانی رخ می‌دهد که یک خطای سیستمی در ارسال پیامک وجود داشته باشد.
+                    register_form.add_error(None, result.get('message', 'خطای ناشناخته در ارسال کد.'))
+
+            # اگر فرم نامعتبر بود یا خطایی رخ داد، در همان تب بمان
             active_tab = 'register'
             
             # بازیابی نام استان/شهر برای جلوگیری از پریدن UI در صورت خطا

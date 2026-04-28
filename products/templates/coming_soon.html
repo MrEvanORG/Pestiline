@@ -1,170 +1,221 @@
-<!DOCTYPE html>
 {% load static %}
+<!DOCTYPE html>
 <html lang="fa" dir="rtl">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>پستیلاین | به زودی بازمیگردیم</title>
-    <title>{% if seo_title %}{{seo_title}}{% else %}پستیلاین | به زودی بازمیگردیم{% endif %}</title>
-    <meta name="description" content="{% if seo_description %}{{seo_description}}{% else %}تیم پستیلاین در حال آماده‌سازی نسخه‌ای بی‌نظیر، سریع و هوشمند است. از شکیبایی شما سپاسگزاریم، به زودی با قدرتی بیشتر برمی‌گردیم.{% endif %}">
+    <!-- شما می‌توانید عنوان و توضیحات سئو را از طریق context به این تمپلیت پاس دهید -->
+    <title>{% if seo_title %}{{ seo_title }}{% else %}پستیلاین | به زودی بازمی‌گردیم{% endif %}</title>
+    <meta name="description" content="{% if seo_description %}{{ seo_description }}{% else %}تیم پستیلاین در حال آماده‌سازی نسخه‌ای بی‌نظیر، سریع و هوشمند است. از شکیبایی شما سپاسگزاریم.{% endif %}">
+    
+    <!-- لینک به فونت و آیکون‌ها -->
     <link href="{% static 'products/css/Vazirmatn.css' %}" rel="stylesheet" type="text/css" />
     <link rel="stylesheet" href="{% static 'products/css/all_awesome.css' %}">
+    
+    <!-- لینک به فایل‌های استایل اصلی -->
     <link rel="stylesheet" href="{% static 'products/css/root/light_root.css' %}">
     <link rel="stylesheet" href="{% static 'products/css/status_page.css' %}">
+    
+    <!-- فاوآیکون -->
     <link rel="icon" href="{% static 'products/img/fav.svg' %}" type="image/svg+xml">
 </head>
 <body>
-<div class="cs-bg"></div>
-<div class="cs-overlay"></div>
+<div class="scroll-wrapper">
+    <div class="cs-layout">
+        <!-- ستون محتوای اصلی (سمت راست در حالت RTL) -->
+        <div class="cs-content-side">
+            <img src="{% static 'products/img/light-logo-to.svg' %}" alt="پستیلاین" class="cs-logo">
+            <h1 class="cs-title">یک اتفاق <span>بزرگ</span><br>در راه است</h1>
+            <p class="cs-desc">تیم پستیلاین در حال آماده‌سازی نسخه‌ای بی‌نظیر، سریع و هوشمند است. از شکیبایی شما سپاسگزاریم، به زودی با قدرتی بیشتر برمی‌گردیم.</p>
 
-<div class="cs-layout">
-    
-    <div class="cs-content-side">
-        <img src="{% static 'products/img/light-logo-to.svg' %}" alt="پستیلاین" class="cs-logo">
-        <h1 class="cs-title">یک اتفاق <span>بزرگ</span><br>در راه است</h1>
-        <p class="cs-desc">تیم پستیلاین در حال آماده‌سازی نسخه‌ای بی‌نظیر، سریع و هوشمند است. از شکیبایی شما سپاسگزاریم، به زودی با قدرتی بیشتر برمی‌گردیم.</p>
-
-        {% if not is_expired and target_date %}
-            <div class="flip-clock-container" id="flip-clock">
-                <div class="flip-unit-wrapper">
-                    <div class="flip-card" id="fc-days" data-val="00"></div>
-                    <span class="flip-label">روز</span>
-                </div>
-                <div class="flip-unit-wrapper">
-                    <div class="flip-card" id="fc-hours" data-val="00"></div>
-                    <span class="flip-label">ساعت</span>
-                </div>
-                <div class="flip-unit-wrapper">
-                    <div class="flip-card" id="fc-minutes" data-val="00"></div>
-                    <span class="flip-label">دقیقه</span>
-                </div>
-                <div class="flip-unit-wrapper">
-                    <div class="flip-card" id="fc-seconds" data-val="00"></div>
-                    <span class="flip-label">ثانیه</span>
-                </div>
-            </div>
-        {% else %}
-            <h2 style="color: var(--secondary); margin-bottom: 2rem;">در حال همگام‌سازی سیستم ...</h2>
-        {% endif %}
-    </div>
-
-    <div class="cs-team-side">
-        {% if team_members %}
-        <div class="team-masonry">
-            {% for member in team_members %}
-                <a href="{% url 'resume_detail' slug=member.slug %}" target="_blank" class="cs-team-card">
-                    <div class="team-avatar-box">
-                        {% if member.avatar %}
-                            <img src="{{ member.avatar.url }}" alt="{{ member.name }}">
-                        {% else %}
-                            <img src="{% static 'products/img/default-avatar.png' %}" alt="{{ member.name }}">
-                        {% endif %}
+            <!-- بخش شمارش معکوس -->
+            {% if not is_expired and target_date %}
+                <div class="flip-clock-container" id="flip-clock">
+                    <div class="flip-unit-wrapper">
+                        <div class="flip-card" id="fc-days" data-val="00"></div>
+                        <span class="flip-label">روز</span>
                     </div>
-                    <h3 class="team-card-name">{{ member.name }}</h3>
-                    <div class="team-card-role">{{ member.get_role_display|default:member.title }}</div>
-                </a>
-            {% endfor %}
-        </div>
-        {% endif %}
+                    <div class="flip-unit-wrapper">
+                        <div class="flip-card" id="fc-hours" data-val="00"></div>
+                        <span class="flip-label">ساعت</span>
+                    </div>
+                    <div class="flip-unit-wrapper">
+                        <div class="flip-card" id="fc-minutes" data-val="00"></div>
+                        <span class="flip-label">دقیقه</span>
+                    </div>
+                    <div class="flip-unit-wrapper">
+                        <div class="flip-card" id="fc-seconds" data-val="00"></div>
+                        <span class="flip-label">ثانیه</span>
+                    </div>
+                </div>
+            {% else %}
+                <h2 style="color: var(--secondary); margin-bottom: 2rem;">در حال همگام‌سازی سیستم ...</h2>
+            {% endif %}
 
-        {% if site_settings %}
-        <div class="cs-social-bar">
-            {% if site_settings.link_instagram %}
-                <a href="{{ site_settings.link_instagram }}" target="_blank" class="cs-social-link" title="اینستاگرام"><i class="fab fa-instagram"></i></a>
-            {% endif %}
-            {% if site_settings.link_telegram %}
-                <a href="{{ site_settings.link_telegram }}" target="_blank" class="cs-social-link" title="تلگرام"><i class="fab fa-telegram-plane"></i></a>
-            {% endif %}
-            {% if site_settings.link_whatsapp %}
-                <a href="{{ site_settings.link_whatsapp }}" target="_blank" class="cs-social-link" title="واتس‌اپ"><i class="fab fa-whatsapp"></i></a>
-            {% endif %}
-            {% if site_settings.link_twitter %}
-                <a href="{{ site_settings.link_twitter }}" target="_blank" class="cs-social-link" title="توییتر"><i class="fab fa-x-twitter"></i></a>
-            {% endif %}
-            {% if site_settings.link_prphone %}
-                <a href="tel:{{ site_settings.link_prphone }}" class="cs-social-link" title="تماس با ما"><i class="fa-slab-press fa-phone-alt"></i></a>
+            <!-- بخش پلیر موسیقی که به اینجا منتقل شده است -->
+            {% if site_settings.welcome_song %}
+                <div id="welcome-music-container" class="paused"> 
+                    <div class="player-layout">
+                        <div class="player-cover">
+                            <i class="fas fa-music"></i>
+                        </div>
+                        <div class="player-details">
+                            <div id="countdown-container">
+                                <span id="countdown-text">آماده‌سازی موسیقی...</span>
+                            </div>
+                            <div id="track-info-container" style="display: none;">
+                                <div class="player-track-info">
+                                    <span id="track-title">نام ترک</span>
+                                    <span id="track-artist">نام هنرمند</span>
+                                </div>
+                                <div class="track-progress-container">
+                                    <span id="total-duration">00:00</span>
+                                    <div class="progress-bar">
+                                        <div id="progress-filled" class="progress-filled"></div>
+                                    </div>
+                                    <span id="current-time">00:00</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="player-controls">
+                            <div class="equalizer">
+                                <div class="equalizer-bar"></div>
+                                <div class="equalizer-bar"></div>
+                                <div class="equalizer-bar"></div>
+                                <div class="equalizer-bar"></div>
+                                <div class="equalizer-bar"></div>
+                            </div>
+                            <button id="audio-control-btn" class="player-btn">
+                                <i id="main-icon" class="fas fa-play"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <audio id="welcome-audio" src="{{ site_settings.welcome_song.url }}" loop></audio>
+                </div>
             {% endif %}
         </div>
-        {% endif %}
+
+        <!-- ستون تیم (سمت چپ در حالت RTL) -->
+        <div class="cs-team-side">
+            <!-- بخش اعضای تیم -->
+            {% if team_members %}
+                <div class="team-masonry">
+                    {% for member in team_members %}
+                        <a href="{% url 'resume_detail' slug=member.slug %}" target="_blank" class="cs-team-card">
+                            <div class="team-avatar-box">
+                                {% if member.avatar %}
+                                    <img src="{{ member.avatar.url }}" alt="{{ member.name }}">
+                                {% else %}
+                                    <img src="{% static 'products/img/default-avatar.png' %}" alt="{{ member.name }}">
+                                {% endif %}
+                            </div>
+                            <h3 class="team-card-name">{{ member.name }}</h3>
+                            <div class="team-card-role">{{ member.get_role_display|default:member.title }}</div>
+                        </a>
+                    {% endfor %}
+                </div>
+            {% endif %}
+
+            <!-- بخش لینک‌های شبکه‌های اجتماعی -->
+            {% if site_settings %}
+                <div class="cs-social-bar">
+                    {% if site_settings.link_instagram %}
+                        <a href="{{ site_settings.link_instagram }}" target="_blank" class="cs-social-link" title="اینستاگرام"><i class="fab fa-instagram"></i></a>
+                    {% endif %}
+                    {% if site_settings.link_telegram %}
+                        <a href="{{ site_settings.link_telegram }}" target="_blank" class="cs-social-link" title="تلگرام"><i class="fab fa-telegram-plane"></i></a>
+                    {% endif %}
+                    {% if site_settings.link_whatsapp %}
+                        <a href="{{ site_settings.link_whatsapp }}" target="_blank" class="cs-social-link" title="واتس‌اپ"><i class="fab fa-whatsapp"></i></a>
+                    {% endif %}
+                    {% if site_settings.link_twitter %}
+                        <a href="{{ site_settings.link_twitter }}" target="_blank" class="cs-social-link" title="توییتر"><i class="fab fa-x-twitter"></i></a>
+                    {% endif %}
+                    {% if site_settings.link_prphone %}
+                        <a href="tel:{{ site_settings.link_prphone }}" class="cs-social-link" title="تماس با ما"><i class="fa-solid fa-phone-alt"></i></a>
+                    {% endif %}
+                </div>
+            {% endif %}
+        </div>
     </div>
-
 </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const targetDateStr = "{{ target_date|date:'c' }}";
+            if (!targetDateStr) return;
 
-<script>
-    document.addEventListener("DOMContentLoaded", function() {
-        const targetDateStr = "{{ target_date|date:'c' }}";
-        if (!targetDateStr) return;
+            const countDownDate = new Date(targetDateStr).getTime();
 
-        const countDownDate = new Date(targetDateStr).getTime();
+            function initCard(id) {
+                const card = document.getElementById(id);
+                if(!card) return;
+                card.innerHTML = `
+                    <div class="flip-top"><span>00</span></div>
+                    <div class="flip-bottom"><span>00</span></div>
+                `;
+            }
 
-        function initCard(id) {
-            const card = document.getElementById(id);
-            if(!card) return;
-            card.innerHTML = `
-                <div class="flip-top"><span>00</span></div>
-                <div class="flip-bottom"><span>00</span></div>
-            `;
-        }
+            ['fc-days', 'fc-hours', 'fc-minutes', 'fc-seconds'].forEach(initCard);
 
-        ['fc-days', 'fc-hours', 'fc-minutes', 'fc-seconds'].forEach(initCard);
-
-        function updateCard(id, newValue) {
-            const card = document.getElementById(id);
-            if(!card) return;
-            
-            const currentValue = card.getAttribute('data-val');
-            const strNewValue = newValue < 10 ? '0' + newValue : newValue.toString();
-
-            if (currentValue !== strNewValue) {
-                card.setAttribute('data-val', strNewValue);
-
-                const topAnim = document.createElement('div');
-                topAnim.className = 'flip-top-anim';
-                topAnim.innerHTML = `<span>${currentValue}</span>`;
-
-                const bottomAnim = document.createElement('div');
-                bottomAnim.className = 'flip-bottom-anim';
-                bottomAnim.innerHTML = `<span>${strNewValue}</span>`;
-
-                const top = card.querySelector('.flip-top span');
-                const bottom = card.querySelector('.flip-bottom span');
+            function updateCard(id, newValue) {
+                const card = document.getElementById(id);
+                if(!card) return;
                 
-                top.innerText = strNewValue;
+                const currentValue = card.getAttribute('data-val');
+                const strNewValue = newValue < 10 ? '0' + newValue : newValue.toString();
 
-                card.appendChild(topAnim);
-                card.appendChild(bottomAnim);
+                if (currentValue !== strNewValue) {
+                    card.setAttribute('data-val', strNewValue);
 
-                setTimeout(() => {
-                    bottom.innerText = strNewValue;
-                    if (card.contains(topAnim)) card.removeChild(topAnim);
-                    if (card.contains(bottomAnim)) card.removeChild(bottomAnim);
-                }, 1000); 
+                    const topAnim = document.createElement('div');
+                    topAnim.className = 'flip-top-anim';
+                    topAnim.innerHTML = `<span>${currentValue}</span>`;
+
+                    const bottomAnim = document.createElement('div');
+                    bottomAnim.className = 'flip-bottom-anim';
+                    bottomAnim.innerHTML = `<span>${strNewValue}</span>`;
+
+                    const top = card.querySelector('.flip-top span');
+                    const bottom = card.querySelector('.flip-bottom span');
+                    
+                    top.innerText = strNewValue;
+
+                    card.appendChild(topAnim);
+                    card.appendChild(bottomAnim);
+
+                    setTimeout(() => {
+                        bottom.innerText = strNewValue;
+                        if (card.contains(topAnim)) card.removeChild(topAnim);
+                        if (card.contains(bottomAnim)) card.removeChild(bottomAnim);
+                    }, 1000); 
+                }
             }
-        }
 
-        const timerInterval = setInterval(function() {
-            const now = new Date().getTime();
-            const distance = countDownDate - now;
+            const timerInterval = setInterval(function() {
+                const now = new Date().getTime();
+                const distance = countDownDate - now;
 
-            if (distance < 0) {
-                clearInterval(timerInterval);
-                location.reload();
-                return;
-            }
+                if (distance < 0) {
+                    clearInterval(timerInterval);
+                    location.reload();
+                    return;
+                }
 
-            const days = Math.floor(distance / (1000 * 60 * 60 * 24));
-            const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-            const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-            const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+                const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-            updateCard('fc-days', days);
-            updateCard('fc-hours', hours);
-            updateCard('fc-minutes', minutes);
-            updateCard('fc-seconds', seconds);
+                updateCard('fc-days', days);
+                updateCard('fc-hours', hours);
+                updateCard('fc-minutes', minutes);
+                updateCard('fc-seconds', seconds);
 
-        }, 1000);
-    });
-</script>
-
+            }, 1000);
+        });
+    </script>
+    {% if site_settings.welcome_song %}
+    <script src="{% static 'products/js/player.js' %}"></script>
+    {% endif %}
 </body>
 </html>

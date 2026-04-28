@@ -166,7 +166,7 @@ class MessageSiteSettingsAdmin(admin.ModelAdmin):
 class SiteSettingsAdmin(admin.ModelAdmin):
     readonly_fields = ('total_views','today_views','this_week_views','this_month_views','this_year_views','tj_last_reset_date')
     fieldsets = (
-        ('وضعیت سایت', {'fields': ('status', 'maintenance_message','coming_soon_date','bypass_for_staff','bypass_for_superuser'),'classes': ('collapse',)}),
+        ('وضعیت سایت', {'fields': ('status', 'maintenance_message','coming_soon_date','bypass_for_staff','bypass_for_superuser','welcome_song'),'classes': ('collapse',)}),
         ('سایر تنظیمات', {'fields': ('otp_time_interval',),'classes': ('collapse',)}),
         ('لینک های وبسایت', {'fields': ('link_phone1','link_phone2','link_prphone','link_mail','link_instagram','link_telegram','link_whatsapp','link_twitter','link_address','address_text'),'classes': ('collapse',)}),
         ('بازدید های وبسایت', {'fields': ('total_views','today_views','this_week_views','this_month_views','this_year_views','tj_last_reset_date'),'classes': ('collapse',)}),
