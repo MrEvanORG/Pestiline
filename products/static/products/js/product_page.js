@@ -20,6 +20,12 @@ document.addEventListener('DOMContentLoaded', () => {
 // ============================================
 // 1. Slider Logic (RTL & Touch Optimized)
 // ============================================
+// ============================================
+// 1. Slider Logic (RTL FIXED)
+// ============================================
+// ============================================
+// 1. Slider Logic (RTL FIXED - Final)
+// ============================================
 function initSlider() {
     const track = document.getElementById('sliderTrack');
     const stage = document.getElementById('galleryStage');
@@ -34,6 +40,8 @@ function initSlider() {
         ? PRODUCT_DATA.imagesCount
         : 0;
 
+    if (totalSlides <= 0) return;
+
     // دکمه‌ها
     if (btnNext) btnNext.onclick = () => slideTo(currentIndex + 1);
     if (btnPrev) btnPrev.onclick = () => slideTo(currentIndex - 1);
@@ -46,7 +54,7 @@ function initSlider() {
         });
     });
 
-    // تنظیمات درگ
+    // ---------------- Drag Logic ----------------
     let isDragging = false;
     let startPos = 0;
     let currentTranslate = 0;
@@ -71,28 +79,39 @@ function initSlider() {
 
     function touchMove(event) {
         if (!isDragging) return;
+
         const currentPosition = getPositionX(event);
-        const currentMove = currentPosition - startPos;
-        let moveWithResistance = currentMove;
-        // مقاومت در لبۀ اسلایدر
-        if ((currentIndex === 0 && currentMove > 0) ||
-            (currentIndex === totalSlides - 1 && currentMove < 0)) {
-            moveWithResistance = currentMove / 3;
+        const diff = currentPosition - startPos; // کشیدن چپ به راست = مثبت، راست به چپ = منفی
+
+        let move = diff;
+
+        // اصلاح مقاومت لبه‌ها برای RTL
+        // اگر عکس اولیم و به سمت چپ می‌کشیم (diff < 0) -> مقاومت (جلوگیری از سفیدی)
+        // اگر عکس آخریم و به سمت راست می‌کشیم (diff > 0) -> مقاومت
+        if ((currentIndex === 0 && diff < 0) ||
+            (currentIndex === totalSlides - 1 && diff > 0)) {
+            move = diff / 3;
         }
-        currentTranslate = prevTranslate + moveWithResistance;
+
+        currentTranslate = prevTranslate + move;
     }
 
     function touchEnd() {
         isDragging = false;
         cancelAnimationFrame(animationID);
-        const movedBy = currentTranslate - prevTranslate;
-        const threshold = 50;
 
-        if (movedBy < -threshold && currentIndex < totalSlides - 1) {
-            currentIndex -= 1;//gam
-        } else if (movedBy > threshold && currentIndex > 0) {
-            currentIndex += 1;//gam
+        const movedBy = currentTranslate - prevTranslate;
+        const threshold = 60;
+
+        // در محیط RTL:
+        // اگر نوار به اندازه کافی به راست کشیده شد (movedBy > threshold)، عکس بعدی را نشان بده
+        // اگر به چپ کشیده شد (movedBy < -threshold)، عکس قبلی را نشان بده
+        if (movedBy > threshold && currentIndex < totalSlides - 1) {
+            currentIndex += 1;
+        } else if (movedBy < -threshold && currentIndex > 0) {
+            currentIndex -= 1;
         }
+
         slideTo(currentIndex);
     }
 
@@ -112,12 +131,13 @@ function initSlider() {
     }
 
     function slideTo(index) {
-        // محدود کردن ایندکس
         index = Math.max(0, Math.min(index, totalSlides - 1));
         currentIndex = index;
+
         const stageWidth = stage.offsetWidth;
-        // برای RTL: منفی می‌کنیم تا جهت سوایپ اصلاح شود
-        currentTranslate = currentIndex * stageWidth;//gam
+
+        // مقدار مثبت در RTL باعث حرکت نوار به راست و نمایش عکس سمت چپ (عکس بعدی) می‌شود
+        currentTranslate = currentIndex * stageWidth;
         prevTranslate = currentTranslate;
 
         track.style.transition = 'transform 0.4s cubic-bezier(0.25, 1, 0.5, 1)';
@@ -130,72 +150,118 @@ function initSlider() {
         const active = thumbs[currentIndex];
         if (active) {
             active.classList.add('active');
-            active.scrollIntoView({
-                behavior: 'smooth',
-                block: 'nearest',
-                inline: 'center'
-            });
+
+            // جلوگیری از پرش صفحه به بالا
+            const container = document.getElementById('galleryThumbs');
+            if (container) {
+                const scrollPos =
+                    active.offsetLeft -
+                    container.offsetWidth / 2 +
+                    active.offsetWidth / 2;
+
+                container.scrollTo({
+                    left: scrollPos,
+                    behavior: 'smooth'
+                });
+            }
         }
     }
 
     window.addEventListener('resize', () => {
-        track.style.transition = 'none';
         slideTo(currentIndex);
     });
 }
 
+
+
+// ============================================
+// 2. Price Calculation & Input Logic
+// ============================================
 // ============================================
 // 2. Price Calculation & Input Logic
 // ============================================
 function initPriceCalculator() {
-    updateFinalPrice();
+    forceValidValue(); // در لود اولیه مقادیر را تنظیم و قیمت را حساب کند
 }
 
-const originalUpdateQty = window.updateQty;
 window.updateQty = function(change) {
     const input = document.getElementById('qtyInput');
     if (!input) return;
-    let newVal = parseInt(input.value) + change;
-    if (newVal >= PRODUCT_DATA.minOrder && newVal <= PRODUCT_DATA.maxOrder) {
-        input.value = newVal;
-        updateFinalPrice();
-        handleQtyChange();
-    }
-}
+    let newVal = parseInt(input.value) || 0;
+    input.value = newVal + change;
+    
+    forceValidValue();  
+    handleQtyChange();
+};
 
-const originalSetWeight = window.setWeight;
 window.setWeight = function(weight, element) {
     const input = document.getElementById('weightInput');
     if (!input) return;
     input.value = weight;
     document.querySelectorAll('.weight-tag').forEach(tag => tag.classList.remove('active'));
     if (element) element.classList.add('active');
-    updateFinalPrice();
+    
+    forceValidValue(); 
     handleQtyChange();
-}
+};
 
 window.manualWeightInput = function() {
     document.querySelectorAll('.weight-tag').forEach(tag => tag.classList.remove('active'));
-    updateFinalPrice();
-    // با تأخیر در initCartSystem هندل می‌شود
-}
+    
+    // محاسبه پیش‌نمایش قیمت حین تایپ (بدون اصلاح اجباری اینپوت)
+    calculateTempPrice(); 
 
-function updateFinalPrice() {
-    let quantity = 0;
+    // تشخیص اتمام تایپ (۸۰۰ میلی ثانیه)
+    clearTimeout(typingTimer);
+    typingTimer = setTimeout(() => {
+        forceValidValue(); // اصلاح ظاهری عدد
+        handleQtyChange(); // ارسال ریکوئست به بک‌اند در صورت موجود بودن در سبد
+    }, 800);
+};
+
+// محاسبه قیمت حین تایپ (بدون تغییر دادن عدد داخل اینپوت)
+function calculateTempPrice() {
     const priceDisplay = document.getElementById('finalPriceDisplay');
-    if (!priceDisplay) return;
+    const el = PRODUCT_DATA.isPackaged ? document.getElementById('qtyInput') : document.getElementById('weightInput');
+    if (!priceDisplay || !el) return;
 
-    if (PRODUCT_DATA.isPackaged) {
-        const qtyEl = document.getElementById('qtyInput');
-        quantity = qtyEl ? parseInt(qtyEl.value) || 0 : 0;
-    } else {
-        const weightEl = document.getElementById('weightInput');
-        quantity = weightEl ? parseFloat(weightEl.value) || 0 : 0;
-    }
-
-    const total = quantity * PRODUCT_DATA.price;
+    let val = parseFloat(el.value);
+    if (isNaN(val) || val <= 0) val = 0; // فقط برای نمایش موقت مبلغ صفر شود
+    
+    const total = val * PRODUCT_DATA.price;
     priceDisplay.textContent = `${Math.round(total).toLocaleString('en-US')} تومان`;
 }
+
+// تابع اصلی برای بررسی Min/Max و تصحیح مقدار ظاهری و نهایی کردن قیمت
+function forceValidValue() {
+    const priceDisplay = document.getElementById('finalPriceDisplay');
+    const el = PRODUCT_DATA.isPackaged ? document.getElementById('qtyInput') : document.getElementById('weightInput');
+    if (!priceDisplay || !el) return;
+
+    const minOrder = PRODUCT_DATA.minOrder;
+    const maxOrder = PRODUCT_DATA.maxOrder;
+
+    let val = parseFloat(el.value);
+    
+    // اعمال قوانین Min و Max
+    if (isNaN(val) || val < minOrder) val = minOrder;
+    if (val > maxOrder) val = maxOrder;
+    
+    // اگر بسته ای است، باید عدد صحیح باشد
+    if (PRODUCT_DATA.isPackaged) val = Math.round(val);
+
+    // آپدیت ظاهری اینپوت به مقدار تصحیح شده
+    if (el.value !== String(val)) {
+        el.value = val;
+    }
+
+    // محاسبه قیمت نهایی
+    const total = val * PRODUCT_DATA.price;
+    priceDisplay.textContent = `${Math.round(total).toLocaleString('en-US')} تومان`;
+}
+
+
+
 
 // ============================================
 // 3. Advanced Cart System
@@ -203,14 +269,9 @@ function updateFinalPrice() {
 function initCartSystem() {
     const btn = document.querySelector('.btn-pro-cart');
     if (btn) btn.addEventListener('click', handleMainBtnClick);
-
-    const weightInput = document.getElementById('weightInput');
-    if (weightInput) {
-        weightInput.addEventListener('input', () => {
-            clearTimeout(typingTimer);
-            typingTimer = setTimeout(handleQtyChange, 800);
-        });
-    }
+    
+    // رویداد input برای weightInput قبلا در manualWeightInput هندل شد،
+    // پس نیازی نیست اینجا دوباره eventListener برای تایمر بگذارید.
 }
 
 function syncInputWithCart() {
@@ -220,7 +281,7 @@ function syncInputWithCart() {
         const qtyEl = document.getElementById('qtyInput');
         if (qtyEl) {
             qtyEl.value = parseInt(PRODUCT_DATA.currentQty);
-            updateFinalPrice();
+            forceValidValue();
         }
     } else {
         const weightEl = document.getElementById('weightInput');
@@ -234,7 +295,7 @@ function syncInputWithCart() {
                     tag.classList.remove('active');
                 }
             });
-            updateFinalPrice();
+            forceValidValue();
         }
     }
 }

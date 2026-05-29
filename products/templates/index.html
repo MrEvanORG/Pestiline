@@ -1,5 +1,6 @@
 {% extends "patterns/main_base.html" %}
 {% load static %}
+{% load custom_filters %}
 {% load humanize %}
 {% block description %}پستیلاین بازار تخصصی خرید و فروش پسته ؛ بهترین قیمت ، بهترین کیفیت ، خرید مستقیم پسته از کشاورزان رفسنجان و سرتاسر کشور .{% endblock %}
 {% block title %}خرید و فروش پسته به صورت آنلاین | پستیلاین {% endblock title %}
@@ -185,54 +186,32 @@
 
 
 
-    <div class="blog-grid">
-        <article class="blog-card">
-            <div class="blog-img-wrapper">
-                <span class="blog-tag">آموزشی</span>
-                <img src="{% static 'products/img/home/blog.webp' %}" alt="خواص پسته">
-            </div>
-            <div class="blog-content">
-                <span class="blog-date"><i class="fa-slab-press fa-calendar"></i> ۱۲ اسفند ۱۴۰۳</span>
-                <h3 class="blog-title">۱۰ خاصیت پسته برای رشد هوش کودکان</h3>
-                <p class="blog-excerpt">پسته منبع غنی از فسفر و آهن است که تاثیر مستقیمی بر بهبود عملکرد مغزی دارد...</p>
-                <a href="#" class="read-more-btn">
-                    خواندن کامل مقاله
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                </a>
-            </div>
-        </article>
-
-        <article class="blog-card">
-            <div class="blog-img-wrapper">
-                <span class="blog-tag">راهنمای خرید</span>
-                <img src="{% static 'products/img/home/blog.webp' %}" alt="تفاوت پسته">
-            </div>
-            <div class="blog-content">
-                <span class="blog-date"><i class="fa-slab-press fa-calendar"></i> ۱۰ اسفند ۱۴۰۳</span>
-                <h3 class="blog-title">تفاوت پسته اکبری و احمدآقایی چیست؟</h3>
-                <p class="blog-excerpt">خیلی‌ها موقع خرید تفاوت ظاهری این دو رقم را نمی‌دانند. در این مقاله به بررسی تفاوت‌ها می‌پردازیم...</p>
-                <a href="#" class="read-more-btn">
-                    خواندن کامل مقاله
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                </a>
-            </div>
-        </article>
-
-        <article class="blog-card">
-            <div class="blog-img-wrapper">
-                <span class="blog-tag">نگهداری</span>
-                <img src="{% static 'products/img/home/blog.webp' %}" alt="نگهداری پسته">
-            </div>
-            <div class="blog-content">
-                <span class="blog-date"><i class="fa-slab-press fa-calendar"></i> ۰۵ اسفند ۱۴۰۳</span>
-                <h3 class="blog-title">چطور پسته خام را تازه نگه داریم؟</h3>
-                <p class="blog-excerpt">رطوبت و گرما دشمن اصلی پسته هستند. برای جلوگیری از بوی نا، این ترفندها را اجرا کنید...</p>
-                <a href="#" class="read-more-btn">
-                    خواندن کامل مقاله
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
-                </a>
-            </div>
-        </article>
-    </div>
+        <div class="blog-grid">
+            {% for post in posts %}
+                <article class="blog-card">
+                    <div class="blog-img-wrapper">
+                        <span class="blog-tag">{{ post.category.title }}</span>
+                        <a href="{% url 'blog:post_detail' post.category.slug post.slug %}">
+                            <img src="{{ post.cover_image.url }}" alt="{{ post.cover_image_alt|default:post.title }}" loading="lazy">
+                        </a>
+                    </div>
+                    <div class="blog-content">
+                        <span class="blog-date"><i class="fa-slab-press fa-calendar"></i> {{ post.created_at|to_jalali:"persian_date" }}</span>
+                        <h3 class="blog-title">
+                            <a href="{% url 'blog:post_detail' post.category.slug post.slug %}">{{ post.title }}</a>
+                        </h3>
+                        <p class="blog-excerpt">{{ post.meta_description|default:"خلاصه‌ای برای این مقاله ثبت نشده است..." }}</p>
+                        <a href="{% url 'blog:post_detail' post.category.slug post.slug %}" class="read-more-btn">
+                            خواندن کامل مقاله
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+                        </a>
+                    </div>
+                </article>
+            {% empty %}
+                <div class="empty-state">
+                    <p>هنوز مقاله‌ای منتشر نشده است!</p>
+                </div>
+            {% endfor %}
+        </div>
 </section>
 {% endblock %}

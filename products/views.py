@@ -14,6 +14,7 @@ from .forms import UserRegisterForm, UserLoginForm ,SetNewPasswordForm
 from .addons import initiate_otp_process, get_otp_settings, get_remaining_otp_time , get_client_fingerprint
 from blog.models import BlogPost
 from django.core.cache import cache
+from products.models import SiteSettings 
 #-----------------------------------------------------------------------------------
 def index_page(request): 
     # وضعیت‌های معتبر برای محاسبه یک فروش موفق
@@ -90,45 +91,60 @@ def merge_session_cart(request, user, explicit_cart=None):
 
 @require_POST
 def update_cart_api(request):
-    """API برای افزودن، حذف و آپدیت تعداد آیتم‌های سبد"""
     try:
         data = json.loads(request.body)
         product_id = str(data.get('product_id'))
-        action = data.get('action') # 'add', 'remove', 'update'
+        action = data.get('action')
         quantity = float(data.get('quantity', 1))
     except:
         return JsonResponse({'success': False, 'message': 'داده نامعتبر'}, status=400)
 
     in_cart = False
+    item_total = 0
+    total_price = 0
+    all_free_shipping = False
 
-    # === سناریوی کاربر لاگین شده (دیتابیس) ===
+    # گرفتن محصول و محدود کردن مقدار مجاز (امنیت بک‌اند)
+    if action in ['add', 'update']:
+        product = get_object_or_404(Product, id=product_id)
+        
+        min_qty = product.min_order if product.min_order else (1.0 if product.sale_method == 'PACKAGED' else 0.1)
+        max_qty = product.max_order if product.max_order else 1000.0
+        
+        if quantity < min_qty:
+            quantity = min_qty
+        elif quantity > max_qty:
+            quantity = max_qty
+
     if request.user.is_authenticated:
-        # دریافت یا ساخت سبد خرید (وضعیت CART)
         order, _ = Order.objects.get_or_create(customer=request.user, status='CART')
         
         if action == 'remove':
             OrderItem.objects.filter(order=order, product_id=product_id).delete()
             in_cart = False
         else: 
-            # برای add و update
-            product = get_object_or_404(Product, id=product_id)
             item, created = OrderItem.objects.get_or_create(
                 order=order, 
                 product=product,
                 defaults={'quantity': quantity, 'price': product.price}
             )
             
-            # اگر آیتم از قبل بود یا درخواست آپدیت صریح داشتیم، مقدار را بروز کن
+            # جلوگیری از تقلب: همیشه هنگام آپدیت، قیمت را با دیتابیس هماهنگ کن
             if not created or action == 'update':
                 item.quantity = quantity
+                item.price = product.price 
                 item.save()
             
             in_cart = True
+            item_total = item.quantity * item.price
         
         order.calculate_total()
         cart_count = order.items.count()
+        # محاسبه جمع کل برای فرانت
+        total_price = sum(i.quantity * i.price for i in order.items.all())
+        if cart_count > 0:
+            all_free_shipping = all(i.product.is_free_shipping for i in order.items.all())
 
-    # === سناریوی کاربر مهمان (سشن) ===
     else:
         cart = request.session.get('cart', {})
         
@@ -137,20 +153,29 @@ def update_cart_api(request):
                 del cart[product_id]
             in_cart = False
         else: 
-            # برای add و update مقدار را ست میکنیم
-            cart[product_id] = {'quantity': quantity}
+            # آپدیت سشن با مقدار محدود شده و قیمت واقعی
+            cart[product_id] = {
+                'quantity': quantity,
+                'price': float(product.price)
+            }
             in_cart = True
+            item_total = quantity * float(product.price)
         
         request.session['cart'] = cart
         request.session.modified = True
         cart_count = len(cart)
+        total_price = sum(v['quantity'] * v.get('price', 0) for v in cart.values())
 
     return JsonResponse({
         'success': True,
-        'in_cart': in_cart,     # وضعیت نهایی محصول (در سبد هست یا نه)
-        'cart_count': cart_count, # تعداد کل اقلام سبد برای بج هدر
+        'in_cart': in_cart,
+        'cart_count': cart_count,
+        'item_total': item_total,      # برای آپدیت قیمت همان ردیف
+        'total_price': total_price,    # برای آپدیت پیش فاکتور
+        'all_free_shipping': all_free_shipping,
         'message': 'سبد خرید بروز شد'
     })
+
 # ==========================================
 # سیستم احراز هویت ماژولار
 # ==========================================
@@ -817,3 +842,28 @@ def ai_page(request):
 
 def mixer_page(request):
     return render(request,"developing.html")
+
+def maintenance_page(request):
+    settings = SiteSettings.objects.first()
+    return render(request, 'maintenance.html', {'message': settings.maintenance_message}) # type: ignore
+
+def developing_page(request):
+    return render(request,"developing.html")
+
+def commingsoon_page(request):
+    settings = SiteSettings.objects.first()
+    from resume.models import Resume
+    from django.utils import timezone
+
+    context = {'target_date': settings.coming_soon_date}
+    if settings.coming_soon_date:
+        remaining = settings.coming_soon_date - timezone.now()
+        if remaining.total_seconds() > 0:
+            context['is_expired'] = False
+        else:
+            context['is_expired'] = True
+    settings = SiteSettings.objects.first()
+    context['site_settings'] = settings
+    context['team_members'] = Resume.objects.filter(is_confirmed=True).order_by('-id')[:6]
+    return render(request, 'coming_soon.html', context)
+

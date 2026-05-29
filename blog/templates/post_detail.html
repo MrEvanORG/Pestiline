@@ -43,6 +43,15 @@
             <p class="post-page-header__excerpt">
                 {{ post.short_description|default:post.meta_description }}
             </p>
+            {% if post.reading_time %}
+                <div class="post-reading-time">
+                    <i class="fa-slab-press fa-clock"></i>
+                    <span>
+                        مدت زمان مطالعه : 
+                        {{ post.reading_time }} دقیقه
+                    </span>
+                </div>
+            {% endif %}
             {% endif %}
 
             <div class="post-author-row">
@@ -72,13 +81,6 @@
                         {% endif %}
                     </div>
                 </div>
-
-                {% if post.reading_time %}
-                <div class="post-reading-time">
-                    <i class="fa-slab-press fa-hourglass-half"></i>
-                    <span>{{ post.reading_time }} دقیقه مطالعه</span>
-                </div>
-                {% endif %}
             </div>
         </div>
 

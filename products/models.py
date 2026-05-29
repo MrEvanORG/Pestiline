@@ -71,6 +71,11 @@ def validate_file_size(value):
     limit = 5 * 1024 * 1024  # 5 مگابایت
     if value.size > limit:
         raise ValidationError('حجم فایل نباید بیشتر از 5 مگابایت باشد.')
+    
+def validate_file_size_music(value):
+    limit = 12 * 1024 * 1024  # 
+    if value.size > limit:
+        raise ValidationError('حجم فایل نباید بیشتر از 12 مگابایت باشد.')
 
 # --- تنظیمات سایت ---
 class SiteSettings(models.Model):
@@ -81,13 +86,14 @@ class SiteSettings(models.Model):
     ]
 
     status = models.CharField(max_length=15, choices=SITE_STATUS_CHOICES, default='ACTIVE', verbose_name="وضعیت سایت")
-    maintenance_message = models.TextField(blank=True, null=True, verbose_name="متن صفحه غیرفعال")
+    maintenance_message = models.TextField(blank=True, null=True, verbose_name="متن صفحه بروزرسانی")
     coming_soon_date = models.DateTimeField(null=True, blank=True, verbose_name="تاریخ و زمان بازگشایی")
     welcome_song = models.FileField(
         upload_to='settings/audio/', 
         null=True, 
         blank=True, 
         verbose_name="آهنگ صفحه Coming Soon",
+        validators=[FileExtensionValidator(allowed_extensions=['mp3']), validate_file_size],
         help_text="فرمت MP3، حداکثر حجم 12 مگابایت. اگر خالی باشد، آهنگی پخش نخواهد شد."
     )
     otp_time_interval = models.PositiveIntegerField(default=120, verbose_name="زمان انتظار ارسال مجدد کد (ثانیه)")
@@ -139,7 +145,7 @@ class MessageSiteSettings(models.Model):
         DISABLE = "DISABLE","غیر فعال"
         ENABLE = "ENABLE","فعال"
 
-    # ta : to to admin
+    # ta : to admin
     # tu : to user
     # ts : to staff
 
@@ -262,7 +268,7 @@ class User(AbstractUser):
     postal_code = models.CharField(max_length=10, null=True, blank=True, verbose_name="کد پستی")
     province = models.ForeignKey(Province, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="استان")
     city = models.ForeignKey(City, on_delete=models.SET_NULL, null=True, blank=True, verbose_name="شهر")
-    prefered_notification = models.CharField(max_length=8,choices=PrederefNotifChoices,default=PrederefNotifChoices.MESSAGE)
+    prefered_notification = models.CharField(max_length=8,choices=PrederefNotifChoices,default=PrederefNotifChoices.MESSAGE,verbose_name='ترجیح اطلاع رسانی',help_text='* درخواست های همکاری رزومه در هر حالتی و همیشه به صورت ایمیل ارسال میشوند')
     #اطلاع رسانی های پستیلاین شامل اعلان های ثبت سفارش / پاسخ داده شدن تیک ها / ارسال کد های پیگیری پستی یا کد های پیگیری سفارش هستند
 
     def clean(self):
@@ -319,12 +325,25 @@ class Product(models.Model):
     time_tosend = models.CharField(null=True, max_length=50, verbose_name='متن مدت زمان ارسال', help_text='مثلا : تحویل به پست تا 3 روز کاری')
     updated_at = models.DateTimeField(auto_now=True, verbose_name="تاریخ بروزرسانی")
 
-
-    
-
     def clean(self):
+        super().clean()  
         if self.sale_method == 'PACKAGED' and not self.package_weight:
             raise ValidationError("برای فروش بسته‌ای، وارد کردن وزن هر بسته الزامی است.")
+    
+        if self.sale_method == 'PACKAGED':
+            errors = {}
+            if self.min_order and self.min_order % 1 != 0:
+                errors['min_order'] = ValidationError(
+                    'برای فروش بسته‌ای، کف سفارش باید یک عدد صحیح باشد (مثلا: ۴) و نمی‌تواند اعشاری باشد (مثلا: ۴.۲).',
+                    code='not_an_integer'
+                )
+            if self.max_order and self.max_order % 1 != 0:
+                errors['max_order'] = ValidationError(
+                    'برای فروش بسته‌ای، سقف سفارش باید یک عدد صحیح باشد (مثلا: ۱۰۰).',
+                    code='not_an_integer'
+                )
+            if errors:
+                raise ValidationError(errors)
 
     # متدهای کمکی
     def get_dynamic_title(self):
@@ -753,3 +772,4 @@ class NotificationLog(models.Model):
         verbose_name = "گزارش اطلاع‌رسانی"
         verbose_name_plural = "گزارش‌های اطلاع‌رسانی"
         ordering = ['-created_at'] # همیشه جدیدترین‌ها اول نمایش داده شوند
+

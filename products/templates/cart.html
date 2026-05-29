@@ -58,18 +58,27 @@
                 <div class="item-actions-wrapper">
                     <div class="cart-qty-control">
                         {% if item.product.sale_method == 'PACKAGED' %}
-                            <div class="counter-control">
-                                <button type="button" onclick="changeQty('{{ item.product.id }}', 1, {{ item.product.price }})"><i class="fa-slab-press fa-regular fa-plus"></i></button>
-                                <input type="text" id="qty-input-{{ item.product.id }}" value="{{ item.quantity|floatformat:0 }}" data-price="{{ item.product.price }}" readonly>
-                                <button type="button" onclick="changeQty('{{ item.product.id }}', -1, {{ item.product.price }})"><i class="fa-slab-press fa-regular fa-minus"></i></button>
-                            </div>
+                        <div class="counter-control">
+                            <button type="button" onclick="changeQty('{{ item.product.id }}', 1, {{ item.product.price }})"><i class="fa-slab-press fa-regular fa-plus"></i></button>
+                            <input type="text" id="qty-input-{{ item.product.id }}" 
+                                value="{{ item.quantity|floatformat:0 }}" 
+                                data-price="{{ item.product.price }}" 
+                                data-min="{{ item.product.min_order|default_if_none:'1' }}"
+                                data-max="{{ item.product.max_order|default_if_none:'1000' }}"
+                                readonly>
+                            <button type="button" onclick="changeQty('{{ item.product.id }}', -1, {{ item.product.price }})"><i class="fa-slab-press fa-regular fa-minus"></i></button>
+                        </div>
                         {% else %}
-                            <div class="cart-weight-control">
-                                <input type="number" id="qty-input-{{ item.product.id }}" value="{{ item.quantity|floatformat:1 }}" data-price="{{ item.product.price }}" step="0.1" min="0.1" 
-                                oninput="updateWeight('{{ item.product.id }}', {{ item.product.price }})" 
-                                onblur="validateWeight(this, '{{ item.product.id }}', {{ item.product.price }})">
-                                <span>کیلو</span>
-                            </div>
+                        <div class="cart-weight-control">
+                            <input type="number" id="qty-input-{{ item.product.id }}" 
+                                value="{{ item.quantity|floatformat:1 }}" 
+                                data-price="{{ item.product.price }}" 
+                                data-min="{{ item.product.min_order|default_if_none:'0.1' }}"
+                                data-max="{{ item.product.max_order|default_if_none:'1000' }}"
+                                step="0.1" 
+                                oninput="handleTypingWeight('{{ item.product.id }}', {{ item.product.price }})">
+                            <span>کیلو</span>
+                        </div>
                         {% endif %}
                         
                         <button class="btn-delete-item" onclick="promptDelete('{{ item.product.id }}', '{{ item.product.name }}', {{ item.quantity }})">
@@ -141,7 +150,7 @@
 {% block script %}
 <script>
     // دیکشنری برای ذخیره تایمرهای Debounce هر محصول
-    let updateTimers = {};
+    let typingTimers = {};
     let itemToDelete = null;
     let deletedItemBackup = null;
     let undoTimeout = null;
@@ -187,13 +196,49 @@
 
     // --- توابع تغییر مقدار ---
 
+    function handleTypingWeight(productId, unitPrice) {
+        const input = document.getElementById(`qty-input-${productId}`);
+        
+        // پاک کردن تایمر قبلی (اگر کاربر هنوز در حال تایپ است)
+        clearTimeout(typingTimers[productId]);
+
+        // تنظیم تایمر جدید (پس از 800 میلی‌ثانیه توقف، اجرا می‌شود)
+        typingTimers[productId] = setTimeout(() => {
+            let val = parseFloat(input.value);
+            const minVal = parseFloat(input.getAttribute('data-min'));
+            const maxVal = parseFloat(input.getAttribute('data-max'));
+
+            // اگر خالی بود یا کمتر/بیشتر از حد مجاز بود
+            if (isNaN(val) || val < minVal) {
+                val = minVal;
+            } else if (val > maxVal) {
+                val = maxVal;
+            }
+
+            // 1. تصحیح ظاهری عدد داخل اینپوت
+            input.value = val;
+            
+            // 2. ارسال به بک‌اند (تابع هندل کننده سبد خرید)
+            handleQuantityChange(productId, val, unitPrice);
+        }, 800);
+    }
     // تغییر مقدار بسته‌ای (با دکمه)
     function changeQty(productId, change, unitPrice) {
         const input = document.getElementById(`qty-input-${productId}`);
+        const minVal = parseFloat(input.getAttribute('data-min'));
+        const maxVal = parseFloat(input.getAttribute('data-max'));
+        
         let newVal = parseInt(input.value) + change;
-        if (newVal >= 1) {
+        
+        if (newVal >= minVal && newVal <= maxVal) {
             input.value = newVal;
             handleQuantityChange(productId, newVal, unitPrice);
+        } else if (newVal < minVal) {
+            input.value = minVal;
+            handleQuantityChange(productId, minVal, unitPrice);
+        } else if (newVal > maxVal) {
+            input.value = maxVal;
+            handleQuantityChange(productId, maxVal, unitPrice);
         }
     }
 
@@ -201,17 +246,36 @@
     function updateWeight(productId, unitPrice) {
         const input = document.getElementById(`qty-input-${productId}`);
         let newVal = parseFloat(input.value);
-        if (isNaN(newVal)) return; // اگر کاربر فیلد را کاملا پاک کرد ریکوئست نزن
         
-        handleQuantityChange(productId, newVal, unitPrice);
+        // اگر کاربر فیلد را پاک کرده، کاری نکن تا ریکوئست الکی نرود
+        if (isNaN(newVal)) return; 
+
+        // برای تجربه کاربری بهتر، وسط تایپ کردن فیلد را به زور تغییر نمیدهیم، 
+        // اما مقداری که به سرور ارسال میکنیم (در handleQuantityChange) را محدود (Clamp) میکنیم.
+        const minVal = parseFloat(input.getAttribute('data-min'));
+        const maxVal = parseFloat(input.getAttribute('data-max'));
+        
+        let validVal = newVal;
+        if (validVal < minVal) validVal = minVal;
+        if (validVal > maxVal) validVal = maxVal;
+        
+        handleQuantityChange(productId, validVal, unitPrice);
     }
 
     // اعتبارسنجی هنگام خروج از فیلد (onblur)
     function validateWeight(input, productId, unitPrice) {
         let val = parseFloat(input.value);
-        if (isNaN(val) || val < 0.1) {
-            input.value = 0.5; // حداقل مجاز
-            handleQuantityChange(productId, 0.5, unitPrice);
+        const minVal = parseFloat(input.getAttribute('data-min'));
+        const maxVal = parseFloat(input.getAttribute('data-max'));
+
+        if (isNaN(val) || val < minVal) {
+            input.value = minVal; // تغییر ظاهری اینپوت به حداقل مجاز
+            handleQuantityChange(productId, minVal, unitPrice);
+        } else if (val > maxVal) {
+            input.value = maxVal; // تغییر ظاهری اینپوت به حداکثر مجاز
+            handleQuantityChange(productId, maxVal, unitPrice);
+        } else {
+            input.value = val;
         }
     }
 

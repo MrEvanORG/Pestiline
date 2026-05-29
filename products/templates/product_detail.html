@@ -140,19 +140,19 @@
 
             <div class="input-control-wrapper">
                 {% if product.sale_method == 'PACKAGED' %}
+                    <div class="product-specs-box" style="color:#666;font-size:small;padding:10px">
+                        لازم به ذکر است وزن هر بسته {{product.package_weight|format_weight}} میباشد
+                    </div>
                     <label class="input-label">تعداد بسته:</label>
-                    <div class="counter-control" style="margin-bottom:12.5px;">
+                    <div class="counter-control">
                         <button onclick="updateQty(1)"><i class="fa-slab-press fa-regular fa-plus"></i></button>
                         <input type="text" id="qtyInput" value="1" readonly>
                         <button onclick="updateQty(-1)"><i class="fa-slab-press fa-regular fa-minus"></i></button>
                     </div>
-                    <div class="product-specs-box" style="color:#666;font-size:small;padding:10px">
-                        لازم به ذکر است وزن هر بسته {{product.package_weight|format_weight}} میباشد
-                    </div>
                 {% else %}
                     <label class="input-label">وزن (کیلوگرم):</label>
                     <div class="auth-style-input">
-                        <input type="number" id="weightInput" class="clean-input" value="1" step="0.1" min="{{ product.min_order }}" max="{{ product.max_order }}" oninput="manualWeightInput()">
+                        <input type="number" id="weightInput" class="clean-input" value="0.1" step="0.1" min="{{ product.min_order }}" max="{{ product.max_order }}" oninput="manualWeightInput()">
                         <span class="unit-suffix">KG</span>
                     </div>
                     <div class="weight-shortcuts">
@@ -171,6 +171,13 @@
                     <span class="per-unit">
                         / {% if product.sale_method == 'PACKAGED' %}هر بسته{% else %}هر کیلو{% endif %}
                     </span>
+                </div>
+                <div class="product-specs-box" style="color:#666;font-size:small;padding:10px">
+                    *&nbsp;حداقل سفارش 
+                    {% if product.sale_method == 'PACKAGED' %}{{product.min_order|stringformat:"d"}}بسته{% else %}{{ product.min_order | format_weight }}{% endif %}
+                    و حداکثر سفارش 
+                    {% if product.sale_method == 'PACKAGED' %}{{product.max_order|stringformat:"d"}}بسته{% else %}{{ product.max_order | format_weight }}{% endif %}
+                    میباشد .    
                 </div>
 
                 <button class="btn-pro-cart" {% if product.stock <= 0 %}disabled{% endif %}>

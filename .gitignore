@@ -72,3 +72,7 @@ seo/migrations/0001_initial.py
 seo/migrations/0002_staticpageseo_about_status_staticpageseo_ai_status_and_more.py
 seo/migrations/0003_customseodata.py
 seo/migrations/0004_alter_customseodata_options_and_more.py
+products/templatetags/__pycache__/custom_filters.cpython-313.pyc
+products/templatetags/__pycache__/custom_filters.cpython-313.pyc
+products/templatetags/__pycache__/custom_filters.cpython-313.pyc
+/products/templatetags/__pycache__

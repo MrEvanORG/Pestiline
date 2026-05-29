@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ subject }}</title>
+    <style>
+        body { font-family: Vazirmatn,zavir,Tahoma,Arial,sans-serif; }
+    </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f8f9fa; direction: rtl;">
+    <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" style="max-width: 600px; margin: 20px auto; background-color: #ffffff; border: 1px solid #dee2e6; border-radius: 12px; box-shadow: 0 5px 15px rgba(18, 53, 36, 0.1);">
+        <!-- Header with Logo -->
+        <tr>
+            <td align="center" style="background-color: #123524; padding: 25px 20px; border-top-left-radius: 12px; border-top-right-radius: 12px;">
+                <img src="https://pestiline.ir/static/products/img/light-logo-second.svg" alt="لوگو پستیلاین" width="160" style="display: block;">
+            </td>
+        </tr>
+        
+        <!-- Main Content -->
+        <tr>
+            <td style="padding: 30px 25px;">
+                <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                    <!-- Title -->
+                    <tr>
+                        <td style="color: #123524; font-size: 24px; font-weight: bold; text-align: center; padding-bottom: 20px;">
+                            {{ main_title }}
+                        </td>
+                    </tr>
+                    <!-- Message Content -->
+                    <tr>
+                        <td style="font-size: 16px; line-height: 1.7; color: #333;">
+                            <p style="margin: 0;">{{name}}</p>
+                            
+                            <div style="background-color: #fdfefe; border: 1px solid #dae9c3; border-radius: 8px; padding: 20px; margin: 25px 0;">
+                                <h3 style="margin-top: 0; margin-bottom: 15px; color: #123524; font-size: 18px; border-bottom: 2px solid #dae9c3; padding-bottom: 10px;">اطلاعات تماس فرستنده</h3>
+                                
+                                <p style="margin: 5px 0;">
+                                    <strong>راه ارتباطی :</strong> 
+                                    <a href="mailto:{{ reply_to }}" style="color: #85A947; text-decoration: none; font-weight: bold;">{{ reply_to }}</a>
+                                </p>
+
+                                <hr style="border: 0; border-top: 1px solid #dae9c3; margin: 20px 0;">
+
+                                <p style="margin: 0; white-space: pre-wrap; color: #333;">{{ user_message|linebreaksbr }}</p>
+                            </div>
+                        </td>
+                    </tr>
+                    <!-- CTA Button -->
+                    <tr>
+                        <td align="center" style="padding-top: 10px; padding-bottom: 20px;">
+                            <a href="{{ cta_link }}" target="_blank" style="display: inline-block; background-color: #85A947; color: #ffffff; padding: 12px 30px; font-size: 16px; font-weight: bold; text-decoration: none; border-radius: 8px;">
+                                {{ cta_text }}
+                            </a>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+            <td align="center" style="background-color: #f1f3f5; padding: 20px; color: #6c757d; font-size: 12px; border-bottom-left-radius: 12px; border-bottom-right-radius: 12px;">
+                <p style="margin: 0;">این ایمیل به صورت خودکار از طرف پلتفرم پستیلاین ارسال شده است.</p>
+                <p style="margin: 5px 0;">© {% now "Y" %} پستیلاین. تمامی حقوق محفوظ است.</p>
+            </td>
+        </tr>
+    </table>
+</body>
+</html>

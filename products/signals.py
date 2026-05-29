@@ -1,9 +1,7 @@
 import os
 from django.db.models.signals import post_delete, pre_save , post_save
 from django.dispatch import receiver
-from .models import ProductImage , Order , User , TicketMessage
-
-
+from .models import ProductImage , Order , User , TicketMessage , SiteSettings
 # ---------------------------------------------------------
 # سیگنال‌های مربوط به حذف عکس محصولات 
 # ---------------------------------------------------------
@@ -68,30 +66,37 @@ def delete_old_attachment_on_update(sender, instance, **kwargs):
         if os.path.isfile(old_file.path):
             os.remove(old_file.path)
 
+# ---------------------------------------------------------
+# سیگنال‌های مربوط به حذف فایل ولکام سانگ
+# --------------------------------------------------------
+@receiver(post_delete, sender=SiteSettings)
+def delete_welcome_song_on_delete(sender, instance, **kwargs):
+    if instance.welcome_song:
+        instance.welcome_song.delete(save=False)
 
-@receiver(pre_save,sender=User)
-def new_user_registered(sender , instance , **kwargs):
-    from .notifications import  new_user_notif
-    if not instance.pk: #تشخیص ایجاد کاربر
-        new_user_notif(instance)
-
-@receiver(pre_save,sender=Order)
-def new_order_submitted(sender , instance , **kwargs):
-    from .notifications import  new_order_notif
+@receiver(pre_save, sender=SiteSettings)
+def delete_old_welcome_song_on_update(sender, instance, **kwargs):
 
     if not instance.pk:
         return
 
     try:
-        # دریافت وضعیت قبلی از دیتابیس
-        old_order = Order.objects.get(pk=instance.pk)
-        old_status = old_order.status
-        new_status = instance.status
+        old_instance = SiteSettings.objects.get(pk=instance.pk)
+    except SiteSettings.DoesNotExist:
+        return
 
-        # اگر وضعیت تغییر کرده است
-        if old_status == 'CART' and new_status == 'PENDING':
-            new_order_notif(instance)
+    if old_instance.welcome_song and old_instance.welcome_song != instance.welcome_song:
+        old_instance.welcome_song.delete(save=False)
 
-    except Order.DoesNotExist:
-        pass
+# ---------------------------------------------------------
+# سیگنال‌های ایجاد کاربر جدید
+# --------------------------------------------------------
+@receiver(post_save, sender=User)
+def handle_new_user_registration(sender, instance, created, **kwargs):
+    from .notifications import notify_new_user_welcome, notify_admins_new_user
+    if created:
+        notify_new_user_welcome(instance)
+
+        notify_admins_new_user(instance)
+
 

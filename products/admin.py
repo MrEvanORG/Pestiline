@@ -6,6 +6,7 @@ from .models import User, Product, ProductComponent, SiteSettings, ProductImage 
 from .models import Order, OrderItem , Ticket , TicketMessage , NotificationLog
 from products.templatetags.custom_filters import to_jalali
 from django.db.models import Q
+from django.urls import reverse
 
 # --- تنظیمات پنل مدیریت اختصاصی ---
 class PestilineAdminSite(admin.AdminSite):
@@ -134,7 +135,7 @@ class CustomUserAdmin(UserAdmin):
         js = ('products/js/admin_chained_cities.js',)
     
     fieldsets = (
-        ('اطلاعات ورود', {'fields': ('username', 'password'), 'classes': ('wide',)}),
+        ('اطلاعات ورود', {'fields': ('username', 'password','prefered_notification'), 'classes': ('wide',)}),
         ('اطلاعات شخصی', {'fields': ('first_name', 'last_name', 'email', 'phone_number'), 'classes': ('extrapretty',)}),
         ('موقعیت جغرافیایی', {'fields': ('province', 'city','address','postal_code')}),
         ('سطوح دسترسی', {'fields': ('is_active', 'is_staff', 'is_superuser', 'groups', 'user_permissions'), 'classes': ('collapse',)}),
@@ -164,9 +165,10 @@ class MessageSiteSettingsAdmin(admin.ModelAdmin):
 
 @admin.register(SiteSettings, site=super_admin_site)
 class SiteSettingsAdmin(admin.ModelAdmin):
-    readonly_fields = ('total_views','today_views','this_week_views','this_month_views','this_year_views','tj_last_reset_date')
+    readonly_fields = ('total_views','today_views','this_week_views','this_month_views','this_year_views','tj_last_reset_date','test_maintenance','test_commingsoon','test_developing')
     fieldsets = (
         ('وضعیت سایت', {'fields': ('status', 'maintenance_message','coming_soon_date','bypass_for_staff','bypass_for_superuser','welcome_song'),'classes': ('collapse',)}),
+        ('لینک های تست', {'fields': ('test_commingsoon', 'test_maintenance','test_developing'),'classes': ('collapse',)}),
         ('سایر تنظیمات', {'fields': ('otp_time_interval',),'classes': ('collapse',)}),
         ('لینک های وبسایت', {'fields': ('link_phone1','link_phone2','link_prphone','link_mail','link_instagram','link_telegram','link_whatsapp','link_twitter','link_address','address_text'),'classes': ('collapse',)}),
         ('بازدید های وبسایت', {'fields': ('total_views','today_views','this_week_views','this_month_views','this_year_views','tj_last_reset_date'),'classes': ('collapse',)}),
@@ -174,6 +176,30 @@ class SiteSettingsAdmin(admin.ModelAdmin):
     def tj_last_reset_date(self,obj):
         return to_jalali(obj.last_reset_date,form="persian_date")
     tj_last_reset_date.short_description = "زمان آخرین ریست تاریخ"
+
+    def test_commingsoon(self,obj):
+        url = '#'
+        try:
+            url = reverse('comming_soon')
+        except:pass
+        return format_html('<a class="button" target="_blank" style="font-family:Vazirmatn;text-decoration:none;" href="{}">مشاهده</a>',url)
+    test_commingsoon.short_description = "تست صفحه کامینگ سون"
+
+    def test_maintenance(self,obj):
+        url = '#'
+        try:
+            url = reverse('maintenance')
+        except:pass
+        return format_html('<a class="button" target="_blank" style="font-family:Vazirmatn;text-decoration:none;" href="{}">مشاهده</a>',url)
+    test_maintenance.short_description = "تست صفحه در حال آپدیت"
+
+    def test_developing(self,obj):
+        url = '#'
+        try:
+            url = reverse('developing')
+        except:pass
+        return format_html('<a class="button" target="_blank" style="font-family:Vazirmatn;text-decoration:none;" href="{}">مشاهده</a>',url)
+    test_developing.short_description = "تست صفحه درحال توسعه"
 
     def has_delete_permission(self, request, obj=None): return False
     def has_add_permission(self, request): return not SiteSettings.objects.exists()

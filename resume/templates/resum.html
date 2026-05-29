@@ -266,22 +266,76 @@
                     <div class="row">
                         <div class="col-md-7 d-print-none">
                             <div class="my-2">
-                                <form action="https://formspree.io/f/{your_form_id}" method="POST">
-                                    <div class="row">
-                                        <div class="col-6">
-                                            <input class="form-control" type="text" id="name" name="name" placeholder="اسمتون" required>
-                                        </div>
-                                        <div class="col-6">
-                                            <input class="form-control" type="email" id="email" name="_replyto" placeholder="ایمیلتون" required>
+                            <form action="#contact" method="POST" id="resumeContactForm">
+                                {% csrf_token %}
+                                <div class="row">
+                                    <div class="col-6">
+                                        <!-- استفاده از value="{{ request.POST.name }}" برای نگه داشتن مقدار در صورت خطا -->
+                                        <input class="form-control" type="text" id="name" name="name" placeholder="اسمتون" required value="{{ request.POST.name|default:'' }}">
+                                    </div>
+                                    <div class="col-6">
+                                        <input class="form-control" type="text" id="email" name="reply_to" placeholder="ایمیل یا موبایل" required value="{{ request.POST.reply_to|default:'' }}">
+                                    </div>
+                                </div>
+                                <div class="form-group my-2">
+                                    <textarea class="form-control" style="resize: none;" id="message" name="message" rows="4" placeholder="پیام یا درخواست شما از من" required>{{ request.POST.message|default:'' }}</textarea>
+                                </div>
+
+                                <!-- ========== بخش کپچا ========== -->
+                                <div class="row align-items-center">
+                                    <div class="col-lg-6 col-12 order-2 order-lg-1">
+                                        <input class="form-control" type="text" id="captcha" name="captcha" 
+                                        placeholder="کد امنیتی را وارد کنید" required autocomplete="off" style="height: 50px;">
+                                    </div>
+                                    
+                                    <div class="col-lg-6 col-12 order-1 order-lg-2">
+                                        <div class="d-flex justify-content-start">
+                                            <div class="d-flex align-items-center mb-2 mb-lg-0">
+                                                <img src="{% url 'captcha_image' %}" alt="Captcha Image" id="captcha-image" 
+                                                class="rounded border" 
+                                                style="width: 150px; height: 50px; object-fit: cover;">                                                    
+                                                <button class="btn btn-light me-2" type="button" id="refresh-captcha" title="بارگذاری مجدد کد" style="font-size: 1rem;padding: 6px 6px;height: 32px;">
+                                                    <i class="fa-solid fa-arrows-rotate"></i>
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div class="form-group my-2">
-                                        <textarea class="form-control" style="resize: none;" id="message" name="message" rows="4" placeholder="پیام یا درخواست شما از من" required></textarea>
-                                    </div>
-                                    <button class="btn btn-primary mt-2" type="submit">
-                                        ارسال <i class="fa-duotone fa-solid fa-paper-plane fa-flip-horizontal"></i>
-                                    </button>
-                                </form>
+                                </div>
+
+                                <!-- بخش نمایش خطاها و پیام موفقیت -->
+                                <div class="mt-2">
+                                    {% if form.errors %}
+                                        <div class="alert alert-danger" style="padding:12px 12px !important;">
+                                            <ul class="list-unstyled" style="padding:0;margin:0;">
+                                                {% for field, errors in form.errors.items %}
+                                                    {% for error in errors %}
+                                                        <li class="list-sty;e"><i class="fa-solid fa-circle-exclamation"></i> {{ error }}</li>
+                                                    {% endfor %}
+                                                {% endfor %}
+                                            </ul>
+                                        </div>
+                                    {% endif %}
+
+                                    {% if messages %}
+                                        {% for message in messages %}
+                                            <div class="alert alert-{% if message.tags == 'error' %}danger{% else %}{{ message.tags }}{% endif %}" style="padding:12px 12px !important;">
+                                                <ul class="list-unstyled" style="padding:0;margin:0;">
+                                                    {% if message.tags == 'error' %}
+                                                    <li class="list-sty;e"><i class="fa-solid fa-circle-exclamation"></i> {{message }}</li>
+                                                    {% else %}
+                                                    <li><i class="fa-slab-press fa-circle-check"></i> {{ message }}</li>
+                                                    {% endif %}
+                                                </ul>
+                                            </div>
+                                        {% endfor %}
+                                    {% endif %}
+                                </div>
+                                    
+                                <button id="submitButton" class="btn btn-primary mt-1" type="submit">
+                                    <span class="btn-text">ارسال</span>
+                                    <i class="fa-duotone fa-solid fa-paper-plane fa-flip-horizontal"></i>
+                                </button>
+                            </form>
                             </div>
                         </div>
                         <div class="col">
@@ -348,4 +402,42 @@
     {% comment %} <script src="{% static 'js/loading.js' %}?ver=1.2.0"></script> {% endcomment %}
     {% comment %} <script src="{% static 'js/theme-toggle.js' %}" defer></script> {% endcomment %}
 </body>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const refreshButton = document.getElementById('refresh-captcha');
+    const captchaImage = document.getElementById('captcha-image');
+
+    if (refreshButton && captchaImage) {
+        refreshButton.addEventListener('click', function() {
+            const newSrc = captchaImage.src.split('?')[0] + '?' + new Date().getTime();
+            captchaImage.src = newSrc;
+        });
+    }
+
+    const hasFormErrors = {% if form.errors %}true{% else %}false{% endif %};
+    const hasMessages = {% if messages %}true{% else %}false{% endif %};
+    
+    if (window.location.hash === '#contact' || hasFormErrors || hasMessages) {
+        const contactSection = document.getElementById('contact');
+        if (contactSection) {
+            setTimeout(() => {
+                contactSection.scrollIntoView({ behavior: 'instant', block: 'center' });
+            }, 10); 
+        }
+    }
+    const contactForm = document.getElementById('resumeContactForm'); 
+    const submitButton = document.getElementById('submitButton');
+
+    if (contactForm && submitButton) {
+        contactForm.addEventListener('submit', function() {
+            submitButton.disabled = true;
+            submitButton.innerHTML = `
+                <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true" style="background-color:var(--section-ng) !important;"></span>
+                <span class="btn-text">در حال ارسال...</span>
+            `;
+        });
+    }
+});
+</script>
+
 </html>

@@ -29,7 +29,7 @@ else:
     else:
         DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1','10.142.128.235','192.168.1.11','www.pestiline.ir','pestiline.ir']
+ALLOWED_HOSTS = ['127.0.0.1','10.33.117.235','192.168.1.11','www.pestiline.ir','pestiline.ir']
 
 CSRF_TRUSTED_ORIGINS = ['https://www.pestiline.ir','https://pestiline.ir/']
 
@@ -192,6 +192,7 @@ MEDIA_URL = '/media/'
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 #----------------------------- Email --------------------------#
+# EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = config("EMAIL_HOST")
 EMAIL_PORT = config("EMAIL_PORT",cast=int)

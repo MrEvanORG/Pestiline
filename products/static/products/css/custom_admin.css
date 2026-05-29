@@ -136,7 +136,7 @@ html[data-theme="dark"] {
     @media (max-width: 768px) {
         #branding-wrapper {
             flex-direction: column;
-            align-items: flex-start;
+            align-items: center;
             gap: 10px;
             margin-bottom: 10px;
         }

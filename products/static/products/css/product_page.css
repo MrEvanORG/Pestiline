@@ -190,7 +190,7 @@
 .weight-tag.active { background: var(--primary); color: white; border-color: var(--primary); }
 
 /* --- Action Bar & Button (Refined) --- */
-.action-bar-wrapper { margin-top: 30px; background: #fff; }
+.action-bar-wrapper { margin-top: 15px; background: #fff; }
 
 .unit-price-display {
     margin-bottom: 15px; font-size: 1.2rem; font-weight: 800; color: var(--dark);

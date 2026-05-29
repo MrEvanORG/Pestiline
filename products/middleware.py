@@ -2,7 +2,6 @@ import jdatetime
 from django.db.models import F
 from resume.models import Resume
 from django.utils import timezone
-from django.utils import timezone
 from django.core.cache import cache
 from django.shortcuts import render
 from products.models import SiteSettings 
@@ -28,6 +27,9 @@ class SiteStatusMiddleware:
 
             current_path = request.path
             
+            if current_path.startswith('/siteresume/'):
+                return self.get_response(request)
+            
             if current_path.startswith(django_settings.STATIC_URL) or current_path.startswith(django_settings.MEDIA_URL):
                 return self.get_response(request)
 
@@ -48,6 +50,7 @@ class SiteStatusMiddleware:
                 'about_us',
                 'contact_pesticide_specialists',
                 'resume_detail', 
+                'captcha_image'
             ]
 
             try:

@@ -39,14 +39,19 @@ if (closeBtns.length > 0) {
     });
 }
 
-// اسکرول نرم به بالا برای لینک‌های با href="#"
 document.querySelectorAll('a[href="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
-        e.preventDefault(); // جلوگیری از پرش ناگهانی مرورگر
         
+        // جلوگیری از اسکرول در صورتی که کاربر داخل گالری محصول کلیک کرده باشد
+        // یا اگر لینک مورد نظر کلاس خاصی مثل 'no-scroll' داشت
+        if (this.closest('.product-main-grid') || this.classList.contains('no-scroll')) {
+            return; // از اجرای اسکرول به بالا صرف نظر کن
+        }
+        
+        e.preventDefault(); 
         window.scrollTo({
             top: 0,
-            behavior: 'smooth' // اسکرول نرم
+            behavior: 'smooth' 
         });
     });
 });
