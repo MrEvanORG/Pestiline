@@ -1,0 +1,307 @@
+/* =========================================
+   About Us - Advanced & Interactive UI
+   ========================================= */
+
+/* --- 1. Parallax Hero Section --- */
+.about-hero-immersive {
+    position: relative;
+    height: 90vh;
+    min-height: 600px;
+    background: linear-gradient(to bottom, rgba(18, 53, 36, 0.6), rgba(18, 53, 36, 0.95)), url('../img/home/banner.webp') no-repeat center center;
+    background-size: cover;
+    background-attachment: fixed; /* Parallax Effect */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    color: var(--white);
+    padding: 0 5%;
+    overflow: hidden;
+}
+
+.about-hero-immersive::after {
+    content: '';
+    position: absolute;
+    bottom: -50px;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background: var(--bg-body);
+    filter: blur(20px);
+    border-radius: 50% 50% 0 0;
+}
+
+.hero-title-glitch {
+    font-size: 4rem;
+    font-weight: 900;
+    margin-bottom: 20px;
+    background: linear-gradient(45deg, #fff, var(--secondary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    transform: translateY(30px);
+    opacity: 0;
+    animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.3s;
+}
+
+.hero-subtitle {
+    font-size: 1.3rem;
+    max-width: 700px;
+    line-height: 1.8;
+    color: #e0e0e0;
+    transform: translateY(30px);
+    opacity: 0;
+    animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.6s;
+}
+
+.scroll-indicator {
+    position: absolute;
+    bottom: 40px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    color: var(--secondary);
+    font-size: 0.9rem;
+    opacity: 0;
+    animation: fadeUp 1s forwards 1.2s;
+    z-index: 10;
+}
+
+.mouse {
+    width: 25px;
+    height: 40px;
+    border: 2px solid var(--secondary);
+    border-radius: 15px;
+    position: relative;
+    margin-bottom: 10px;
+}
+.mouse::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 4px;
+    height: 8px;
+    background: var(--secondary);
+    border-radius: 2px;
+    animation: scrollMouse 1.5s infinite;
+}
+
+/* --- 2. Bento Box Grid (Modern Stats) --- */
+.bento-section {
+    padding: 6rem 5%;
+    background-color: var(--bg-body);
+    position: relative;
+    z-index: 5;
+}
+
+.bento-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: minmax(200px, auto);
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.bento-item {
+    background: var(--bg-product-card);
+    border-radius: 24px;
+    padding: 2rem;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    border: 1px solid rgba(0,0,0,0.02);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.bento-item:hover {
+    transform: translateY(-5px) scale(1.01);
+    box-shadow: 0 20px 40px rgba(18, 53, 36, 0.08);
+}
+
+.bento-item.large { grid-column: span 2; grid-row: span 2; background: var(--primary); color: white;}
+.bento-item.medium-h { grid-column: span 2; }
+.bento-item.medium-v { grid-row: span 2; background: var(--section-bg); }
+
+.bento-item i { font-size: 2.5rem; margin-bottom: 15px; color: var(--secondary); }
+.bento-item.large i { color: var(--secondary); font-size: 3.5rem; }
+
+.bento-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; color: var(--primary); }
+.bento-item.large .bento-title { color: white; font-size: 2.5rem; }
+.bento-desc { color: var(--text-feature-desc); line-height: 1.7; font-size: 0.95rem;}
+.bento-item.large .bento-desc { color: #ccc; font-size: 1.1rem; }
+
+/* Abstract shapes inside bento */
+.bento-shape {
+    position: absolute;
+    right: -20px;
+    bottom: -20px;
+    width: 150px;
+    height: 150px;
+    background: linear-gradient(135deg, transparent, rgba(133, 169, 71, 0.1));
+    border-radius: 50%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* --- 3. Sticky Scroll Story Section --- */
+.sticky-story-section {
+    display: flex;
+    padding: 0 5% 6rem 5%;
+    gap: 50px;
+    background-color: var(--bg-body);
+    position: relative;
+    align-items: flex-start;
+}
+
+.story-sticky-side {
+    flex: 1;
+    position: sticky;
+    top: 120px; /* زیر هدر قرار میگیرد */
+    padding-bottom: 20px;
+}
+
+.story-sticky-side h2 {
+    font-size: 2.5rem;
+    color: var(--primary);
+    margin-bottom: 1rem;
+    line-height: 1.4;
+}
+
+.story-scrolling-side {
+    flex: 1.5;
+    display: flex;
+    flex-direction: column;
+    gap: 40px;
+}
+
+.story-card {
+    background: var(--bg-product-card);
+    padding: 3rem;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    border-right: 4px solid var(--secondary);
+    transform: translateY(50px);
+    opacity: 0;
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.story-card.visible {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+.story-card h3 { font-size: 1.5rem; color: var(--primary); margin-bottom: 15px; }
+.story-card p { line-height: 1.9; color: var(--text-blog-desc); text-align: justify; font-size: 1.05rem;}
+
+/* --- 4. Interactive Path (Timeline) --- */
+.interactive-path {
+    padding: 8rem 5%;
+    background: var(--primary);
+    color: white;
+    position: relative;
+    overflow: hidden;
+}
+
+.path-container {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+}
+
+/* خط مرکزی تایم لاین */
+.path-container::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 50px;
+    width: 2px;
+    height: 100%;
+    background: rgba(255,255,255,0.1);
+}
+
+.path-line-fill {
+    position: absolute;
+    top: 0;
+    right: 50px;
+    width: 2px;
+    height: 0%; /* با جاوااسکریپت پر میشود */
+    background: var(--secondary);
+    transition: height 0.5s ease-out;
+    box-shadow: 0 0 15px var(--secondary);
+}
+
+.path-node {
+    display: flex;
+    align-items: center;
+    margin-bottom: 60px;
+    position: relative;
+    opacity: 0.3;
+    transform: translateX(20px);
+    transition: all 0.6s ease;
+}
+
+.path-node.active {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.node-icon {
+    width: 60px;
+    height: 60px;
+    background: var(--primary);
+    border: 2px solid var(--secondary);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    color: var(--secondary);
+    margin-left: 30px;
+    position: relative;
+    z-index: 2;
+    transition: 0.4s;
+    box-shadow: 0 0 0 10px rgba(133, 169, 71, 0.1);
+}
+
+.path-node.active .node-icon {
+    background: var(--secondary);
+    color: var(--primary);
+    box-shadow: 0 0 20px rgba(133, 169, 71, 0.4), 0 0 0 10px rgba(133, 169, 71, 0.2);
+}
+
+.node-content h4 { font-size: 1.5rem; margin-bottom: 10px; color: var(--secondary);}
+.node-content p { color: #ddd; line-height: 1.7;}
+
+/* --- Animations --- */
+@keyframes fadeUp {
+    to { opacity: 1; transform: translateY(0); }
+}
+@keyframes scrollMouse {
+    0% { top: 6px; opacity: 1; }
+    100% { top: 20px; opacity: 0; }
+}
+
+/* --- Responsive adjustments --- */
+@media (max-width: 1024px) {
+    .bento-grid { grid-template-columns: repeat(2, 1fr); }
+    .bento-item.medium-h, .bento-item.medium-v { grid-column: span 2; grid-row: span 1;}
+}
+@media (max-width: 991px) {
+    .sticky-story-section { flex-direction: column; }
+    .story-sticky-side { position: relative; top: 0; margin-bottom: 30px; }
+}
+@media (max-width: 768px) {
+    .hero-title-glitch { font-size: 2.5rem; }
+    .bento-grid { grid-template-columns: 1fr; }
+    .bento-item { grid-column: span 1 !important; grid-row: span 1 !important; }
+    .path-container::before, .path-line-fill { right: 30px; }
+    .node-icon { width: 50px; height: 50px; font-size: 1.2rem; margin-left: 20px; }
+}

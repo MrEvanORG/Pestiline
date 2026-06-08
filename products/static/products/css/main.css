@@ -2,6 +2,7 @@
    1. متغیرها و تنظیمات پایه (Variables & Reset)
    ========================================= */
 @import url('root/light_root.css');
+@import url('root/dark_root.css');
 /* ===============================
    Mobile UI Reset
    Android + iOS + Chrome
@@ -9,11 +10,11 @@
 :root {
     --blog-primary: var(--primary, #123524);
     --blog-secondary: var(--secondary, #85A947);
-    --blog-surface: #ffffff;
-    --blog-bg: #f8f9fa;
-    --blog-text: #333333;
-    --blog-muted: #777777;
-    --blog-border: #eaeaea;
+    --blog-surface: var(--bg-blog-card);
+    --blog-bg: var(--bg-blog-section);
+    --blog-text: var(--dark);
+    --blog-muted: var(--text-blog-desc);
+    --blog-border: var(--border);
     --blog-radius: 16px;
     --transition-fast: 0.2s ease;
     --transition-smooth: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
@@ -36,7 +37,7 @@ a:active {
 
 body {
     font-family: var(--font-main);
-    background-color: #fcfcfc;
+    background-color: var(--bg-body);
     color: var(--dark);
     line-height: 1.6;
     overflow-x: hidden;
@@ -59,8 +60,8 @@ img { max-width: 100%; display: block; }
     max-width: 100%;
     margin-bottom: 2rem;
     box-shadow: 0 2px 5px rgba(0,0,0,0.03);
-    border: 1px solid #eee;
-    background-color: #fff;
+    border: 1px solid var(--border-breadcrumb);
+    background-color: var(--white);
     overflow-x: auto;
     white-space: nowrap;
 }
@@ -71,17 +72,17 @@ img { max-width: 100%; display: block; }
     align-items: center;
     gap: 6px;
     font-size: 0.85rem;
-    color: #666;
+    color: var(--text-breadcrumb-item);
     transition: all 0.3s ease;
     text-decoration: none;
     padding: 4px 8px;
     border-radius: 12px;
 }
-.breadcrumb-item i { font-size: 0.95rem; color: #aaa; }
-.breadcrumb-item:hover { color: var(--primary); background-color: #f9f9f9; border-radius: 40px; }
+.breadcrumb-item i { font-size: 0.95rem; color: var(--text-breadcrumb-icon); }
+.breadcrumb-item:hover { color: var(--primary); background-color: var(--bg-breadcrumb-hover); border-radius: 40px; }
 .breadcrumb-item:hover i { color: var(--primary); }
 
-.separator { color: #ccc; font-size: 0.7rem; }
+.separator { color: var(--border); font-size: 0.7rem; }
 /* =========================================
    2. هدر و نویگیشن (Header & Nav)
    ========================================= */
@@ -190,7 +191,7 @@ img { max-width: 100%; display: block; }
     right: -300px;
     width: 280px;
     height: 100%;
-    background: white;
+    background: var(--bg-mobile-sidebar);
     z-index: 999;
     transition: var(--transition);
     display: flex;
@@ -217,19 +218,19 @@ body.menu-open .mobile-sidebar { right: 0; }
 .sidebar-logo-container {
     text-align: center;
     padding: 20px 0;
-    border-bottom: 1px solid #f0f0f0;
-    background-color: #fcfcfc;
+    border-bottom: 1px solid var(--border-sidebar-logo);
+    background-color: var(--bg-sidebar-logo);
 }
 .sidebar-logo-img {
     width: 120px; height: auto; margin-right: 20px; display: block;
 }
 
 .sidebar-links { padding: 20px; flex: 1; overflow-y: auto; }
-.sidebar-links li { margin-bottom: 15px; border-bottom: 1px solid #f5f5f5; padding-bottom: 10px; }
-.sidebar-links a { display: flex; align-items: center; gap: 10px; font-weight: 500; color: #555; }
+.sidebar-links li { margin-bottom: 15px; border-bottom: 1px solid var(--border-sidebar-link); padding-bottom: 10px; }
+.sidebar-links a { display: flex; align-items: center; gap: 10px; font-weight: 500; color: var(--text-sidebar-link); }
 .sidebar-links a i { color: var(--secondary); width: 20px; text-align: center; } /* تراز آیکون‌ها */
 
-.sidebar-footer { padding: 20px; text-align: center; border-top: 1px solid #eee; }
+.sidebar-footer { padding: 20px; text-align: center; border-top: 1px solid var(--border-sidebar-footer); }
 .btn-sidebar-login {
     width: 100%; padding: 10px; background: var(--secondary); color: white; border-radius: 8px; margin-bottom: 10px;
 }
@@ -293,7 +294,7 @@ body.menu-open .mobile-sidebar { right: 0; }
 }
 .features-header { text-align: center; margin-bottom: 3rem; }
 .features-header h2 { color: var(--primary); font-size: 2rem; margin-bottom: 0.5rem; }
-.features-header p { color: #555; font-size: 1.1rem; }
+.features-header p { color: var(--text-feature-desc); font-size: 1.1rem; }
 
 .features-grid {
     display: grid;
@@ -301,9 +302,9 @@ body.menu-open .mobile-sidebar { right: 0; }
     gap: 2rem;
 }
 .feature-item {
-    background: rgba(255, 255, 255, 0.6);
+    background: var(--bg-feature-item);
     padding: 2rem; border-radius: var(--radius); text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.8);
+    border: 1px solid var(--border-feature-item);
     transition: var(--transition);
     box-shadow: 0 4px 6px rgba(0,0,0,0.02);
 }
@@ -335,7 +336,7 @@ body.menu-open .mobile-sidebar { right: 0; }
 @media(min-width: 1024px) { .products-grid { grid-template-columns: repeat(4, 1fr); } }
 
 .product-card {
-    background: white; border-radius: var(--radius); position: relative;
+    background: var(--bg-product-card); border-radius: var(--radius); position: relative;
     box-shadow: var(--shadow); overflow: hidden; height: 450px;
     display: flex; flex-direction: column; transition: var(--transition);
 }
@@ -356,7 +357,7 @@ body.menu-open .mobile-sidebar { right: 0; }
     /* این باعث می‌شود ارتفاع کانتینر همیشه ثابت بماند حتی اگر خالی باشد */
 }
 .diag-ribbon {
-    color: white; font-size: 0.65rem; font-weight: bold; text-transform: uppercase;
+    color: var(--text-ribbon); font-size: 0.65rem; font-weight: bold; text-transform: uppercase;
     padding: 4.5px 0; width: 100%; display: block; border-bottom: 1px solid rgba(0,0,0,0.1); 
 }
 .diag-ribbon:last-child { border-bottom: none; }
@@ -407,7 +408,7 @@ body.menu-open .mobile-sidebar { right: 0; }
 
 .info-btn {
     position: absolute; top: 10px; right: 10px;
-    width: 30px; height: 30px; background: rgba(255,255,255,0.9);
+    width: 30px; height: 30px; background: var(--bg-info-btn);
     border-radius: 50%; color: var(--primary); z-index: 5;
     font-weight: bold; box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: 0.2s;
     display: flex; align-items: center; justify-content: center; /* تراز آیکون */
@@ -420,7 +421,7 @@ body.menu-open .mobile-sidebar { right: 0; }
 }
 .p-title { font-size: 1.1rem; color: var(--dark); }
 .p-price { font-size: 1.2rem; font-weight: 800; color: var(--primary); display: block; }
-.p-unit { font-size: 0.8rem; color: #888; display: block; margin-bottom: 10px; }
+.p-unit { font-size: 0.8rem; color: var(--text-product-unit); display: block; margin-bottom: 10px; }
 .btn-add {
     width: 100%; padding: 10px; border: 1px solid var(--primary); color: var(--primary);
     background: transparent; border-radius: 8px; font-weight: bold; transition: 0.2s;
@@ -431,7 +432,7 @@ body.menu-open .mobile-sidebar { right: 0; }
 /* --- پنل کشویی جزئیات (Details Overlay) --- */
 .details-overlay {
     position: absolute; top: 0; right: 0; width: 100%; height: 100%;
-    background: rgba(255,255,255,0.98); z-index: 10; padding: 20px;
+    background: var(--bg-details-overlay); z-index: 10; padding: 20px;
     transform: translateX(100%);
     transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
     display: flex; flex-direction: column;
@@ -447,14 +448,14 @@ body.menu-open .mobile-sidebar { right: 0; }
 }
 
 .close-details {
-    position: absolute; top: 15px; right: 15px; font-size: 1.5rem; cursor: pointer; color: #666;
+    position: absolute; top: 15px; right: 15px; font-size: 1.5rem; cursor: pointer; color: var(--text-close-details);
 }
 .close-details:hover { color: red; }
-.details-title { text-align: center; color: var(--secondary); margin-bottom: 15px; border-bottom: 1px dashed #ccc; padding-bottom: 10px; }
+.details-title { text-align: center; color: var(--secondary); margin-bottom: 15px; border-bottom: 1px dashed var(--border); padding-bottom: 10px; }
 .details-scroll-area { flex: 1; overflow-y: auto; padding-left: 5px; }
-.spec-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
+.spec-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-spec-row); font-size: 0.9rem; }
 .spec-val { font-weight: bold; color: var(--dark); }
-.spec-desc { font-size: 0.85rem; color: #666; margin-top: 15px; text-align: justify; line-height: 1.5; }
+.spec-desc { font-size: 0.85rem; color: var(--text-spec-desc); margin-top: 15px; text-align: justify; line-height: 1.5; }
 /* =========================================
    بخش هوش مصنوعی (Compact Glam AI Helper)
    ========================================= */
@@ -470,15 +471,6 @@ body.menu-open .mobile-sidebar { right: 0; }
 .ai-glam-wide-container.compact {
     position: relative;
     width: 100%;
-    /* max-width: 1500px; */
-    /* background: linear-gradient(
-        135deg, 
-        #1e0c45 0%,   
-        #3a1a7a 25%,  
-        #024cc4 50%,  
-        #05a9b4 75%, 
-        #e260a1 100%  
-    ); */
     background: linear-gradient(
         135deg, 
         #dbeb04 0%,   
@@ -672,11 +664,11 @@ body.menu-open .mobile-sidebar { right: 0; }
    8. بخش کشاورزان (Coming Soon)
    ========================================= */
 .farmers-section {
-    margin: 4rem 5%; padding: 3rem; background: var(--white);
+    margin: 4rem 5%; padding: 3rem; background: var(--bg-farmers);
     border: 1px dashed var(--border); border-radius: var(--radius);
     display: flex; align-items: center; justify-content: space-between;
 }
-.coming-soon-badge { background: #333; color: #FFD700; padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; }
+.coming-soon-badge { background: var(--badge-farmers-bg); color: var(--badge-farmers-text); padding: 4px 12px; border-radius: 20px; font-size: 0.8rem; }
 .farmers-content h2 { color: var(--primary); margin: 10px 0; }
 .farmers-icon { font-size: 4rem; opacity: 0.8; }
 .farmers-icon img{
@@ -688,7 +680,7 @@ body.menu-open .mobile-sidebar { right: 0; }
    9. مجله پستیلاین (Blog Magazine Style)
    ========================================= */
 .blog-section {
-    padding: 5rem 5%; background-color: #f8fcf5;
+    padding: 5rem 5%; background-color: var(--bg-blog-section);
 }
 .blog-header {
     text-align: center; margin-bottom: 3.5rem; max-width: 800px; margin-left: auto; margin-right: auto;
@@ -697,7 +689,7 @@ body.menu-open .mobile-sidebar { right: 0; }
     color: var(--primary); font-size: 2.2rem; margin-bottom:10px; position: relative; display: inline-block;
     display: flex; align-items: center; justify-content: center; /* تراز آیکون تیتر */
 }
-.blog-header p { color: #666; font-size: 1.1rem; line-height: 1.8;margin-top:15px }
+.blog-header p { color: var(--text-blog-desc); font-size: 1.1rem; line-height: 1.8;margin-top:15px }
 
 .blog-main-content {
     margin-bottom: 6rem;

@@ -21,6 +21,8 @@ ADMIN_URL = config('ADMIN_URL')
 
 SITEMAP_URL = config('SITEMAP_URL')
 
+BASE_SITEURL = config('BASE_SITEURL')
+
 if DEV_MODE:
     DEBUG = True
 else:
@@ -29,9 +31,9 @@ else:
     else:
         DEBUG = False
 
-ALLOWED_HOSTS = ['127.0.0.1','10.33.117.235','192.168.1.11','www.pestiline.ir','pestiline.ir']
+ALLOWED_HOSTS = ['127.0.0.1',f'www.{BASE_SITEURL}',BASE_SITEURL]
 
-CSRF_TRUSTED_ORIGINS = ['https://www.pestiline.ir','https://pestiline.ir/']
+CSRF_TRUSTED_ORIGINS = [f'https://www.{BASE_SITEURL}/',f'https://{BASE_SITEURL}/']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -47,8 +49,6 @@ INSTALLED_APPS = [
     'seo.apps.SeoConfig',
 
     'adminsortable2', 
-    # pip install django-adminsortable2
-
     'blog.apps.BlogConfig',
     
     'django.contrib.humanize',

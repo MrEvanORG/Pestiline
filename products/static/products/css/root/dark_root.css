@@ -1,0 +1,153 @@
+/* =========================================
+   dark_root.css (Premium & Interactive Edition)
+   ========================================= */
+[data-theme="dark"] {
+    /* =========================================
+       1. پالت رنگی پایه (Luxury Forest Night)
+       ========================================= */
+    --white: #101713;        /* ایجاد عمق برای کارت‌ها (سبز-خاکستری بسیار تیره) */
+    --dark: #f0f4f2;         /* سفید مات با ته رنگ سبز برای جلوگیری از خستگی چشم */
+    
+    /* استفاده از سبز بسیار عمیق برای پس‌زمینه‌های بزرگ مثل فوتر */
+    --primary: #12301f;      
+    
+    /* سبز پسته‌ای درخشان برای المان‌های جذاب و دکمه‌ها */
+    --secondary: #a1d15c;    
+    
+    --section-bg: #0b110d;   /* رنگ سکشن‌ها، کمی متفاوت از بادی برای تفکیک */
+    --border: #23362a;       /* حاشیه‌های نرم و هم‌خانواده با سبز */
+    --p-color: #aebdb5;      /* رنگ پاراگراف‌ها: بسیار خوانا و جذاب در تاریکی */
+    --shadow: 0 8px 25px rgba(0, 0, 0, 0.7);
+
+    /* =========================================
+       2. متغیرهای کمکی و پس‌زمینه‌ها
+       ========================================= */
+    --bg-body: #070a08;              /* سیاهی مطلق با 3 درصد سبز */
+    --bg-mobile-sidebar: #101713;
+    --bg-sidebar-logo: #070a08;
+    --bg-feature-item: rgba(18, 28, 22, 0.7); /* شیشه‌ای تاریک */
+    --bg-product-card: #101713;
+    --bg-info-btn: rgba(20, 30, 24, 0.95);
+    --bg-details-overlay: rgba(8, 12, 10, 0.96); /* اورلی با عمق بالا */
+    --bg-farmers: #0b110d;
+    --bg-blog-section: #050806;
+    --bg-blog-card: #101713;
+    --bg-breadcrumb-hover: #17241c;
+    
+    --border-breadcrumb: #1f3025;
+    --border-sidebar-logo: #17241c;
+    --border-sidebar-link: #17241c;
+    --border-sidebar-footer: #1f3025;
+    --border-feature-item: rgba(161, 209, 92, 0.1);
+    --border-spec-row: #1f3025;
+    
+    --text-breadcrumb-icon: #5f7a68;
+    --text-breadcrumb-item: #8ea696;
+    --text-sidebar-link: #aebdb5;
+    --text-feature-desc: #9cb3a4;
+    --text-product-unit: #7d9685;
+    --text-close-details: #8ea696;
+    --text-spec-desc: #8ea696;
+    --text-blog-desc: #9cb3a4;
+    --text-ribbon: #000000;
+    
+    --badge-farmers-bg: #15241b;
+    --badge-farmers-text: #a1d15c;
+}
+
+/* =======================================================
+   3. تزریق جادوی دارک مود (Dark Mode Overrides)
+   این بخش بدون دست زدن به main.css، ایرادات آن را در شب رفع میکند
+   ======================================================= */
+
+/* --- حل مشکل ناخوانایی تیترها و قیمت‌ها --- */
+/* در فایل اصلی این موارد از primary تاریک استفاده میکردند، اینجا آنها را به پسته‌ای روشن تغییر میدهیم */
+[data-theme="dark"] .features-header h2,
+[data-theme="dark"] .feature-item h3,
+[data-theme="dark"] .section-title h2,
+[data-theme="dark"] .farmers-content h2,
+[data-theme="dark"] .blog-header h2,
+[data-theme="dark"] .blog-title a,
+[data-theme="dark"] .p-price,
+[data-theme="dark"] .info-btn,
+[data-theme="dark"] .read-more-btn {
+    color: var(--secondary);
+}
+
+/* --- حل مشکل باکس اعتماد و نمادها (سفیدی‌های آزاردهنده) --- */
+[data-theme="dark"] .trust-box {
+    color: #d1e0d7;
+    background: #17241c;
+    border: 1px solid var(--border);
+}
+[data-theme="dark"] .badge-hanging {
+    color: #121212; /* متن تیره روی روبان زرد */
+}
+[data-theme="dark"] .no-img-placeholder {
+    color: #2b3d32;
+}
+
+/* --- تنظیم رنگ دکمه‌ها برای تضاد فوق‌العاده --- */
+[data-theme="dark"] .btn-login-desktop,
+[data-theme="dark"] .btn-add {
+    color: var(--secondary);
+    border-color: var(--secondary);
+}
+[data-theme="dark"] .btn-hero {
+    background: var(--secondary);
+    color: #070a08;
+}
+
+/* =======================================================
+   4. تعاملات کاربری و هاله‌های نوری (Hover & Glow Effects)
+   جذاب‌سازی بی‌نظیر برای لذت بردن کاربر از اسکرول و کلیک
+   ======================================================= */
+
+/* هاور دکمه‌ها: درخشش نئونی نرم */
+[data-theme="dark"] .btn-login-desktop:hover,
+[data-theme="dark"] .btn-add:hover {
+    background: var(--secondary);
+    color: #070a08;
+    box-shadow: 0 5px 20px rgba(161, 209, 92, 0.25);
+}
+[data-theme="dark"] .btn-hero:hover {
+    background: #b6e86d; /* روشن‌تر شدن در هاور */
+    box-shadow: 0 5px 25px rgba(161, 209, 92, 0.4);
+}
+[data-theme="dark"] .btn-mix-sharp:hover {
+    box-shadow: 4px 4px 0 var(--secondary);
+    background: var(--secondary);
+    color: #070a08;
+}
+
+/* هاور کارت محصولات: ایجاد عمق سه بعدی و هاله پسته‌ای */
+[data-theme="dark"] .product-card:hover {
+    box-shadow: 0 15px 35px rgba(0,0,0,0.9), 0 0 20px rgba(161, 209, 92, 0.1);
+    border-color: #2b4535;
+}
+
+/* هاور کارت ویژگی‌ها: روشن شدن ملایم */
+[data-theme="dark"] .feature-item:hover {
+    background: #141f18;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7), 0 0 15px rgba(161, 209, 92, 0.15);
+    border-color: rgba(161, 209, 92, 0.3);
+}
+
+/* هاور مقالات وبلاگ */
+[data-theme="dark"] .blog-card:hover {
+    box-shadow: 0 15px 35px rgba(0,0,0,0.9), 0 0 15px rgba(161, 209, 92, 0.1);
+    border-color: #2b4535;
+}
+
+/* =======================================================
+   5. اصلاح گرادیانت‌های هاردکد شده برای شب
+   ======================================================= */
+[data-theme="dark"] .hero-overlay {
+    background: linear-gradient(rgba(8, 12, 10, 0.95), rgba(21, 56, 35, 0.65));
+}
+[data-theme="dark"] .ai-glam-wide-container.compact {
+    background: linear-gradient(135deg, #0e170a 0%, #2b0b0b 25%, #02122b 50%, #002252 75%, #36001b 100%);
+    border-color: rgba(161, 209, 92, 0.15);
+}
+[data-theme="dark"] .glow-1 { background: rgba(0, 150, 255, 0.15); }
+[data-theme="dark"] .glow-2 { background: rgba(161, 209, 92, 0.15); }

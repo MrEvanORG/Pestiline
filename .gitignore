@@ -76,3 +76,11 @@ products/templatetags/__pycache__/custom_filters.cpython-313.pyc
 products/templatetags/__pycache__/custom_filters.cpython-313.pyc
 products/templatetags/__pycache__/custom_filters.cpython-313.pyc
 /products/templatetags/__pycache__
+resume/migrations/0004_resume_changefreq_resume_seo_priority_and_more.py
+resume/migrations/0005_resume_visit_count.py
+resume/migrations/0005_resume_visit_count.py
+products/migrations/0040_messagesitesettings_tu_new_ticket_and_more.py
+seo/migrations/0005_alter_customseodata_path.py
+resume/migrations/0006_alter_resume_address.py
+/products/templatetags/__pycache__
+products/templatetags/__pycache__/custom_filters.cpython-313.pyc

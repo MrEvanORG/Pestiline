@@ -1,102 +1,112 @@
 import os
-from django.db.models.signals import post_delete, pre_save , post_save
+from django.db.models.signals import post_delete, pre_save, post_save
 from django.dispatch import receiver
-from .models import ProductImage , Order , User , TicketMessage , SiteSettings
+from .models import ProductImage, Order, User, Ticket, TicketMessage, SiteSettings
+
 # ---------------------------------------------------------
-# سیگنال‌های مربوط به حذف عکس محصولات 
+# سیگنال‌های محصولات، تیکت‌ها و تنظیمات (دست‌نخورده از قبل)
 # ---------------------------------------------------------
 @receiver(post_delete, sender=ProductImage)
 def delete_product_image_file(sender, instance, **kwargs):
-    """
-    وقتی رکورد عکس از دیتابیس حذف می‌شود، فایل آن هم از هاست پاک شود.
-    """
-    if instance.image:
-        if os.path.isfile(instance.image.path):
-            os.remove(instance.image.path)
+    if instance.image and os.path.isfile(instance.image.path): os.remove(instance.image.path)
 
 @receiver(pre_save, sender=ProductImage)
 def delete_old_image_on_update(sender, instance, **kwargs):
-    """
-    وقتی عکس جایگزین می‌شود، عکس قبلی پاک شود.
-    """
-    if not instance.pk:
-        return False
-
-    try:
-        old_file = sender.objects.get(pk=instance.pk).image
-    except sender.DoesNotExist:
-        return False
-
+    if not instance.pk: return False
+    try: old_file = sender.objects.get(pk=instance.pk).image
+    except sender.DoesNotExist: return False
     new_file = instance.image
-    if not old_file == new_file:
-        if os.path.isfile(old_file.path):
-            os.remove(old_file.path)
+    if not old_file == new_file and os.path.isfile(old_file.path): os.remove(old_file.path)
 
-# ---------------------------------------------------------
-# سیگنال‌های مربوط به حذف فایل‌های ضمیمه تیکت‌های پشتیبانی
-# ---------------------------------------------------------
 @receiver(post_delete, sender=TicketMessage)
 def delete_ticket_message_attachment(sender, instance, **kwargs):
-    """
-    وقتی پیام تیکت از دیتابیس حذف می‌شود، فایل ضمیمه آن هم از هاست پاک شود.
-    """
-    if instance.attachment:
-        if os.path.isfile(instance.attachment.path):
-            os.remove(instance.attachment.path)
+    if instance.attachment and os.path.isfile(instance.attachment.path): os.remove(instance.attachment.path)
 
 @receiver(pre_save, sender=TicketMessage)
 def delete_old_attachment_on_update(sender, instance, **kwargs):
-    """
-    وقتی فایل ضمیمه در یک پیام ویرایش یا جایگزین می‌شود، فایل قبلی از هاست پاک شود.
-    """
-    # اگر پیام جدید است و هنوز در دیتابیس ذخیره نشده، نیازی به بررسی نیست
-    if not instance.pk:
-        return False
-
-    try:
-        # واکشی فایل قدیمی از دیتابیس
-        old_file = sender.objects.get(pk=instance.pk).attachment
-    except sender.DoesNotExist:
-        return False
-
+    if not instance.pk: return False
+    try: old_file = sender.objects.get(pk=instance.pk).attachment
+    except sender.DoesNotExist: return False
     new_file = instance.attachment
-    
-    # اگر فایل قدیمی وجود داشت و با فایل جدید تفاوت داشت، آن را حذف کن
-    if old_file and old_file != new_file:
-        if os.path.isfile(old_file.path):
-            os.remove(old_file.path)
+    if old_file and old_file != new_file and os.path.isfile(old_file.path): os.remove(old_file.path)
 
-# ---------------------------------------------------------
-# سیگنال‌های مربوط به حذف فایل ولکام سانگ
-# --------------------------------------------------------
 @receiver(post_delete, sender=SiteSettings)
 def delete_welcome_song_on_delete(sender, instance, **kwargs):
-    if instance.welcome_song:
-        instance.welcome_song.delete(save=False)
+    if instance.welcome_song: instance.welcome_song.delete(save=False)
 
 @receiver(pre_save, sender=SiteSettings)
 def delete_old_welcome_song_on_update(sender, instance, **kwargs):
-
-    if not instance.pk:
-        return
-
-    try:
-        old_instance = SiteSettings.objects.get(pk=instance.pk)
-    except SiteSettings.DoesNotExist:
-        return
-
+    if not instance.pk: return
+    try: old_instance = SiteSettings.objects.get(pk=instance.pk)
+    except SiteSettings.DoesNotExist: return
     if old_instance.welcome_song and old_instance.welcome_song != instance.welcome_song:
         old_instance.welcome_song.delete(save=False)
 
+
 # ---------------------------------------------------------
-# سیگنال‌های ایجاد کاربر جدید
-# --------------------------------------------------------
+# سیگنال‌های اطلاع‌رسانی پستیلاین (منطق تجاری جدید)
+# ---------------------------------------------------------
+
 @receiver(post_save, sender=User)
 def handle_new_user_registration(sender, instance, created, **kwargs):
     from .notifications import notify_new_user_welcome, notify_admins_new_user
     if created:
         notify_new_user_welcome(instance)
-
         notify_admins_new_user(instance)
 
+# --- منطق تغییر وضعیت سفارش ---
+@receiver(pre_save, sender=Order)
+def capture_old_order_state(sender, instance, **kwargs):
+    """ ذخیره وضعیت قبلی سفارش برای مقایسه در post_save """
+    if instance.pk:
+        try:
+            instance._old_status = Order.objects.get(pk=instance.pk).status
+        except Order.DoesNotExist:
+            instance._old_status = None
+    else:
+        instance._old_status = None
 
+@receiver(post_save, sender=Order)
+def handle_order_status_changes(sender, instance, created, **kwargs):
+    from .notifications import notify_user_submit_order, notify_admins_new_order, notify_user_send_order, notify_admins_cancel_order
+    
+    old_status = getattr(instance, '_old_status', None)
+
+    # حالت اول: کاربر سفارش را نهایی کرده و در انتظار پرداخت است
+    if old_status == 'CART' and instance.status == 'PENDING':
+        notify_user_submit_order(instance)
+        notify_admins_new_order(instance)
+
+    # حالت دوم: کاربر پشیمان شده و سفارش پرداخت نشده را لغو کرده (برگشت به سبد خرید)
+    elif old_status == 'PENDING' and instance.status == 'CART':
+        notify_admins_cancel_order(instance)
+
+    # حالت سوم: ادمین وضعیت سفارش را به ارسال شده تغییر داده است
+    elif old_status != 'SHIPPED' and instance.status == 'SHIPPED':
+        notify_user_send_order(instance)
+
+@receiver(post_delete, sender=Order)
+def handle_order_deletion(sender, instance, **kwargs):
+    """ اگر کاربر به جای لغو، کل آبجکت سفارش را حذف کرد، به ادمین هشدار لغو برود """
+    from .notifications import notify_admins_cancel_order
+    if instance.status == 'PENDING':
+        notify_admins_cancel_order(instance)
+
+# --- منطق تیکت‌ها ---
+@receiver(post_save, sender=Ticket)
+def handle_new_ticket_creation(sender, instance, created, **kwargs):
+    from .notifications import notify_admins_new_ticket, notify_user_new_ticket
+    if created:
+        notify_admins_new_ticket(instance)
+        notify_user_new_ticket(instance)
+
+@receiver(post_save, sender=TicketMessage)
+def handle_new_ticket_message(sender, instance, created, **kwargs):
+    from .notifications import notify_admins_ticket_message, notify_user_ticket_message
+    if created:
+        # اگر فرستنده ادمین بود -> به کاربر پیام بده
+        if instance.is_admin_reply():
+            notify_user_ticket_message(instance)
+        # اگر فرستنده کاربر بود -> به ادمین‌ها پیام بده
+        else:
+            notify_admins_ticket_message(instance)

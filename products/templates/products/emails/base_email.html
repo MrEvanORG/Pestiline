@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{ subject }}</title>
     <style>
-        body { font-family: Vazirmatn,zavir,Tahoma,Arial,sans-serif; }
+        body { font-family: Vazirmatn, zavir, Tahoma, Arial, sans-serif; }
     </style>
 </head>
 <body style="margin: 0; padding: 0; background-color: #f8f9fa; direction: rtl;">
@@ -27,33 +27,68 @@
                             {{ main_title }}
                         </td>
                     </tr>
+                    
                     <!-- Message Content -->
                     <tr>
                         <td style="font-size: 16px; line-height: 1.7; color: #333;">
-                            <p style="margin: 0;">{{name}}</p>
                             
-                            <div style="background-color: #fdfefe; border: 1px solid #dae9c3; border-radius: 8px; padding: 20px; margin: 25px 0;">
-                                <h3 style="margin-top: 0; margin-bottom: 15px; color: #123524; font-size: 18px; border-bottom: 2px solid #dae9c3; padding-bottom: 10px;">اطلاعات تماس فرستنده</h3>
+                            <!-- پیام معرفی یا سلام (اختیاری) -->
+                            {% if top_greeting %}
+                            <p style="margin: 0 0 15px 0; font-weight: bold;">{{ top_greeting }}</p>
+                            {% endif %}
+
+                            {% if top_message %}
+                            <p style="margin: 0 0 20px 0;">{{ top_message|linebreaksbr }}</p>
+                            {% endif %}
+                            
+                            <!-- باکس اطلاعات و جزئیات (نمایش فقط در صورت ارسال دیتا از بک‌اند) -->
+                            {% if info_items or info_box_title or user_message %}
+                            <div style="background-color: #fdfefe; border: 1px solid #dae9c3; border-radius: 8px; padding: 20px; margin: 10px 0 25px 0;">
                                 
-                                <p style="margin: 5px 0;">
-                                    <strong>راه ارتباطی :</strong> 
-                                    <a href="mailto:{{ reply_to }}" style="color: #85A947; text-decoration: none; font-weight: bold;">{{ reply_to }}</a>
-                                </p>
+                                {% if info_box_title %}
+                                <h3 style="margin-top: 0; margin-bottom: 15px; color: #123524; font-size: 18px; border-bottom: 2px solid #dae9c3; padding-bottom: 10px;">
+                                    {{ info_box_title }}
+                                </h3>
+                                {% endif %}
+                                
+                                <!-- لیست پویا برای کلید-مقدارها (مثل شماره سفارش، کد رهگیری، نام کاربر و...) -->
+                                {% if info_items %}
+                                <table width="100%" cellpadding="0" cellspacing="0" style="margin-bottom: 15px;">
+                                    {% for item in info_items %}
+                                    <tr>
+                                        <td style="padding: 5px 0; color: #555; width: 40%;"><strong>{{ item.label }} :</strong></td>
+                                        <td style="padding: 5px 0; color: #111; font-weight: bold;">
+                                            {% if item.is_link %}
+                                                <a href="{{ item.value }}" style="color: #85A947; text-decoration: none;">{{ item.value }}</a>
+                                            {% else %}
+                                                {{ item.value }}
+                                            {% endif %}
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </table>
+                                {% endif %}
 
-                                <hr style="border: 0; border-top: 1px solid #dae9c3; margin: 20px 0;">
-
-                                <p style="margin: 0; white-space: pre-wrap; color: #333;">{{ user_message|linebreaksbr }}</p>
+                                {% if user_message %}
+                                {% if info_items %}<hr style="border: 0; border-top: 1px solid #dae9c3; margin: 15px 0;">{% endif %}
+                                <p style="margin: 0; white-space: pre-wrap; color: #333; font-size: 15px;">{{ user_message|linebreaksbr }}</p>
+                                {% endif %}
+                                
                             </div>
+                            {% endif %}
                         </td>
                     </tr>
-                    <!-- CTA Button -->
+                    
+                    <!-- CTA Button (اختیاری) -->
+                    {% if cta_link %}
                     <tr>
                         <td align="center" style="padding-top: 10px; padding-bottom: 20px;">
-                            <a href="{{ cta_link }}" target="_blank" style="display: inline-block; background-color: #85A947; color: #ffffff; padding: 12px 30px; font-size: 16px; font-weight: bold; text-decoration: none; border-radius: 8px;">
+                            <a href="{{ cta_link }}" target="_blank" style="display: inline-block; background-color: #85A947; color: #ffffff; padding: 12px 30px; font-size: 16px; font-weight: bold; text-decoration: none; border-radius: 8px; box-shadow: 0 4px 6px rgba(133, 169, 71, 0.2);">
                                 {{ cta_text }}
                             </a>
                         </td>
                     </tr>
+                    {% endif %}
                 </table>
             </td>
         </tr>

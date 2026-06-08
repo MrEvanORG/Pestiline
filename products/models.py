@@ -217,6 +217,14 @@ class MessageSiteSettings(models.Model):
         verbose_name='پیام جدید روی تیکت',
         help_text='اطلاع رسانی به کاربر ایجاد پیام روی تیکت ایجاد شده قبلی .'   
     )
+
+    tu_new_ticket = models.CharField(
+        max_length=8,
+        choices=NotifStatusChoices,
+        default=NotifStatusChoices.DISABLE,
+        verbose_name='ثبت تیکت',
+        help_text='اطلاع رسانی به کاربر پس از ثبت موفق تیکت پشتیبانی.'
+    )
     
     primary_line_number = models.CharField(
         max_length=100,
@@ -707,6 +715,7 @@ class NotificationLog(models.Model):
         SENT_ORDER_TU = "SENT_ORDER_TU","به کاربر سفارش ارسال شد"
 
         NEW_TICKET_TA = "NEW_TICKET_TA","به ادمین تیکت جدید"
+        NEW_TICKET_TU = "NEW_TICKET_TU","به کاربر تیکت جدید" 
         MSG_TICKET_TA = "MSG_TICKET_TA","به ادمین پیام جدید در تیکت"
         MSG_TICKET_TU = "MSG_TICKET_TU","به کاربر پیام جدید در تیکت"
 

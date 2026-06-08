@@ -57,39 +57,41 @@ def resume_detail_view(request, slug):
             
             if not resume_object.related_user.email:
                 messages.error(request, "متأسفانه مشکلی در ارسال ایمیل رخ داد. بعداً تلاش کنید.")
-                # لاگ‌گیری خطا برای نبود ایمیل را می‌توانید اینجا اضافه کنید
                 return render(request, 'resum.html', {'resume': resume_object, 'form': form})
 
             subject = f"پیام جدید از فرم رزومه: {name}"
             recipient_list = [resume_object.related_user.email]
             
+            # تغییر اصلی: ساختار جدید کانتکست برای هماهنگی با قالب ماژولار مادر
             email_context = {
                 'subject': subject,
                 'main_title': 'پیام جدید دریافت شد',
-                'content_title': f'شما یک پیام جدید از طرف "{name}" دارید:',
-                'name': f'یک پیام جدید از طرف {name} برای شما ارسال شده است .',
-                'reply_to': reply_to,
-                'user_message': user_message,
+                'top_greeting': 'کاربر گرامی،',
+                'top_message': f'شما یک پیام جدید از طرف "{name}" در رابطه با رزومه خود دریافت کرده‌اید.',
+                'info_box_title': 'اطلاعات تماس فرستنده',
+                'info_items': [
+                    {'label': 'نام فرستنده', 'value': name, 'is_link': False},
+                    {'label': 'راه ارتباطی (ایمیل)', 'value': reply_to, 'is_link': False}
+                ],
+                'user_message': user_message, # متن پیام کاربر در باکس پایینی می‌نشیند
                 'cta_text': 'مشاهده رزومه در سایت',
                 'cta_link': request.build_absolute_uri(
                     reverse('resume_detail', kwargs={'slug': slug})
                 )
             }
             
-            # توجه: من آدرس تمپلیت را طبق کد شما به products تغییر دادم
             html_message = render_to_string('products/emails/base_email.html', email_context)
             plain_message = f"نام فرستنده: {name}\nتماس: {reply_to}\n\nمتن پیام:\n{user_message}"
 
             try:
-                # تغییر ۲: استفاده از EmailMultiAlternatives
                 email = EmailMultiAlternatives(
                     subject,
-                    plain_message,      # بدنه اصلی (متن ساده)
-                    None,               # از DEFAULT_FROM_EMAIL در settings استفاده کن
+                    plain_message,      
+                    None,               
                     recipient_list,
-                    reply_to=[reply_to] # بسیار مهم برای پاسخ مستقیم
+                    reply_to=[reply_to] 
                 )
-                email.attach_alternative(html_message, "text/html") # پیوست کردن نسخه HTML
+                email.attach_alternative(html_message, "text/html") 
                 email.send()
                 
                 NotificationLog.objects.create(
@@ -101,7 +103,6 @@ def resume_detail_view(request, slug):
                 )
                 
                 messages.success(request, "پیام شما با موفقیت ارسال شد.")
-                # تغییر ۳: استفاده از متغیر url در redirect
                 url = reverse('resume_detail', kwargs={'slug': slug}) + '#contact'
                 return redirect(url) 
             

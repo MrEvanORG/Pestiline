@@ -1,5 +1,5 @@
 /* === Logic: Mobile Menu & Product Detail Overlay === */
-
+// document.documentElement.setAttribute('data-theme', 'dark');
 // Toggle Mobile Menu
 function toggleMenu() {
     document.body.classList.toggle('menu-open');

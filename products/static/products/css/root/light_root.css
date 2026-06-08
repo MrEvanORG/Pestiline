@@ -1,4 +1,8 @@
+/* =========================================
+   light_root.css
+   ========================================= */
 :root {
+    /* --- متغیرهای اورجینال شما (دقیقا دست‌نخورده) --- */
     --white: #ffffff;
     --dark: #0e0e0ef1;
     --primary: #123524;     /* سبز تیره */
@@ -12,4 +16,38 @@
     --radius: 12px;
     --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     --font-main: 'Vazirmatn', sans-serif;
+
+    /* --- متغیرهای کمکی برای حفظ ۱۰۰ درصدی طراحی شما --- */
+    /* این متغیرها دقیقا کدهای رنگی دستی شما در فایل main.css هستند */
+    --bg-body: #fcfcfc;
+    --bg-mobile-sidebar: white;
+    --bg-sidebar-logo: #fcfcfc;
+    --bg-feature-item: rgba(255, 255, 255, 0.6);
+    --bg-product-card: white;
+    --bg-info-btn: rgba(255, 255, 255, 0.9);
+    --bg-details-overlay: rgba(255, 255, 255, 0.98);
+    --bg-farmers: var(--white);
+    --bg-blog-section: #f8fcf5;
+    --bg-blog-card: #ffffff;
+    --bg-breadcrumb-hover: #f9f9f9;
+    
+    --border-breadcrumb: #eee;
+    --border-sidebar-logo: #f0f0f0;
+    --border-sidebar-link: #f5f5f5;
+    --border-sidebar-footer: #eee;
+    --border-feature-item: rgba(255, 255, 255, 0.8);
+    --border-spec-row: #f0f0f0;
+    
+    --text-breadcrumb-icon: #aaa;
+    --text-breadcrumb-item: #666;
+    --text-sidebar-link: #555;
+    --text-feature-desc: #555;
+    --text-product-unit: #888;
+    --text-close-details: #666;
+    --text-spec-desc: #666;
+    --text-blog-desc: #666;
+    --text-ribbon: white;
+    
+    --badge-farmers-bg: #333;
+    --badge-farmers-text: #FFD700;
 }

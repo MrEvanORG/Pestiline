@@ -10,7 +10,7 @@ urlpatterns = [
     path('mixer/', views.mixer_page, name='mixer'),
 
     path('about_us/', views.aboutus_page, name='about_us'),
-    path('shop/', views.aboutus_page, name='shop'),
+    path('shop/', views.shop_page, name='shop'),
 
     path('dashboard/', views.dashboard_page, name='dashboard'),
 

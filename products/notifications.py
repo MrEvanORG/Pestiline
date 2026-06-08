@@ -1,223 +1,319 @@
 import ghasedak_sms
-from django.core.mail import send_mail
 from django.conf import settings as django_settings
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 from .models import User, MessageSiteSettings, NotificationLog
 
 sms_api = ghasedak_sms.Ghasedak(api_key=f'{django_settings.SMS_API}')
-mss = MessageSiteSettings.objects.first()
+
+BASE_URL = "https://pestiline.ir" 
+
+def get_mss():
+    return MessageSiteSettings.objects.first()
+
+def get_admin_url(instance):
+    """
+    تولید آدرس پویای پنل ادمین بر اساس متغیر امنیتی ADMIN_URL در ستینگز
+    """
+    admin_prefix = getattr(django_settings, 'ADMIN_URL', 'admin').strip('/')
+    app_label = instance._meta.app_label
+    model_name = instance._meta.model_name
+    return f"{BASE_URL}/{admin_prefix}/{app_label}/{model_name}/{instance.id}/change/"
 
 def send_sms_mock(phone_number, text):
-    if django_settings.DEV_MODE : 
-        print(f"\n{'='*40}")
-        print(f" MESSAGE SENT (SUCCESS)")
-        print(f"To: {phone_number}")
-        print(f"MESSAGE: {text}")
-        print(f"{'='*40}\n")
+    mss = get_mss()
+    if getattr(django_settings, 'DEV_MODE', False): 
+        print(f"\n{'='*40}\n MESSAGE SENT (SUCCESS)\nTo: {phone_number}\nMESSAGE:\n{text}\n{'='*40}\n")
     else:
         response = sms_api.send_single_sms(
             ghasedak_sms.SendSingleSmsInput(
                 message=text,
                 receptor=str(phone_number),
-                line_number=str(mss.primary_line_number), # type: ignore
+                line_number=str(mss.primary_line_number) if mss and mss.primary_line_number else '', 
                 send_date='',
                 client_reference_id=''
             )
         )
-        if not response.get('isSuccess'): # type: ignore
-            raise Exception(response.get('message', 'خطای نامشخص')) # type: ignore
-        
-def send_email_mock(plain_message,email_context):
+        if not response.get('isSuccess'):
+            raise Exception(response.get('message', 'خطای نامشخص در ارسال پیامک'))
+
+def send_email_mock(subject, plain_message, email_context, recipient_email):
     html_message = render_to_string('products/emails/base_email.html', email_context)
     email = EmailMultiAlternatives(
-        subject,
-        plain_message,      # بدنه اصلی (متن ساده)
-        None,               # از DEFAULT_FROM_EMAIL در settings استفاده کن
-        recipient_list,
-        reply_to=[reply_to] # بسیار مهم برای پاسخ مستقیم
+        subject=subject,
+        body=plain_message,      
+        from_email=django_settings.DEFAULT_FROM_EMAIL,               
+        to=[recipient_email],
     )
-    email.attach_alternative(html_message, "text/html") # پیوست کردن نسخه HTML
+    email.attach_alternative(html_message, "text/html") 
     email.send()
 
-def notify_new_user_welcome(user):
-    settings = MessageSiteSettings.objects.first()
-    
-    # بررسی فعال بودن تنظیمات خوشامدگویی کاربر
-    if not settings or settings.tu_wellcome != MessageSiteSettings.NotifStatusChoices.ENABLE or not user.phone_number:
-        return
+def dispatch_notification(user, event_type, sms_msg, email_subj, email_plain, email_context):
+    """ هسته مرکزی پردازش، اعتبارسنجی و لاگ‌گیری """
+    pref = user.prefered_notification
+    if pref == User.PrederefNotifChoices.DISABLE: return
 
-    message = f"{user.first_name} عزیز به پستیلاین خوش آمدید\nحساب شما با موفقیت ایجاد شد در صورت بروز هرگونه مشکل با پشتیبانی در ارتباط باشید .\nلغو 11"
-    status = 'SUCCESS'
-    error_details = None
-
-    try:
-        send_sms_mock(user.phone_number, message)
-    except Exception as e:
-        status = 'FAILED'
-        error_details = str(e)[:220]
-
-    # ثبت لاگ
-    NotificationLog.objects.create(
-        user=user,
-        notification_type='SMS',
-        related_event=NotificationLog.EventChoices.NEW_USER_TU,
-        message_content=message,
-        status=status,
-        error_details=error_details
-    )
-
-def notify_admins_new_user(new_user):
-    settings = MessageSiteSettings.objects.first()
-    
-    # بررسی فعال بودن تنظیمات اطلاع‌رسانی ثبت‌نام به ادمین
-    if not settings or settings.ta_new_user != MessageSiteSettings.NotifStatusChoices.ENABLE:
-        return
-
-    message = f"کاربر {new_user.first_name+' '+new_user.last_name} در پستیلاین ثبت نام کرد\nلغو11"
-    
-    superusers = User.objects.filter(is_superuser=True)
-    
-    for admin in superusers:
-        pref = admin.prefered_notification
-        
-        if pref == User.PrederefNotifChoices.DISABLE:
-            continue
-            
-        status = 'SUCCESS'
-        error_details = None
-        notif_type = 'SMS'
-
-        try:
-            if pref == User.PrederefNotifChoices.MESSAGE:
-                notif_type = 'SMS'
-                send_sms_mock(admin.phone_number, message)
-                
-            elif pref == User.PrederefNotifChoices.EMAIL:
-                notif_type = 'EMAIL'
-                email_context = {
-                    'subject': subject,
-                    'main_title': 'ثبت نام کاربر جدید',
-                    'content_title': f'کاربر {new_user.get_full_name()} روی سایت ثبت نام کرد ',
-                    'name': name,
-                    'reply_to': reply_to,
-                    'user_message': user_message,
-                    'cta_text': 'مشاهده سفارش در سایت',
-                    'cta_link': request.build_absolute_uri(
-                        reverse('resume_detail', kwargs={'slug': slug})
-                    )
-                }
-                plain_message = f"نام فرستنده: {name}\nتماس: {reply_to}\n\nمتن پیام:\n{user_message}"
-                send_email_mock(plain_message=plain_message,email_context=email_context)
-                
-                # send_mail(
-                #     subject="ثبت نام کاربر جدید",
-                #     message=message,
-                #     from_email=None,
-                #     recipient_list=[admin.email],
-                #     fail_silently=False,
-                # )
-        except Exception as e:
-            status = 'FAILED'
-            error_details = str(e)[:220]
-
-        NotificationLog.objects.create(
-            user=admin,
-            notification_type=notif_type,
-            related_event=NotificationLog.EventChoices.NEW_USER_TA,
-            message_content=message,
-            status=status,
-            error_details=error_details
-        )
-
-def notify_user_new_order(order):
-    settings = MessageSiteSettings.objects.first()
-    
-    # بررسی فعال بودن تنظیمات اطلاع رسانی ثبت سفارش به مشتری
-    if not settings or settings.tu_new_order != MessageSiteSettings.NotifStatusChoices.ENABLE:
-        return
-
-    customer = order.customer
-    pref = customer.prefered_notification
-    
-    if pref == User.PrederefNotifChoices.DISABLE:
-        return
-
-    message = f"{order.customer.first_name} عزیز سفارش شما ثبت شد همکاران  ما جهت پرداخت هزینه با شما تماس خواهند گرفت\nهمچنین برای مشاهده وضعیت سفارش میتوانید از طریق پنل کاربری اقدام نمایید .\nلغو11"
-
-    status = 'SUCCESS'
-    error_details = None
-    notif_type = 'SMS'
+    status, error_details, notif_type = 'SUCCESS', None, pref
 
     try:
         if pref == User.PrederefNotifChoices.MESSAGE:
             notif_type = 'SMS'
-            send_sms_mock(customer.phone_number, message)
+            if not user.phone_number: raise Exception("شماره موبایل ثبت نشده است.")
+            send_sms_mock(user.phone_number, sms_msg)
             
         elif pref == User.PrederefNotifChoices.EMAIL:
             notif_type = 'EMAIL'
-            send_mail(
-                subject="ثبت سفارش جدید",
-                message=message,
-                from_email=None,
-                recipient_list=[customer.email],
-                fail_silently=False,
-            )
+            if not user.email: raise Exception("ایمیل کاربر ثبت نشده است.")
+            send_email_mock(email_subj, email_plain, email_context, user.email)
+            
     except Exception as e:
-        status = 'FAILED'
-        error_details = str(e)[:220]
+        status, error_details = 'FAILED', str(e)[:220]
 
     NotificationLog.objects.create(
-        user=customer,
-        notification_type=notif_type,
-        related_event=NotificationLog.EventChoices.NEW_ORDER_TU,
-        message_content=message,
-        status=status,
-        error_details=error_details
+        user=user, notification_type=notif_type, related_event=event_type,
+        message_content=sms_msg if notif_type == 'SMS' else email_plain,
+        status=status, error_details=error_details
     )
 
+# ================== TO USER (TU) ==================
+
+def notify_new_user_welcome(user):
+    mss = get_mss()
+    if not mss or mss.tu_wellcome != MessageSiteSettings.NotifStatusChoices.ENABLE: return
+    
+    first_name = user.first_name if user.first_name else "کاربر"
+    sms_msg = f"{first_name} عزیز، به پستیلاین خوش آمدید.\nحساب کاربری شما با موفقیت ایجاد شد.\nلغو 11"
+    
+    email_context = {
+        'subject': 'ثبت نام موفق در پستیلاین', 
+        'main_title': 'خوش‌آمدید',
+        'top_greeting': f'کاربر گرامی {first_name}،',
+        'top_message': 'ثبت نام شما با موفقیت انجام شد. از اینکه به پستیلاین پیوستید خرسندیم. هم‌اکنون می‌توانید از خدمات سایت استفاده نمایید.',
+        'info_box_title': 'اطلاعات حساب کاربری',
+        'info_items': [
+            {'label': 'نام', 'value': user.get_full_name() or 'ثبت نشده'},
+            {'label': 'شماره همراه', 'value': user.phone_number},
+        ],
+        'cta_text': 'ورود به حساب کاربری', 
+        'cta_link': f"{BASE_URL}",
+    }
+    dispatch_notification(user, NotificationLog.EventChoices.NEW_USER_TU, sms_msg, email_context['subject'], "ثبت نام شما با موفقیت در پستیلاین انجام شد.", email_context)
+
+def notify_user_submit_order(order):
+    mss = get_mss()
+    if not mss or mss.tu_submit_order != MessageSiteSettings.NotifStatusChoices.ENABLE: return
+    
+    user = order.customer
+    first_name = user.first_name if user.first_name else "کاربر"
+    sms_msg = f"{first_name} عزیز، سفارش شما با شماره {order.order_number} ثبت شد و در انتظار بررسی است.\nلغو 11"
+    
+    email_context = {
+        'subject': f'سفارش شماره {order.order_number} با موفقیت ثبت شد', 
+        'main_title': 'ثبت موفق سفارش',
+        'top_greeting': f'کاربر گرامی {first_name}،', 
+        'top_message': 'سفارش شما با موفقیت در سیستم ثبت گردید و در مرحله بررسی توسط کارشناسان قرار گرفت. وضعیت سفارش از طریق پنل کاربری قابل پیگیری است.',
+        'info_box_title': 'جزئیات کامل سفارش',
+        'info_items': [
+            {'label': 'شماره سفارش', 'value': order.order_number},
+            {'label': 'مبلغ کل پرداخت', 'value': f"{order.total_price:,} تومان"},
+            {'label': 'گیرنده', 'value': order.receiver_name},
+            {'label': 'آدرس ارسال', 'value': order.address},
+        ],
+        'cta_text': 'پیگیری وضعیت سفارش', 
+        'cta_link': f"{BASE_URL}",
+    }
+    dispatch_notification(user, NotificationLog.EventChoices.NEW_ORDER_TU, sms_msg, email_context['subject'], f"سفارش {order.order_number} ثبت گردید.", email_context)
+
+def notify_user_send_order(order):
+    mss = get_mss()
+    if not mss or mss.tu_send_order != MessageSiteSettings.NotifStatusChoices.ENABLE: return
+    
+    user = order.customer
+    first_name = user.first_name if user.first_name else "کاربر"
+    
+    sms_msg = f"{first_name} عزیز، سفارش شما با شماره {order.order_number} ارسال شد."
+    info_items = [
+        {'label': 'شماره سفارش', 'value': order.order_number},
+        {'label': 'گیرنده', 'value': order.receiver_name},
+    ]
+    
+    if order.tracking_code:
+        sms_msg += f"\nکد رهگیری: {order.tracking_code}"
+        info_items.extend([
+            {'label': 'کد رهگیری پستی', 'value': order.tracking_code},
+            {'label': 'سامانه پیگیری', 'value': 'tracking.post.ir', 'is_link': True}
+        ])
+    sms_msg += "\nلغو 11"
+
+    email_context = {
+        'subject': f'سفارش شماره {order.order_number} ارسال شد', 
+        'main_title': 'وضعیت: ارسال شده',
+        'top_greeting': f'کاربر گرامی {first_name}،', 
+        'top_message': 'سفارش شما بسته بندی و به اداره پست تحویل داده شد. در صورت وجود کد رهگیری، می‌توانید مرسوله خود را در سامانه پست پیگیری نمایید.',
+        'info_box_title': 'اطلاعات ارسال مرسوله', 
+        'info_items': info_items,
+        'cta_text': 'مشاهده تاریخچه سفارشات', 
+        'cta_link': f"{BASE_URL}",
+    }
+    dispatch_notification(user, NotificationLog.EventChoices.SENT_ORDER_TU, sms_msg, email_context['subject'], f"سفارش {order.order_number} ارسال گردید.", email_context)
+
+def notify_user_new_ticket(ticket):
+    mss = get_mss()
+    if not mss or mss.tu_new_ticket != MessageSiteSettings.NotifStatusChoices.ENABLE: return
+    
+    user = ticket.user
+    first_name = user.first_name if user.first_name else "کاربر"
+    sms_msg = f"{first_name} عزیز، تیکت شما با شماره {ticket.ticket_number} در سیستم ثبت شد و در اسرع وقت بررسی می‌گردد.\nلغو 11"
+    
+    email_context = {
+        'subject': f'تیکت پشتیبانی شماره {ticket.ticket_number} ثبت شد', 
+        'main_title': 'تیکت دریافت شد',
+        'top_greeting': f'کاربر گرامی {first_name}،', 
+        'top_message': 'تیکت شما با موفقیت در سیستم ثبت شد. کارشناسان ما در حال بررسی موضوع می‌باشند و به زودی پاسخگو خواهند بود.',
+        'info_box_title': 'اطلاعات تیکت',
+        'info_items': [
+            {'label': 'شماره پیگیری', 'value': ticket.ticket_number},
+            {'label': 'موضوع گفتگو', 'value': ticket.get_subject_type_display()},
+        ],
+        'cta_text': 'مشاهده تیکت در سایت', 
+        'cta_link': f"{BASE_URL}",
+    }
+    dispatch_notification(user, NotificationLog.EventChoices.NEW_TICKET_TU, sms_msg, email_context['subject'], f"تیکت پشتیبانی {ticket.ticket_number} ثبت شد.", email_context)
+
+def notify_user_ticket_message(ticket_message):
+    mss = get_mss()
+    if not mss or mss.tu_new_ticketmessage != MessageSiteSettings.NotifStatusChoices.ENABLE: return
+    
+    ticket = ticket_message.ticket
+    user = ticket.user
+    first_name = user.first_name if user.first_name else "کاربر"
+    sms_msg = f"{first_name} عزیز، پاسخ جدیدی از سوی پشتیبانی برای تیکت شماره {ticket.ticket_number} ثبت گردید.\nلغو 11"
+    
+    email_context = {
+        'subject': f'پاسخ پشتیبانی به تیکت شماره {ticket.ticket_number}', 
+        'main_title': 'پاسخ جدید دریافت شد',
+        'top_greeting': f'کاربر گرامی {first_name}،',
+        'top_message': 'کارشناسان پشتیبانی پاسخ جدیدی را برای گفتگوی شما ارسال کرده‌اند. متن پیام در ادامه قابل مشاهده است.',
+        'user_message': ticket_message.text,
+        'cta_text': 'ارسال پاسخ جدید', 
+        'cta_link': f"{BASE_URL}",
+    }
+    dispatch_notification(user, NotificationLog.EventChoices.MSG_TICKET_TU, sms_msg, email_context['subject'], f"پاسخ پشتیبانی به تیکت {ticket.ticket_number} ثبت گردید.", email_context)
+
+# ================== TO ADMIN (TA) ==================
+
+def notify_admins_new_user(new_user):
+    mss = get_mss()
+    if not mss or mss.ta_new_user != MessageSiteSettings.NotifStatusChoices.ENABLE: return
+    
+    sms_msg = f"اطلاع رسانی سیستم:\nکاربر جدید با شماره {new_user.phone_number} در سایت ثبت نام کرد.\nلغو 11"
+    
+    email_context = {
+        'subject': 'ثبت نام کاربر جدید در سامانه', 
+        'main_title': 'ثبت نام کاربر جدید',
+        'top_greeting': 'مدیر محترم،',
+        'top_message': 'یک کاربر جدید به تازگی در سامانه پستیلاین ثبت نام کرده است.',
+        'info_box_title': 'اطلاعات کاربر',
+        'info_items': [
+            {'label': 'نام و نام خانوادگی', 'value': new_user.get_full_name() or 'ثبت نشده'},
+            {'label': 'شماره همراه', 'value': new_user.phone_number},
+        ],
+        'cta_text': 'بررسی کاربر در پنل ادمین',
+        'cta_link': get_admin_url(new_user),
+    }
+    for admin in User.objects.filter(is_superuser=True):
+        dispatch_notification(admin, NotificationLog.EventChoices.NEW_USER_TA, sms_msg, email_context['subject'], f"ثبت نام جدید: {new_user.phone_number}", email_context)
+
 def notify_admins_new_order(order):
-    settings = MessageSiteSettings.objects.first()
+    mss = get_mss()
+    if not mss or mss.ta_new_order != MessageSiteSettings.NotifStatusChoices.ENABLE: return
     
-    # بررسی فعال بودن اطلاع رسانی سفارش جدید به ادمین
-    if not settings or settings.ta_new_order != MessageSiteSettings.NotifStatusChoices.ENABLE:
-        return
+    sms_msg = f"اطلاع رسانی سیستم:\nسفارش جدید {order.order_number} توسط {order.customer.get_full_name()} ثبت شد.\nمبلغ: {order.total_price:,} تومان.\nلغو 11"
     
-    message = f"ادمین محترم کاربر {order.customer.get_full_name} سفارشی با شماره {order.order_number}  ثبت کرد و در انتظار پرداخت است.\nلغو11"
+    email_context = {
+        'subject': f'ثبت سفارش جدید شماره {order.order_number}', 
+        'main_title': 'سفارش جدید',
+        'top_greeting': 'مدیر محترم،',
+        'top_message': 'یک سفارش جدید توسط مشتری در سایت ثبت شده و در انتظار بررسی و تایید شما قرار دارد.',
+        'info_box_title': 'جزئیات سفارش',
+        'info_items': [
+            {'label': 'شماره سفارش', 'value': order.order_number},
+            {'label': 'مشتری', 'value': order.customer.get_full_name()},
+            {'label': 'مبلغ کل سفارش', 'value': f"{order.total_price:,} تومان"},
+            {'label': 'هزینه ارسال', 'value': f"{order.shipping_cost:,} تومان" if order.shipping_cost else "نامشخص"},
+        ],
+        'cta_text': 'بررسی سفارش در پنل ادمین',
+        'cta_link': get_admin_url(order),
+    }
+    for admin in User.objects.filter(is_superuser=True):
+        dispatch_notification(admin, NotificationLog.EventChoices.NEW_ORDER_TA, sms_msg, email_context['subject'], f"سفارش جدید {order.order_number} ثبت گردید.", email_context)
 
-    superusers = User.objects.filter(is_superuser=True)
+def notify_admins_cancel_order(order):
+    mss = get_mss()
+    if not mss or mss.ta_cancell_order != MessageSiteSettings.NotifStatusChoices.ENABLE: return
     
-    for admin in superusers:
-        pref = admin.prefered_notification
-        
-        if pref == User.PrederefNotifChoices.DISABLE:
-            continue
-            
-        status = 'SUCCESS'
-        error_details = None
-        notif_type = 'SMS'
+    sms_msg = f"هشدار سیستم:\nسفارش {order.order_number} متعلق به {order.customer.get_full_name()} پیش از پرداخت لغو گردید.\nلغو 11"
+    
+    email_context = {
+        'subject': f'لغو سفارش شماره {order.order_number}', 
+        'main_title': 'لغو سفارش',
+        'top_greeting': 'مدیر محترم،',
+        'top_message': 'کاربر پس از تایید سبد خرید و پیش از تکمیل فرآیند پرداخت، سفارش خود را لغو نموده است.',
+        'info_box_title': 'اطلاعات سفارش لغو شده',
+        'info_items': [
+            {'label': 'شماره سفارش', 'value': order.order_number},
+            {'label': 'مشتری', 'value': order.customer.get_full_name()},
+            {'label': 'شماره همراه', 'value': order.customer.phone_number},
+        ],
+        'cta_text': 'مشاهده وضعیت سفارش در ادمین',
+        'cta_link': get_admin_url(order),
+    }
+    for admin in User.objects.filter(is_superuser=True):
+        dispatch_notification(admin, NotificationLog.EventChoices.CANCELL_ORDER_TA, sms_msg, email_context['subject'], f"سفارش {order.order_number} لغو گردید.", email_context)
 
-        try:
-            if pref == User.PrederefNotifChoices.MESSAGE:
-                notif_type = 'SMS'
-                send_sms_mock(admin.phone_number, message)
-                
-            elif pref == User.PrederefNotifChoices.EMAIL:
-                notif_type = 'EMAIL'
-                send_mail(
-                    subject="سفارش جدید",
-                    message=message,
-                    from_email=None,
-                    recipient_list=[admin.email],
-                    fail_silently=False,
-                )
-        except Exception as e:
-            status = 'FAILED'
-            error_details = str(e)[:220]
+def notify_admins_new_ticket(ticket):
+    mss = get_mss()
+    if not mss or mss.ta_new_ticket != MessageSiteSettings.NotifStatusChoices.ENABLE: return
+    
+    sms_msg = f"اطلاع رسانی سیستم:\nتیکت جدید شماره {ticket.ticket_number} توسط {ticket.user.get_full_name()} در سایت ایجاد شد.\nلغو 11"
+    
+    email_context = {
+        'subject': f'تیکت جدید شماره {ticket.ticket_number}', 
+        'main_title': 'تیکت پشتیبانی جدید',
+        'top_greeting': 'مدیر محترم،',
+        'top_message': 'یک تیکت پشتیبانی جدید توسط کاربر ایجاد شده است و نیازمند بررسی کارشناسان می‌باشد.',
+        'info_box_title': 'اطلاعات تیکت',
+        'info_items': [
+            {'label': 'شماره پیگیری', 'value': ticket.ticket_number},
+            {'label': 'موضوع', 'value': ticket.get_subject_type_display()},
+            {'label': 'ارسال کننده', 'value': ticket.user.get_full_name()},
+        ],
+        'cta_text': 'پاسخ به تیکت در پنل ادمین',
+        'cta_link': get_admin_url(ticket),
+    }
+    for admin in User.objects.filter(is_superuser=True):
+        dispatch_notification(admin, NotificationLog.EventChoices.NEW_TICKET_TA, sms_msg, email_context['subject'], f"تیکت جدید {ticket.ticket_number} ثبت شد.", email_context)
 
-        NotificationLog.objects.create(
-            user=admin,
-            notification_type=notif_type,
-            related_event=NotificationLog.EventChoices.NEW_ORDER_TA,
-            message_content=message,
-            status=status,
-            error_details=error_details
-        )
+def notify_admins_ticket_message(ticket_message):
+    mss = get_mss()
+    if not mss or mss.ta_new_ticketmessage != MessageSiteSettings.NotifStatusChoices.ENABLE: return
+    
+    ticket = ticket_message.ticket
+    sms_msg = f"اطلاع رسانی سیستم:\nپاسخ جدیدی توسط کاربر در تیکت شماره {ticket.ticket_number} ثبت گردید.\nلغو 11"
+    
+    email_context = {
+        'subject': f'پیام جدید در تیکت شماره {ticket.ticket_number}', 
+        'main_title': 'پیام جدید کاربر',
+        'top_greeting': 'مدیر محترم،',
+        'top_message': 'کاربر پاسخ جدیدی را بر روی تیکت قبلی خود ارسال نموده است.',
+        'info_box_title': 'اطلاعات تیکت',
+        'info_items': [
+            {'label': 'شماره پیگیری', 'value': ticket.ticket_number},
+            {'label': 'ارسال کننده', 'value': ticket.user.get_full_name()},
+        ],
+        'user_message': ticket_message.text,
+        'cta_text': 'بررسی تیکت در پنل ادمین',
+        'cta_link': get_admin_url(ticket),
+    }
+    for admin in User.objects.filter(is_superuser=True):
+        dispatch_notification(admin, NotificationLog.EventChoices.MSG_TICKET_TA, sms_msg, email_context['subject'], f"پیام جدید در تیکت {ticket.ticket_number} ثبت گردید.", email_context)

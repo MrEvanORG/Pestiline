@@ -1,0 +1,236 @@
+{% extends "patterns/main_base.html" %}
+{% load static %}
+
+{% block title %}درباره ما | داستان شکل‌گیری پستیلاین{% endblock %}
+
+{% block head %}
+<!-- لینک کردن فایل استایل جداگانه -->
+<link rel="stylesheet" href="{% static 'products/css/about_us.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<!-- 1. Hero Section (Immersive Parallax) -->
+<section class="about-hero-immersive">
+    <h1 class="hero-title-glitch">اصالت در هر دانه پسته</h1>
+    <p class="hero-subtitle">
+        ما در پستیلاین معتقدیم فاصله بین دست‌های پینه‌بسته کشاورز تا لبخند رضایت شما باید کوتاه‌ترین مسیر ممکن باشد. به دنیای شفاف و خوش‌طعم ما خوش آمدید.
+    </p>
+    
+    <div class="scroll-indicator">
+        <div class="mouse"></div>
+        <span>اسکرول کنید</span>
+    </div>
+</section>
+
+<!-- 2. Bento Grid Section (Modern Data Presentation) -->
+<section class="bento-section">
+    <div class="section-title">
+        <h2>DNA پستیلاین</h2>
+        <div class="title-line"></div>
+    </div>
+    
+    <div class="bento-grid">
+        <!-- آیتم بزرگ -->
+        <div class="bento-item large reveal-on-scroll">
+            <i class="fa-sharp fa-solid fa-leaf-heart"></i>
+            <h3 class="bento-title">۱۰۰٪ ارگانیک و طبیعی</h3>
+            <p class="bento-desc">پسته‌های ما در بهترین باغ‌های رفسنجان و بدون استفاده از سموم شیمیایی مضر پرورش می‌یابند. ما طبیعت را دستکاری نمی‌کنیم، فقط آن را بسته‌بندی می‌کنیم.</p>
+            <div class="bento-shape"></div>
+        </div>
+        
+        <!-- آیتم افقی -->
+        <div class="bento-item medium-h reveal-on-scroll" style="transition-delay: 0.1s;">
+            <i class="fa-sharp fa-regular fa-handshake-angle"></i>
+            <h3 class="bento-title">تجارت عادلانه (حذف دلال)</h3>
+            <p class="bento-desc">ما دلال‌ها را حذف کردیم. سود واقعی مستقیماً به جیب کشاورز می‌رود و شما پسته را با قیمت واقعی و منطقی می‌خرید.</p>
+        </div>
+        
+        <!-- آیتم های کوچک -->
+        <div class="bento-item reveal-on-scroll" style="transition-delay: 0.2s;">
+            <i class="fa-sharp fa-solid fa-truck-fast"></i>
+            <h3 class="bento-title">ارسال سریع</h3>
+            <p class="bento-desc">بسته‌بندی ایمن و تحویل سریع در سراسر کشور.</p>
+        </div>
+        
+        <div class="bento-item reveal-on-scroll" style="transition-delay: 0.3s;">
+            <i class="fa-sharp fa-solid fa-shield-check"></i>
+            <h3 class="bento-title">تضمین کیفیت</h3>
+            <p class="bento-desc">بررسی سایز، خندانی و سلامت قبل از ارسال.</p>
+        </div>
+    </div>
+</section>
+
+<!-- 3. Sticky Story Section (Long Scroll Experience) -->
+<section class="sticky-story-section">
+    <div class="story-sticky-side">
+        <div class="custom-breadcrumbs" style="margin-bottom: 1rem;">
+            <span class="breadcrumb-item"><i class="fa-regular fa-book-open"></i> داستان ما</span>
+        </div>
+        <h2>چطور همه‌چیز<br>از یک ایده سبز شروع شد؟</h2>
+        <div class="title-line" style="margin-right: 0;"></div>
+        <p style="color: var(--text-feature-desc); margin-top: 20px; line-height: 1.8;">
+            با اسکرول کردن در این بخش، قدم به قدم با مسیر شکل‌گیری پلتفرم پستیلاین همراه شوید.
+        </p>
+    </div>
+    
+    <div class="story-scrolling-side">
+        <div class="story-card">
+            <h3>۱. دغدغه‌ای از جنس کویر</h3>
+            <p>
+                ما فرزندان کویر و خانواده‌هایی کشاورز هستیم. سال‌ها می‌دیدیم که پدرانمان بهترین پسته دنیا را با زحمت فراوان تولید می‌کنند، اما سود اصلی به جیب واسطه‌هایی می‌رود که حتی یک روز هم در آفتاب داغ باغ کار نکرده‌اند. از طرفی مصرف‌کننده نهایی هم مجبور بود هزینه گزافی پرداخت کند.
+            </p>
+        </div>
+        
+        <div class="story-card">
+            <h3>۲. تولد یک ایده مبتنی بر تکنولوژی</h3>
+            <p>
+                با تخصص در زمینه برنامه‌نویسی و وب (تیم توسعه ما)، تصمیم گرفتیم یک پل مستقیم دیجیتال بسازیم. پستیلاین به عنوان یک بازار تخصصی متولد شد تا کشاورز رفسنجانی بتواند محصولش را مستقیماً به خانواده‌ای در تهران، تبریز یا هرجای ایران بفروشد.
+            </p>
+        </div>
+        
+        <div class="story-card">
+            <h3>۳. وسواس در انتخاب</h3>
+            <p>
+                برای ما کیفیت همه‌چیز است. ما هر باغي را تایید نمی‌کنیم. تیمی از متخصصان کشاورزی پستیلاین، پیش از عقد قرارداد با کشاورز، خاک، آب و محصول را بررسی می‌کنند تا خیالتان از بابت نداشتن افلاتوکسین و سموم غیرمجاز راحت باشد.
+            </p>
+        </div>
+    </div>
+</section>
+
+<!-- 4. Interactive Timeline (From Farm to Door) -->
+<section class="interactive-path" id="interactive-path">
+    <div class="section-title">
+        <h2 style="color: white;">مسیر شفاف پستیلاین</h2>
+        <div class="title-line" style="background: var(--secondary);"></div>
+    </div>
+    
+    <div class="path-container">
+        <div class="path-line-fill" id="path-fill"></div>
+        
+        <div class="path-node">
+            <div class="node-icon"><i class="fa-regular fa-trees"></i></div>
+            <div class="node-content">
+                <h4>دست‌چین از باغ‌های منتخب</h4>
+                <p>انتخاب بهترین زمان برداشت برای حفظ طعم و رنگ طبیعی مغز پسته.</p>
+            </div>
+        </div>
+        
+        <div class="path-node">
+            <div class="node-icon"><i class="fa-regular fa-microscope"></i></div>
+            <div class="node-content">
+                <h4>تست کیفیت و سورتینگ</h4>
+                <p>جداسازی پسته‌های دهان‌بسته و ریز با دستگاه‌های پیشرفته اپتیکال.</p>
+            </div>
+        </div>
+        
+        <div class="path-node">
+            <div class="node-icon"><i class="fa-regular fa-box-check"></i></div>
+            <div class="node-content">
+                <h4>بسته‌بندی دوست‌دار محیط زیست</h4>
+                <p>استفاده از پک‌های استاندارد که رطوبت و عطر پسته را برای ماه‌ها حفظ می‌کنند.</p>
+            </div>
+        </div>
+        
+        <div class="path-node">
+            <div class="node-icon"><i class="fa-regular fa-house-chimney"></i></div>
+            <div class="node-content">
+                <h4>لذت در خانه شما</h4>
+                <p>تحویل سریع درب منزل. آماده برای میهمانی‌ها، میان‌وعده ورزشکاران و مصرف خانواده.</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- 5. Final CTA -->
+<section class="ai-helper-section" style="margin: 6rem 0;">
+    <div class="ai-glam-wide-container compact">
+        <div class="ai-flex-content">
+            <div class="ai-visual-part">
+                <i class="fa-sharp fa-solid fa-cart-shopping-fast" style="font-size: 5rem; color: white;"></i>
+            </div>
+            <div class="ai-text-part">
+                <div class="ai-title-style">آماده‌اید تفاوت را احساس کنید؟</div>
+                <p>حرف زدن کافیست. طعم اصیل پسته تازه رفسنجان را خودتان قضاوت کنید. اولین خرید شما شروع یک اعتماد دائمی خواهد بود.</p>
+                <a href="{% url 'shop' %}" class="btn-ai-glass compact-btn" style="text-decoration: none;">
+                    ورود به فروشگاه پستیلاین
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+{% block script %}
+<script>
+    // Intersection Observer برای ظاهر شدن المان ها با اسکرول
+    document.addEventListener("DOMContentLoaded", function() {
+        
+        // 1. انیمیشن کارت های بخش داستان
+        const storyCards = document.querySelectorAll('.story-card');
+        const cardObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.2, rootMargin: "0px 0px -50px 0px" });
+        
+        storyCards.forEach(card => cardObserver.observe(card));
+
+        // 2. انیمیشن بنتو گرید
+        const bentoItems = document.querySelectorAll('.reveal-on-scroll');
+        const bentoObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                    bentoObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        bentoItems.forEach(item => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(30px)';
+            item.style.transition = 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
+            bentoObserver.observe(item);
+        });
+
+        // 3. اسکرول تعاملی بخش تایم‌لاین (پر شدن خط و روشن شدن آیکون ها)
+        const pathSection = document.getElementById('interactive-path');
+        const pathFill = document.getElementById('path-fill');
+        const pathNodes = document.querySelectorAll('.path-node');
+        
+        window.addEventListener('scroll', () => {
+            if(!pathSection) return;
+            
+            const sectionRect = pathSection.getBoundingClientRect();
+            const sectionTop = sectionRect.top;
+            const sectionHeight = sectionRect.height;
+            const windowHeight = window.innerHeight;
+            
+            // محاسبه میزان اسکرول در سکشن تایم لاین
+            if (sectionTop < windowHeight && sectionTop > -sectionHeight) {
+                let scrollPercentage = (windowHeight - sectionTop) / (windowHeight + sectionHeight) * 100;
+                
+                // تنظیم ارتفاع خط پر شونده (بین 0 تا 100)
+                let fillHeight = Math.max(0, Math.min(100, scrollPercentage * 1.5 - 20)); 
+                pathFill.style.height = fillHeight + '%';
+                
+                // روشن شدن نود ها به ترتیب
+                pathNodes.forEach((node, index) => {
+                    const nodeTop = node.getBoundingClientRect().top;
+                    // اگر نود به میانه صفحه رسید روشن شود
+                    if(nodeTop < windowHeight * 0.75) {
+                        node.classList.add('active');
+                    } else {
+                        node.classList.remove('active'); // برای اینکه اگر بالا رفت دوباره خاموش شود
+                    }
+                });
+            }
+        });
+    });
+</script>
+{% endblock %}

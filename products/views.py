@@ -628,6 +628,9 @@ def product_detail(request, slug):
 
 def aboutus_page(request):
     return render(request,"developing.html",{"message":"ما در حال طراحی، برنامه‌نویسی و آماده‌سازی صفحه درباره ما از پستیلاین هستیم تا تجربه بی‌نظیری را برای شما رقم بزنیم. به زودی با امکانات جدید در این صفحه میزبان شما خواهیم بود"})
+    # return render(request,"about_us.html")
+def shop_page(request):
+    return render(request,"developing.html",{"message":"ما در حال طراحی، برنامه‌نویسی و آماده‌سازی صفحه فروشگاه از پستیلاین هستیم تا تجربه بی‌نظیری را برای شما رقم بزنیم. به زودی با امکانات جدید در این صفحه میزبان شما خواهیم بود"})
 
 # ==========================================
 # صفحه ۱: سبد خرید (Cart Page)

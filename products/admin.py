@@ -158,17 +158,17 @@ class MessageSiteSettingsAdmin(admin.ModelAdmin):
     fieldsets = (
         (None, {'fields': ('primary_line_number',)}),
         ('ارسال پیامک به ادمین', {'fields': ('ta_new_user','ta_new_order','ta_cancell_order','ta_new_ticket','ta_new_ticketmessage'),'classes': ('collapse',)}),
-        ('ارسال پیامک به کاربر', {'fields': ('tu_wellcome','tu_submit_order','tu_send_order','tu_new_ticketmessage'),'classes': ('collapse',)}),
+        ('ارسال پیامک به کاربر', {'fields': ('tu_wellcome','tu_submit_order','tu_send_order','tu_new_ticketmessage','tu_new_ticket'),'classes': ('collapse',)}),
     )
     def has_delete_permission(self, request, obj=None): return False
     def has_add_permission(self, request): return not MessageSiteSettings.objects.exists()
 
 @admin.register(SiteSettings, site=super_admin_site)
 class SiteSettingsAdmin(admin.ModelAdmin):
-    readonly_fields = ('total_views','today_views','this_week_views','this_month_views','this_year_views','tj_last_reset_date','test_maintenance','test_commingsoon','test_developing')
+    readonly_fields = ('total_views','today_views','this_week_views','this_month_views','this_year_views','tj_last_reset_date','test_maintenance','test_commingsoon','test_developing','test_sitemap')
     fieldsets = (
         ('وضعیت سایت', {'fields': ('status', 'maintenance_message','coming_soon_date','bypass_for_staff','bypass_for_superuser','welcome_song'),'classes': ('collapse',)}),
-        ('لینک های تست', {'fields': ('test_commingsoon', 'test_maintenance','test_developing'),'classes': ('collapse',)}),
+        ('لینک های تست', {'fields': ('test_commingsoon', 'test_maintenance','test_developing','test_sitemap'),'classes': ('collapse',)}),
         ('سایر تنظیمات', {'fields': ('otp_time_interval',),'classes': ('collapse',)}),
         ('لینک های وبسایت', {'fields': ('link_phone1','link_phone2','link_prphone','link_mail','link_instagram','link_telegram','link_whatsapp','link_twitter','link_address','address_text'),'classes': ('collapse',)}),
         ('بازدید های وبسایت', {'fields': ('total_views','today_views','this_week_views','this_month_views','this_year_views','tj_last_reset_date'),'classes': ('collapse',)}),
@@ -200,6 +200,14 @@ class SiteSettingsAdmin(admin.ModelAdmin):
         except:pass
         return format_html('<a class="button" target="_blank" style="font-family:Vazirmatn;text-decoration:none;" href="{}">مشاهده</a>',url)
     test_developing.short_description = "تست صفحه درحال توسعه"
+
+    def test_sitemap(self,obj):
+        url = '#'
+        try:
+            url = reverse('django.contrib.sitemaps.views.sitemap')
+        except:pass
+        return format_html('<a class="button" target="_blank" style="font-family:Vazirmatn;text-decoration:none;" href="{}">مشاهده</a>',url)
+    test_sitemap.short_description = "تست سایت مپ"
 
     def has_delete_permission(self, request, obj=None): return False
     def has_add_permission(self, request): return not SiteSettings.objects.exists()
