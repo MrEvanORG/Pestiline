@@ -7,6 +7,7 @@ from .models import Order, OrderItem , Ticket , TicketMessage , NotificationLog
 from products.templatetags.custom_filters import to_jalali
 from django.db.models import Q
 from django.urls import reverse
+from django.contrib.auth.models import Group
 
 # --- تنظیمات پنل مدیریت اختصاصی ---
 class PestilineAdminSite(admin.AdminSite):
@@ -25,6 +26,7 @@ class PestilineAdminSite(admin.AdminSite):
 
 super_admin_site = PestilineAdminSite(name='pestiline_admin')
 
+super_admin_site.register(Group)
 # --- اینلاین‌ها ---
 class ProductImageInline(admin.TabularInline):
     model = ProductImage
@@ -129,6 +131,7 @@ class ProductAdmin(admin.ModelAdmin):
                     raise ValidationError("درصد محصول یکدست باید ۱۰۰ باشد.")
         
         formset.save()
+
 @admin.register(User, site=super_admin_site)
 class CustomUserAdmin(UserAdmin):
     class Media:
@@ -152,6 +155,41 @@ class CustomUserAdmin(UserAdmin):
     def tj_date_joined(self, obj):
         return to_jalali(obj.date_joined,form="persian_date_time")
     tj_date_joined.short_description = "تاریخ عضویت"
+
+    # ۱. کارمندان عادی در لیست کاربران فقط و فقط اکانت خودشان را ببینند
+    def get_queryset(self, request):
+        qs = super().get_queryset(request)
+        if request.user.is_superuser:
+            return qs
+        return qs.filter(pk=request.user.pk)
+
+    # ۲. کارمندان عادی اجازه ساخت کاربر جدید در ادمین پنل را نداشته باشند
+    def has_add_permission(self, request):
+        if request.user.is_superuser:
+            return True
+        return False
+
+    # ۳. کارمندان فقط اجازه ویرایش اکانت خودشان را داشته باشند
+    def has_change_permission(self, request, obj=None):
+        if obj is None:
+            return True
+        if request.user.is_superuser:
+            return True
+        return obj.pk == request.user.pk
+
+    # ۴. کارمندان اجازه حذف اکانتشان را نداشته باشند
+    def has_delete_permission(self, request, obj=None):
+        if request.user.is_superuser:
+            return True
+        return False
+
+    # ۵. حذف کامل بخش "سطوح دسترسی" برای کاربران غیر سوپریوزر (عدم ارسال فیلدها)
+    def get_fieldsets(self, request, obj=None):
+        fieldsets = super().get_fieldsets(request, obj)
+        if not request.user.is_superuser:
+            # بخش 'سطوح دسترسی' کاملاً از لیست فیلدست‌ها فیلتر و حذف می‌شود
+            return [fs for fs in fieldsets if fs[0] != 'سطوح دسترسی']
+        return fieldsets
 
 @admin.register(MessageSiteSettings,site=super_admin_site)
 class MessageSiteSettingsAdmin(admin.ModelAdmin):
@@ -422,7 +460,7 @@ class NotificationLogAdmin(admin.ModelAdmin):
 
     # غیرفعال کردن قابلیت افزودن گزارش دستی از پنل ادمین
     def has_add_permission(self, request):
-        return True
+        return False
 
     # غیرفعال کردن قابلیت ویرایش گزارش‌های ثبت شده
     def has_change_permission(self, request, obj=None):

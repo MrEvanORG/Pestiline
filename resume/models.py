@@ -78,11 +78,11 @@ class Resume(models.Model):
 
     skills_category_1 = models.TextField(
         verbose_name="مهارت‌های دسته اول (فنی)",
-        help_text='مهارت‌ها را به فرمت "نام,درصد" وارد کنید و با ; جدا نمایید. مثال: HTML,95;CSS,40'
+        help_text='مهارت‌ها را به فرمت "نام,درصد" وارد کنید و با ; جدا نمایید. مثال: HTML,95; CSS,40;'
     )
     skills_category_2 = models.TextField(
         verbose_name="مهارت‌های دسته دوم (نرم‌افزار)",
-        help_text='مثال: Adobe Photoshop,80;Sketch,85'
+        help_text='مثال: Adobe Photoshop,80; figma,85; Adobe XD,20'
     )
 
     twitter_url = models.URLField(max_length=200, blank=True, null=True, verbose_name="لینک توییتر")
@@ -90,7 +90,7 @@ class Resume(models.Model):
     instagram_url = models.URLField(max_length=200, blank=True, null=True, verbose_name="لینک اینستاگرام")
     github_url = models.URLField(max_length=200, blank=True, null=True, verbose_name="لینک گیت‌هاب")
 
-    visit_count = models.PositiveIntegerField(default=0)
+    visit_count = models.PositiveIntegerField(default=0,verbose_name='تعداد بازدید')
 
     def __str__(self):
         return self.name
