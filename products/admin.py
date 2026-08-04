@@ -72,7 +72,7 @@ class ProductAdmin(admin.ModelAdmin):
             'fields': ('slug', 'active_status','seo_priority','changefreq','visit_count')
         }),
         ('اطلاعات محصول', {
-            'fields': ('name', 'seller', 'description')
+            'fields': ('name', 'seller', 'ounce', 'harvest_year', 'description')
         }),
         ('تنظیمات مالی و نوع فروش', {
             'fields': ('sale_method', 'price', 'package_weight', 'is_mixed')

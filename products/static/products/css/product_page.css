@@ -373,3 +373,90 @@
     .see-more-card { min-height: 0; }
 }
 @media (max-width: 991px) { .see-more-card { min-height: 350px; grid-column: auto !important; } }
+
+/* =========================================
+   مشخصات درجه‌بندی محصول (اونس و سال برداشت)
+   ========================================= */
+.grade-metrics {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 10px;
+    margin-top: 15px;
+    padding-top: 12px;
+    border-top: 1px dashed #ddd;
+}
+
+.grade-metric {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: #fff;
+    border: 1px solid #e6e6e6;
+    border-radius: 10px;
+    padding: 10px 12px;
+    transition: 0.25s;
+}
+
+.grade-metric:hover {
+    border-color: var(--secondary);
+    box-shadow: 0 4px 12px rgba(133, 169, 71, 0.12);
+}
+
+.grade-metric-icon {
+    width: 36px;
+    height: 36px;
+    flex-shrink: 0;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: var(--primary);
+    background: rgba(133, 169, 71, 0.12);
+}
+
+.grade-metric-body {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.grade-metric-label {
+    font-size: 0.78rem;
+    color: #777;
+    line-height: 1.5;
+}
+
+.grade-metric-value {
+    font-size: 1.15rem;
+    font-weight: 900;
+    color: var(--dark);
+    line-height: 1.4;
+}
+
+.grade-metric-hint {
+    font-size: 0.7rem;
+    color: #9a9a9a;
+    line-height: 1.5;
+}
+
+@media (max-width: 480px) {
+    .grade-metrics { grid-template-columns: 1fr; }
+}
+
+/* دارک‌مود */
+[data-theme="dark"] .grade-metrics { border-top-color: var(--border); }
+
+[data-theme="dark"] .grade-metric {
+    background: var(--bg-product-card);
+    border-color: var(--border);
+}
+
+[data-theme="dark"] .grade-metric-icon {
+    color: var(--secondary);
+    background: rgba(161, 209, 92, 0.12);
+}
+
+[data-theme="dark"] .grade-metric-label { color: var(--text-spec-desc); }
+[data-theme="dark"] .grade-metric-value { color: var(--secondary); }
+[data-theme="dark"] .grade-metric-hint { color: var(--text-product-unit); }

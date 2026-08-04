@@ -1,236 +1,745 @@
 {% extends "patterns/main_base.html" %}
 {% load static %}
 
-{% block title %}درباره ما | داستان شکل‌گیری پستیلاین{% endblock %}
+{% block title %}درباره ما | از خاک تا خانه‌ی شما | پستیلاین{% endblock %}
+{% block description %}داستان پستیلاین؛ پلی مستقیم بین باغ‌های پسته‌ی رفسنجان و سفره‌ی شما. بدون واسطه، با کنترل کیفیت چندمرحله‌ای و قیمت منصفانه.{% endblock %}
 
 {% block head %}
-<!-- لینک کردن فایل استایل جداگانه -->
 <link rel="stylesheet" href="{% static 'products/css/about_us.css' %}">
 {% endblock %}
 
 {% block content %}
+<main class="abt-page">
 
-<!-- 1. Hero Section (Immersive Parallax) -->
-<section class="about-hero-immersive">
-    <h1 class="hero-title-glitch">اصالت در هر دانه پسته</h1>
-    <p class="hero-subtitle">
-        ما در پستیلاین معتقدیم فاصله بین دست‌های پینه‌بسته کشاورز تا لبخند رضایت شما باید کوتاه‌ترین مسیر ممکن باشد. به دنیای شفاف و خوش‌طعم ما خوش آمدید.
-    </p>
-    
-    <div class="scroll-indicator">
-        <div class="mouse"></div>
-        <span>اسکرول کنید</span>
-    </div>
-</section>
+    <!-- نوار پیشرفت اسکرول -->
+    <div class="abt-progress" aria-hidden="true"><span id="abtProgress"></span></div>
 
-<!-- 2. Bento Grid Section (Modern Data Presentation) -->
-<section class="bento-section">
-    <div class="section-title">
-        <h2>DNA پستیلاین</h2>
-        <div class="title-line"></div>
-    </div>
-    
-    <div class="bento-grid">
-        <!-- آیتم بزرگ -->
-        <div class="bento-item large reveal-on-scroll">
-            <i class="fa-sharp fa-solid fa-leaf-heart"></i>
-            <h3 class="bento-title">۱۰۰٪ ارگانیک و طبیعی</h3>
-            <p class="bento-desc">پسته‌های ما در بهترین باغ‌های رفسنجان و بدون استفاده از سموم شیمیایی مضر پرورش می‌یابند. ما طبیعت را دستکاری نمی‌کنیم، فقط آن را بسته‌بندی می‌کنیم.</p>
-            <div class="bento-shape"></div>
+    <!-- ==========================================================
+         ۱. هیرو
+         ========================================================== -->
+    <section class="abt-hero">
+        <div class="abt-hero__bg" aria-hidden="true">
+            <span class="abt-orb abt-orb--1"></span>
+            <span class="abt-orb abt-orb--2"></span>
+            <span class="abt-orb abt-orb--3"></span>
         </div>
-        
-        <!-- آیتم افقی -->
-        <div class="bento-item medium-h reveal-on-scroll" style="transition-delay: 0.1s;">
-            <i class="fa-sharp fa-regular fa-handshake-angle"></i>
-            <h3 class="bento-title">تجارت عادلانه (حذف دلال)</h3>
-            <p class="bento-desc">ما دلال‌ها را حذف کردیم. سود واقعی مستقیماً به جیب کشاورز می‌رود و شما پسته را با قیمت واقعی و منطقی می‌خرید.</p>
-        </div>
-        
-        <!-- آیتم های کوچک -->
-        <div class="bento-item reveal-on-scroll" style="transition-delay: 0.2s;">
-            <i class="fa-sharp fa-solid fa-truck-fast"></i>
-            <h3 class="bento-title">ارسال سریع</h3>
-            <p class="bento-desc">بسته‌بندی ایمن و تحویل سریع در سراسر کشور.</p>
-        </div>
-        
-        <div class="bento-item reveal-on-scroll" style="transition-delay: 0.3s;">
-            <i class="fa-sharp fa-solid fa-shield-check"></i>
-            <h3 class="bento-title">تضمین کیفیت</h3>
-            <p class="bento-desc">بررسی سایز، خندانی و سلامت قبل از ارسال.</p>
-        </div>
-    </div>
-</section>
+        <div class="abt-hero__mesh" aria-hidden="true"></div>
+        <div class="abt-seeds" id="abtSeeds" aria-hidden="true"></div>
 
-<!-- 3. Sticky Story Section (Long Scroll Experience) -->
-<section class="sticky-story-section">
-    <div class="story-sticky-side">
-        <div class="custom-breadcrumbs" style="margin-bottom: 1rem;">
-            <span class="breadcrumb-item"><i class="fa-regular fa-book-open"></i> داستان ما</span>
+        <div class="abt-hero__inner">
+            <div class="abt-hero__content">
+                <div class="abt-hero__eyebrowWrap">
+                    <span class="abt-eyebrow abt-eyebrow--onDark">
+                        <i class="fa-sharp fa-solid fa-sparkles"></i>
+                        از باغ‌های رفسنجان، بدون توقف در انبار واسطه‌ها
+                    </span>
+                </div>
+
+                <h1 class="abt-hero__title">
+                    <span class="abt-word" style="--i:0"><span>اصالت</span></span>
+                    <span class="abt-word" style="--i:1"><span>در</span></span>
+                    <span class="abt-word" style="--i:2"><span>هر</span></span>
+                    <span class="abt-word" style="--i:3"><span><em>دانه‌ی پسته</em></span></span>
+                </h1>
+
+                <p class="abt-hero__lead">
+                    ما در پستیلاین معتقدیم فاصله‌ی میان دست‌های پینه‌بسته‌ی کشاورز تا لبخند رضایت شما
+                    باید کوتاه‌ترین مسیر ممکن باشد. این صفحه، روایت همان مسیر است؛ شفاف، بدون واسطه و
+                    قابل ردیابی از خاک تا خانه.
+                </p>
+
+                <div class="abt-hero__actions">
+                    <a href="#abtStory" class="abt-btn abt-btn--solid">
+                        <i class="fa-sharp fa-solid fa-arrow-left"></i>
+                        داستان ما را بخوانید
+                    </a>
+                    <a href="{% url 'shop' %}" class="abt-btn abt-btn--ghost">
+                        <i class="fa-sharp fa-solid fa-cart-shopping-fast"></i>
+                        ورود به فروشگاه
+                    </a>
+                </div>
+
+                <div class="abt-hero__stats">
+                    <div class="abt-hero__stat">
+                        <b>۱۰۰٪</b>
+                        <span>ارگانیک و بدون سموم غیرمجاز</span>
+                    </div>
+                    <div class="abt-hero__stat">
+                        <b>۰</b>
+                        <span>واسطه بین باغ و سفره‌ی شما</span>
+                    </div>
+                    <div class="abt-hero__stat">
+                        <b>۷</b>
+                        <span>مرحله کنترل کیفیت پیش از ارسال</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- نشان پسته‌ی دست‌ساز -->
+            <div class="abt-hero__art">
+                <svg class="abt-nut" viewBox="0 0 220 300" role="img" aria-label="نشان پسته‌ی پستیلاین">
+                    <defs>
+                        <linearGradient id="abtKernelGrad" x1="0" y1="0" x2="1" y2="1">
+                            <stop offset="0%" stop-color="#e8f5cf"/>
+                            <stop offset="55%" stop-color="#a8cc63"/>
+                            <stop offset="100%" stop-color="#6f8f3a"/>
+                        </linearGradient>
+                        <radialGradient id="abtHaloGrad">
+                            <stop offset="60%" stop-color="#85A947" stop-opacity="0"/>
+                            <stop offset="100%" stop-color="#85A947" stop-opacity="0.55"/>
+                        </radialGradient>
+                    </defs>
+
+                    <circle class="abt-nut__halo" cx="110" cy="155" r="108" fill="url(#abtHaloGrad)"/>
+
+                    <g class="abt-nut__kernel">
+                        <path d="M110 78 C 148 96, 166 140, 156 184 C 148 220, 130 244, 110 242
+                                 C 90 244, 72 220, 64 184 C 54 140, 72 96, 110 78 Z"
+                              fill="url(#abtKernelGrad)" opacity="0.92"/>
+                    </g>
+
+                    <!-- ساقه و برگ -->
+                    <path class="abt-nut__stroke"
+                          d="M110 42 C 108 24, 117 11, 134 7 C 137 25, 128 38, 110 42"/>
+                    <!-- نیمه‌ی راست پوست -->
+                    <path class="abt-nut__stroke"
+                          d="M110 42 C 165 64, 196 124, 182 188 C 170 246, 138 276, 110 270"/>
+                    <!-- نیمه‌ی چپ پوست -->
+                    <path class="abt-nut__stroke"
+                          d="M110 42 C 55 64, 24 124, 38 188 C 50 246, 82 276, 110 270"/>
+                    <!-- شکاف خندانی -->
+                    <path class="abt-nut__stroke"
+                          d="M110 46 C 117 102, 103 162, 113 216 C 117 242, 110 258, 110 266"
+                          opacity="0.55"/>
+                </svg>
+            </div>
         </div>
-        <h2>چطور همه‌چیز<br>از یک ایده سبز شروع شد؟</h2>
-        <div class="title-line" style="margin-right: 0;"></div>
-        <p style="color: var(--text-feature-desc); margin-top: 20px; line-height: 1.8;">
-            با اسکرول کردن در این بخش، قدم به قدم با مسیر شکل‌گیری پلتفرم پستیلاین همراه شوید.
-        </p>
-    </div>
-    
-    <div class="story-scrolling-side">
-        <div class="story-card">
-            <h3>۱. دغدغه‌ای از جنس کویر</h3>
-            <p>
-                ما فرزندان کویر و خانواده‌هایی کشاورز هستیم. سال‌ها می‌دیدیم که پدرانمان بهترین پسته دنیا را با زحمت فراوان تولید می‌کنند، اما سود اصلی به جیب واسطه‌هایی می‌رود که حتی یک روز هم در آفتاب داغ باغ کار نکرده‌اند. از طرفی مصرف‌کننده نهایی هم مجبور بود هزینه گزافی پرداخت کند.
+
+        <div class="abt-cue" aria-hidden="true">
+            <span class="abt-cue__mouse"></span>
+            <span>اسکرول کنید</span>
+        </div>
+
+    </section>
+
+    <!-- ==========================================================
+         ۲. نوار متحرک
+         ========================================================== -->
+    <section class="abt-marquee" aria-hidden="true">
+        <div class="abt-marquee__track">
+            <div class="abt-marquee__group">
+                <span>پسته‌ی تازه‌ی رفسنجان <i class="fa-sharp fa-solid fa-leaf-heart"></i></span>
+                <span>حذف کامل دلال <i class="fa-sharp fa-solid fa-leaf-heart"></i></span>
+                <span>قیمت منصفانه <i class="fa-sharp fa-solid fa-leaf-heart"></i></span>
+                <span>کنترل افلاتوکسین <i class="fa-sharp fa-solid fa-leaf-heart"></i></span>
+                <span>بسته‌بندی حافظ عطر <i class="fa-sharp fa-solid fa-leaf-heart"></i></span>
+                <span>ارسال سراسری <i class="fa-sharp fa-solid fa-leaf-heart"></i></span>
+            </div>
+            <div class="abt-marquee__group">
+                <span>پسته‌ی تازه‌ی رفسنجان <i class="fa-sharp fa-solid fa-leaf-heart"></i></span>
+                <span>حذف کامل دلال <i class="fa-sharp fa-solid fa-leaf-heart"></i></span>
+                <span>قیمت منصفانه <i class="fa-sharp fa-solid fa-leaf-heart"></i></span>
+                <span>کنترل افلاتوکسین <i class="fa-sharp fa-solid fa-leaf-heart"></i></span>
+                <span>بسته‌بندی حافظ عطر <i class="fa-sharp fa-solid fa-leaf-heart"></i></span>
+                <span>ارسال سراسری <i class="fa-sharp fa-solid fa-leaf-heart"></i></span>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         ۳. بیانیه
+         ========================================================== -->
+    <section class="abt-manifesto">
+        <div class="abt-shell">
+            <div class="abt-manifesto__quoteMark" data-reveal aria-hidden="true">”</div>
+            <p data-reveal style="--d:100ms">
+                ما یک فروشگاه نیستیم؛ یک <span class="abt-mark">پُل</span> هستیم.
+                پلی که یک سرش دست‌های خاک‌آلود کشاورز رفسنجانی است و سر دیگرش
+                <span class="abt-mark">سفره‌ی خانه‌ی شما</span>.
+                هر چیزی که در این میانه اضافه باشد — واسطه، انبار اضافی، تبلیغات توخالی — را حذف کرده‌ایم.
             </p>
+            <div class="abt-manifesto__sign" data-reveal style="--d:220ms">
+                <i class="fa-sharp fa-solid fa-signature"></i>
+                <div>
+                    <b>تیم پستیلاین</b>
+                    فرزندان کویر، متولد باغ‌های پسته
+                </div>
+            </div>
         </div>
-        
-        <div class="story-card">
-            <h3>۲. تولد یک ایده مبتنی بر تکنولوژی</h3>
-            <p>
-                با تخصص در زمینه برنامه‌نویسی و وب (تیم توسعه ما)، تصمیم گرفتیم یک پل مستقیم دیجیتال بسازیم. پستیلاین به عنوان یک بازار تخصصی متولد شد تا کشاورز رفسنجانی بتواند محصولش را مستقیماً به خانواده‌ای در تهران، تبریز یا هرجای ایران بفروشد.
-            </p>
-        </div>
-        
-        <div class="story-card">
-            <h3>۳. وسواس در انتخاب</h3>
-            <p>
-                برای ما کیفیت همه‌چیز است. ما هر باغي را تایید نمی‌کنیم. تیمی از متخصصان کشاورزی پستیلاین، پیش از عقد قرارداد با کشاورز، خاک، آب و محصول را بررسی می‌کنند تا خیالتان از بابت نداشتن افلاتوکسین و سموم غیرمجاز راحت باشد.
-            </p>
-        </div>
-    </div>
-</section>
+    </section>
 
-<!-- 4. Interactive Timeline (From Farm to Door) -->
-<section class="interactive-path" id="interactive-path">
-    <div class="section-title">
-        <h2 style="color: white;">مسیر شفاف پستیلاین</h2>
-        <div class="title-line" style="background: var(--secondary);"></div>
-    </div>
-    
-    <div class="path-container">
-        <div class="path-line-fill" id="path-fill"></div>
-        
-        <div class="path-node">
-            <div class="node-icon"><i class="fa-regular fa-trees"></i></div>
-            <div class="node-content">
-                <h4>دست‌چین از باغ‌های منتخب</h4>
-                <p>انتخاب بهترین زمان برداشت برای حفظ طعم و رنگ طبیعی مغز پسته.</p>
-            </div>
-        </div>
-        
-        <div class="path-node">
-            <div class="node-icon"><i class="fa-regular fa-microscope"></i></div>
-            <div class="node-content">
-                <h4>تست کیفیت و سورتینگ</h4>
-                <p>جداسازی پسته‌های دهان‌بسته و ریز با دستگاه‌های پیشرفته اپتیکال.</p>
-            </div>
-        </div>
-        
-        <div class="path-node">
-            <div class="node-icon"><i class="fa-regular fa-box-check"></i></div>
-            <div class="node-content">
-                <h4>بسته‌بندی دوست‌دار محیط زیست</h4>
-                <p>استفاده از پک‌های استاندارد که رطوبت و عطر پسته را برای ماه‌ها حفظ می‌کنند.</p>
-            </div>
-        </div>
-        
-        <div class="path-node">
-            <div class="node-icon"><i class="fa-regular fa-house-chimney"></i></div>
-            <div class="node-content">
-                <h4>لذت در خانه شما</h4>
-                <p>تحویل سریع درب منزل. آماده برای میهمانی‌ها، میان‌وعده ورزشکاران و مصرف خانواده.</p>
-            </div>
-        </div>
-    </div>
-</section>
+    <!-- ==========================================================
+         ۴. بنتو گرید — DNA پستیلاین
+         ========================================================== -->
+    <section class="abt-bento">
+        <div class="abt-shell">
+            <header class="abt-head abt-head--center" data-reveal>
+                <span class="abt-eyebrow"><i class="fa-sharp fa-solid fa-atom-simple"></i> ارزش‌های بنیادین</span>
+                <h2>DNA پستیلاین</h2>
+                <p>چهار اصلی که هیچ‌وقت سرشان معامله نمی‌کنیم — حتی وقتی گران‌تر تمام شود.</p>
+            </header>
 
-<!-- 5. Final CTA -->
-<section class="ai-helper-section" style="margin: 6rem 0;">
-    <div class="ai-glam-wide-container compact">
-        <div class="ai-flex-content">
-            <div class="ai-visual-part">
-                <i class="fa-sharp fa-solid fa-cart-shopping-fast" style="font-size: 5rem; color: white;"></i>
-            </div>
-            <div class="ai-text-part">
-                <div class="ai-title-style">آماده‌اید تفاوت را احساس کنید؟</div>
-                <p>حرف زدن کافیست. طعم اصیل پسته تازه رفسنجان را خودتان قضاوت کنید. اولین خرید شما شروع یک اعتماد دائمی خواهد بود.</p>
-                <a href="{% url 'shop' %}" class="btn-ai-glass compact-btn" style="text-decoration: none;">
-                    ورود به فروشگاه پستیلاین
-                </a>
+            <div class="abt-bento__grid">
+                <article class="abt-tile abt-tile--hero" data-reveal="scale" data-spotlight>
+                    <div class="abt-tile__icon"><i class="fa-sharp fa-solid fa-leaf-heart"></i></div>
+                    <h3>۱۰۰٪ ارگانیک و طبیعی</h3>
+                    <p>
+                        پسته‌های ما در بهترین باغ‌های رفسنجان و بدون استفاده از سموم شیمیایی مضر پرورش
+                        می‌یابند. ما طبیعت را دستکاری نمی‌کنیم، فقط آن را با دقت بسته‌بندی می‌کنیم و
+                        به دست شما می‌رسانیم.
+                    </p>
+                </article>
+
+                <article class="abt-tile abt-tile--wide" data-reveal="scale" style="--d:90ms" data-spotlight>
+                    <div class="abt-tile__icon"><i class="fa-sharp fa-solid fa-scale-balanced"></i></div>
+                    <h3>تجارت عادلانه، بدون دلال</h3>
+                    <p>
+                        واسطه‌ها را حذف کردیم. سود واقعی مستقیماً به جیب کشاورز می‌رود و شما پسته را
+                        با قیمت واقعی و منطقی می‌خرید؛ نه قیمتی که چند دست چرخیده باشد.
+                    </p>
+                </article>
+
+                <article class="abt-tile abt-tile--third abt-tile--accent" data-reveal="scale" style="--d:180ms" data-spotlight>
+                    <div class="abt-tile__icon"><i class="fa-sharp fa-solid fa-truck-fast"></i></div>
+                    <h3>ارسال سریع</h3>
+                    <p>بسته‌بندی ایمن و تحویل سریع در سراسر کشور، با ردیابی لحظه‌ای سفارش.</p>
+                </article>
+
+                <article class="abt-tile abt-tile--third" data-reveal="scale" style="--d:260ms" data-spotlight>
+                    <div class="abt-tile__icon"><i class="fa-sharp fa-solid fa-shield-check"></i></div>
+                    <h3>تضمین کیفیت</h3>
+                    <p>بررسی سایز، خندانی و سلامت مغز، پیش از آنکه بسته به دست پیک برسد.</p>
+                </article>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
+    <!-- ==========================================================
+         ۵. داستان ما (چسبان)
+         ========================================================== -->
+    <section class="abt-story" id="abtStory">
+        <div class="abt-shell">
+            <div class="abt-story__layout">
+                <aside class="abt-story__aside">
+                    <span class="abt-eyebrow"><i class="fa-sharp fa-solid fa-timeline"></i> داستان ما</span>
+                    <div class="abt-story__counter">
+                        <span class="abt-story__counterNum" id="abtChapterNum">۰۱</span>
+                        <small>/ ۰۳</small>
+                    </div>
+                    <h2>چطور همه‌چیز از یک ایده‌ی سبز شروع شد؟</h2>
+                    <p>
+                        با اسکرول در این بخش، قدم‌به‌قدم با مسیر شکل‌گیری پلتفرم پستیلاین همراه شوید؛
+                        از یک دغدغه‌ی خانوادگی تا یک بازار تخصصی.
+                    </p>
+                    <div class="abt-story__dots" id="abtChapterDots" aria-hidden="true">
+                        <i class="on"></i><i></i><i></i>
+                    </div>
+                </aside>
+
+                <div class="abt-story__list">
+                    <article class="abt-chapter" data-reveal data-chapter="1">
+                        <span class="abt-chapter__no">۰۱</span>
+                        <h3><i class="fa-sharp fa-solid fa-mountain-sun"></i> دغدغه‌ای از جنس کویر</h3>
+                        <p>
+                            ما فرزندان کویر و خانواده‌هایی کشاورز هستیم. سال‌ها می‌دیدیم که پدرانمان
+                            بهترین پسته‌ی دنیا را با زحمت فراوان تولید می‌کنند، اما سود اصلی به جیب
+                            واسطه‌هایی می‌رود که حتی یک روز هم در آفتاب داغ باغ کار نکرده‌اند. از آن
+                            طرف، مصرف‌کننده‌ی نهایی هم مجبور بود هزینه‌ی گزافی پرداخت کند.
+                        </p>
+                    </article>
+
+                    <article class="abt-chapter" data-reveal data-chapter="2">
+                        <span class="abt-chapter__no">۰۲</span>
+                        <h3><i class="fa-sharp fa-solid fa-lightbulb-on"></i> تولد یک ایده‌ی مبتنی بر تکنولوژی</h3>
+                        <p>
+                            با تخصص تیم توسعه‌مان در برنامه‌نویسی و وب، تصمیم گرفتیم یک پل مستقیم
+                            دیجیتال بسازیم. پستیلاین به‌عنوان یک بازار تخصصی متولد شد تا کشاورز
+                            رفسنجانی بتواند محصولش را مستقیماً به خانواده‌ای در تهران، تبریز یا هر
+                            جای دیگر ایران بفروشد.
+                        </p>
+                    </article>
+
+                    <article class="abt-chapter" data-reveal data-chapter="3">
+                        <span class="abt-chapter__no">۰۳</span>
+                        <h3><i class="fa-sharp fa-solid fa-magnifying-glass-chart"></i> وسواس در انتخاب</h3>
+                        <p>
+                            برای ما کیفیت همه‌چیز است. ما هر باغی را تأیید نمی‌کنیم. تیمی از متخصصان
+                            کشاورزی پستیلاین، پیش از عقد قرارداد با کشاورز، خاک، آب و محصول را بررسی
+                            می‌کنند تا خیالتان از بابت نداشتن افلاتوکسین و سموم غیرمجاز راحت باشد.
+                        </p>
+                    </article>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         ۶. مسیر شفاف
+         ========================================================== -->
+    <section class="abt-path" id="abtPath">
+        <div class="abt-shell">
+            <header class="abt-head abt-head--center abt-head--onDark" data-reveal>
+                <span class="abt-eyebrow abt-eyebrow--onDark"><i class="fa-sharp fa-solid fa-route"></i> شفافیت کامل</span>
+                <h2>مسیر پسته، از باغ تا درِ خانه</h2>
+                <p>هیچ مرحله‌ای پنهان نیست. این دقیقاً همان چیزی است که بر سر پسته‌ی شما می‌آید.</p>
+            </header>
+
+            <div class="abt-path__rail">
+                <span class="abt-path__fill" id="abtPathFill"></span>
+
+                <article class="abt-step">
+                    <span class="abt-step__dot"><span class="abt-step__icon"><i class="fa-sharp fa-solid fa-trees"></i></span></span>
+                    <div class="abt-step__body">
+                        <span class="abt-step__tag">مرحله ۰۱</span>
+                        <h4>دست‌چین از باغ‌های منتخب</h4>
+                        <p>انتخاب بهترین زمان برداشت برای حفظ طعم، رنگ و روغن طبیعی مغز پسته.</p>
+                    </div>
+                </article>
+
+                <article class="abt-step">
+                    <span class="abt-step__dot"><span class="abt-step__icon"><i class="fa-sharp fa-solid fa-microscope"></i></span></span>
+                    <div class="abt-step__body">
+                        <span class="abt-step__tag">مرحله ۰۲</span>
+                        <h4>تست کیفیت و سورتینگ</h4>
+                        <p>جداسازی پسته‌های دهان‌بسته و ریز با دستگاه‌های پیشرفته‌ی سورتینگ اپتیکال.</p>
+                    </div>
+                </article>
+
+                <article class="abt-step">
+                    <span class="abt-step__dot"><span class="abt-step__icon"><i class="fa-sharp fa-solid fa-flask"></i></span></span>
+                    <div class="abt-step__body">
+                        <span class="abt-step__tag">مرحله ۰۳</span>
+                        <h4>کنترل سلامت و افلاتوکسین</h4>
+                        <p>نمونه‌برداری از هر محموله و بررسی آزمایشگاهی، پیش از ورود به خط بسته‌بندی.</p>
+                    </div>
+                </article>
+
+                <article class="abt-step">
+                    <span class="abt-step__dot"><span class="abt-step__icon"><i class="fa-sharp fa-solid fa-box-check"></i></span></span>
+                    <div class="abt-step__body">
+                        <span class="abt-step__tag">مرحله ۰۴</span>
+                        <h4>بسته‌بندی دوست‌دار محیط زیست</h4>
+                        <p>پک‌های استاندارد که رطوبت و عطر پسته را برای ماه‌ها حفظ می‌کنند.</p>
+                    </div>
+                </article>
+
+                <article class="abt-step">
+                    <span class="abt-step__dot"><span class="abt-step__icon"><i class="fa-sharp fa-solid fa-truck-fast"></i></span></span>
+                    <div class="abt-step__body">
+                        <span class="abt-step__tag">مرحله ۰۵</span>
+                        <h4>لذت در خانه‌ی شما</h4>
+                        <p>تحویل سریع درب منزل؛ آماده برای میهمانی‌ها، میان‌وعده‌ی ورزشکاران و مصرف خانواده.</p>
+                    </div>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         ۷. آمار
+         ========================================================== -->
+    <section class="abt-stats">
+        <div class="abt-shell">
+            <div class="abt-stats__grid">
+                <div class="abt-stat" data-reveal>
+                    <i class="fa-sharp fa-solid fa-leaf-heart"></i>
+                    <b><span data-count="100">۰</span><sup>٪</sup></b>
+                    <span>محصول ارگانیک و بدون سموم غیرمجاز</span>
+                </div>
+                <div class="abt-stat" data-reveal style="--d:90ms">
+                    <i class="fa-sharp fa-solid fa-handshake-angle"></i>
+                    <b><span data-count="0">۰</span></b>
+                    <span>واسطه بین کشاورز و شما</span>
+                </div>
+                <div class="abt-stat" data-reveal style="--d:180ms">
+                    <i class="fa-sharp fa-solid fa-clipboard-check"></i>
+                    <b><span data-count="7">۰</span></b>
+                    <span>مرحله کنترل کیفیت پیش از ارسال</span>
+                </div>
+                <div class="abt-stat" data-reveal style="--d:270ms">
+                    <i class="fa-sharp fa-solid fa-truck-fast"></i>
+                    <b><span data-count="24">۰</span><sup>س</sup></b>
+                    <span>زمان آماده‌سازی و تحویل به پست</span>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         ۸. مقایسه
+         ========================================================== -->
+    <section class="abt-vs">
+        <div class="abt-shell">
+            <header class="abt-head abt-head--center" data-reveal>
+                <span class="abt-eyebrow"><i class="fa-sharp fa-solid fa-scale-balanced"></i> تفاوت در کجاست؟</span>
+                <h2>مسیر سنتی در برابر پستیلاین</h2>
+                <p>یک محصول یکسان، دو مسیر کاملاً متفاوت تا رسیدن به دست شما.</p>
+            </header>
+
+            <div class="abt-vs__grid">
+                <article class="abt-card abt-card--bad" data-reveal="side">
+                    <div class="abt-card__head">
+                        <i class="fa-sharp fa-solid fa-plant-wilt"></i>
+                        <div>
+                            <h3>مسیر سنتی</h3>
+                            <small>باغ ← دلال ← عمده‌فروش ← خرده‌فروش ← شما</small>
+                        </div>
+                    </div>
+                    <ul class="abt-list">
+                        <li><i class="fa-sharp fa-solid fa-xmark"></i> چند لایه واسطه و افزایش پلکانی قیمت</li>
+                        <li><i class="fa-sharp fa-solid fa-xmark"></i> نامشخص بودن باغ مبدأ و سال برداشت</li>
+                        <li><i class="fa-sharp fa-solid fa-xmark"></i> اختلاط محصولات با کیفیت‌های متفاوت</li>
+                        <li><i class="fa-sharp fa-solid fa-xmark"></i> ماه‌ها ماندگاری در انبار و افت عطر و طعم</li>
+                        <li><i class="fa-sharp fa-solid fa-xmark"></i> سهم اندک کشاورز از قیمت نهایی</li>
+                    </ul>
+                </article>
+
+                <article class="abt-card abt-card--good" data-reveal="side" style="--d:120ms">
+                    <span class="abt-vs__badge">مسیر ما</span>
+                    <div class="abt-card__head">
+                        <i class="fa-sharp fa-solid fa-sprout"></i>
+                        <div>
+                            <h3>مسیر پستیلاین</h3>
+                            <small>باغ ← کنترل کیفیت ← بسته‌بندی ← شما</small>
+                        </div>
+                    </div>
+                    <ul class="abt-list">
+                        <li><i class="fa-sharp fa-solid fa-circle-check"></i> ارتباط مستقیم با کشاورز، بدون واسطه</li>
+                        <li><i class="fa-sharp fa-solid fa-circle-check"></i> مشخص بودن باغ مبدأ و سال برداشت</li>
+                        <li><i class="fa-sharp fa-solid fa-circle-check"></i> سورتینگ و تفکیک دقیق بر اساس سایز و نوع</li>
+                        <li><i class="fa-sharp fa-solid fa-circle-check"></i> بسته‌بندی پس از ثبت سفارش، با حداکثر تازگی</li>
+                        <li><i class="fa-sharp fa-solid fa-circle-check"></i> سهم عادلانه‌ی کشاورز از هر فروش</li>
+                    </ul>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         ۹. تیم و تخصص‌ها
+         ========================================================== -->
+    <section class="abt-team">
+        <div class="abt-shell">
+            <header class="abt-head abt-head--center" data-reveal>
+                <span class="abt-eyebrow"><i class="fa-sharp fa-solid fa-people-group"></i> پشت صحنه</span>
+                <h2>تیم‌هایی که پستیلاین را می‌سازند</h2>
+                <p>چهار تخصص که کنار هم، مسیر پسته را از خاک تا خانه‌ی شما تضمین می‌کنند.</p>
+            </header>
+
+            <div class="abt-team__grid">
+                <article class="abt-member" data-reveal>
+                    <div class="abt-member__avatar"><i class="fa-sharp fa-solid fa-tractor"></i></div>
+                    <h3>تیم باغ و کشاورزی</h3>
+                    <small>ارزیابی خاک، آب و محصول</small>
+                    <p>پیش از هر قرارداد، شرایط باغ را بررسی می‌کنند و در فصل برداشت کنار کشاورز هستند.</p>
+                </article>
+
+                <article class="abt-member" data-reveal style="--d:90ms">
+                    <div class="abt-member__avatar"><i class="fa-sharp fa-solid fa-microscope"></i></div>
+                    <h3>تیم کنترل کیفیت</h3>
+                    <small>سورتینگ، آزمایش و تأیید</small>
+                    <p>هر محموله را نمونه‌برداری و بررسی می‌کنند؛ چیزی که تأیید نشود، بسته‌بندی نمی‌شود.</p>
+                </article>
+
+                <article class="abt-member" data-reveal style="--d:180ms">
+                    <div class="abt-member__avatar"><i class="fa-sharp fa-solid fa-layer-group"></i></div>
+                    <h3>تیم فناوری و توسعه</h3>
+                    <small>پلتفرم، سفارش و ردیابی</small>
+                    <p>همین سایتی که در آن هستید را می‌سازند و نگه می‌دارند تا خرید ساده و شفاف بماند.</p>
+                </article>
+
+                <article class="abt-member" data-reveal style="--d:270ms">
+                    <div class="abt-member__avatar"><i class="fa-sharp fa-solid fa-headset"></i></div>
+                    <h3>تیم پشتیبانی</h3>
+                    <small>همراه شما، پیش و پس از خرید</small>
+                    <p>از انتخاب سایز مناسب تا پیگیری مرسوله، پاسخگوی سؤال‌ها و نظرهای شما هستند.</p>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         ۱۰. سوالات متداول
+         ========================================================== -->
+    <section class="abt-faq">
+        <div class="abt-shell">
+            <div class="abt-faq__layout">
+                <aside class="abt-faq__aside">
+                    <span class="abt-eyebrow"><i class="fa-sharp fa-solid fa-comment-quote"></i> پرسش‌های پرتکرار</span>
+                    <div class="abt-head" style="margin-bottom:0">
+                        <h2>چیزی هست که هنوز مبهم باشد؟</h2>
+                        <p>پاسخ رایج‌ترین سؤال‌هایی که درباره‌ی پستیلاین از ما می‌پرسید.</p>
+                    </div>
+                </aside>
+
+                <div class="abt-faq__list">
+                    <div class="abt-acc">
+                        <button class="abt-acc__q" type="button" aria-expanded="false">
+                            <span>پسته‌ها دقیقاً از کجا تأمین می‌شوند؟</span>
+                            <span><i class="fa-sharp fa-solid fa-chevron-down"></i></span>
+                        </button>
+                        <div class="abt-acc__a"><div>
+                            <p>
+                                از باغ‌های منتخب رفسنجان و مناطق پسته‌خیز اطراف آن. پیش از هر همکاری،
+                                تیم کشاورزی ما خاک، آب و محصول باغ را بررسی می‌کند و تنها باغ‌هایی که
+                                معیارهای ما را داشته باشند وارد چرخه‌ی تأمین می‌شوند.
+                            </p>
+                        </div></div>
+                    </div>
+
+                    <div class="abt-acc">
+                        <button class="abt-acc__q" type="button" aria-expanded="false">
+                            <span>منظور از «حذف واسطه» چیست؟</span>
+                            <span><i class="fa-sharp fa-solid fa-chevron-down"></i></span>
+                        </button>
+                        <div class="abt-acc__a"><div>
+                            <p>
+                                در مسیر سنتی، پسته پیش از رسیدن به شما از چند دست عبور می‌کند و هر
+                                مرحله قیمت را بالا می‌برد. ما محصول را مستقیم از کشاورز تحویل می‌گیریم؛
+                                یعنی سهم بیشتری به تولیدکننده می‌رسد و قیمت نهایی هم برای شما منطقی‌تر می‌ماند.
+                            </p>
+                        </div></div>
+                    </div>
+
+                    <div class="abt-acc">
+                        <button class="abt-acc__q" type="button" aria-expanded="false">
+                            <span>موضوع افلاتوکسین و سلامت محصول چطور کنترل می‌شود؟</span>
+                            <span><i class="fa-sharp fa-solid fa-chevron-down"></i></span>
+                        </button>
+                        <div class="abt-acc__a"><div>
+                            <p>
+                                کنترل سلامت یکی از مراحل ثابت مسیر ماست. از محموله‌ها نمونه‌برداری و
+                                بررسی آزمایشگاهی انجام می‌شود و محموله‌ای که تأیید نشود، وارد خط
+                                بسته‌بندی نمی‌شود.
+                            </p>
+                        </div></div>
+                    </div>
+
+                    <div class="abt-acc">
+                        <button class="abt-acc__q" type="button" aria-expanded="false">
+                            <span>بسته‌بندی چطور تازگی پسته را حفظ می‌کند؟</span>
+                            <span><i class="fa-sharp fa-solid fa-chevron-down"></i></span>
+                        </button>
+                        <div class="abt-acc__a"><div>
+                            <p>
+                                از پک‌های استانداردی استفاده می‌کنیم که رطوبت و عطر پسته را حفظ می‌کنند.
+                                بسته‌بندی نزدیک به زمان ارسال انجام می‌شود تا محصول با حداکثر تازگی به
+                                دست شما برسد.
+                            </p>
+                        </div></div>
+                    </div>
+
+                    <div class="abt-acc">
+                        <button class="abt-acc__q" type="button" aria-expanded="false">
+                            <span>ارسال به چه شهرهایی انجام می‌شود؟</span>
+                            <span><i class="fa-sharp fa-solid fa-chevron-down"></i></span>
+                        </button>
+                        <div class="abt-acc__a"><div>
+                            <p>
+                                ارسال به سراسر کشور انجام می‌شود. پس از ثبت سفارش، بسته آماده‌سازی و
+                                تحویل پست می‌شود و می‌توانید وضعیت آن را از پنل کاربری خود پیگیری کنید.
+                            </p>
+                        </div></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- ==========================================================
+         ۱۱. فراخوان پایانی
+         ========================================================== -->
+    <section class="abt-cta">
+        <div class="abt-shell">
+            <div class="abt-cta__box" data-reveal="scale">
+                <div class="abt-cta__icon"><i class="fa-sharp fa-solid fa-cart-shopping-fast"></i></div>
+                <h2>آماده‌اید تفاوت را حس کنید؟</h2>
+                <p>
+                    حرف زدن کافی است. طعم اصیل پسته‌ی تازه‌ی رفسنجان را خودتان قضاوت کنید.
+                    اولین خرید شما، شروع یک اعتماد دائمی خواهد بود.
+                </p>
+                <div class="abt-cta__actions">
+                    <a href="{% url 'shop' %}" class="abt-btn abt-btn--solid">
+                        <i class="fa-sharp fa-solid fa-arrow-left"></i>
+                        ورود به فروشگاه پستیلاین
+                    </a>
+                    <a href="{% url 'blog:blog_index' %}" class="abt-btn abt-btn--ghost">
+                        <i class="fa-sharp fa-solid fa-newspaper"></i>
+                        مطالعه‌ی وبلاگ
+                    </a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+</main>
 {% endblock %}
 
 {% block script %}
 <script>
-    // Intersection Observer برای ظاهر شدن المان ها با اسکرول
-    document.addEventListener("DOMContentLoaded", function() {
-        
-        // 1. انیمیشن کارت های بخش داستان
-        const storyCards = document.querySelectorAll('.story-card');
-        const cardObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if(entry.isIntersecting) {
-                    entry.target.classList.add('visible');
+(function () {
+    "use strict";
+
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var FA_DIGITS = ["۰", "۱", "۲", "۳", "۴", "۵", "۶", "۷", "۸", "۹"];
+
+    function toFa(n) {
+        return String(n).replace(/\d/g, function (d) { return FA_DIGITS[+d]; });
+    }
+
+    /* ---------- ۱. پسته‌های شناور در هیرو ---------- */
+    (function seeds() {
+        var host = document.getElementById("abtSeeds");
+        if (!host || reduce) return;
+        var frag = document.createDocumentFragment();
+        for (var i = 0; i < 16; i++) {
+            var s = document.createElement("span");
+            s.className = "abt-seed";
+            s.style.setProperty("--x", (Math.random() * 100).toFixed(2) + "%");
+            s.style.setProperty("--s", (7 + Math.random() * 14).toFixed(1) + "px");
+            s.style.setProperty("--dur", (20 + Math.random() * 22).toFixed(1) + "s");
+            s.style.setProperty("--dl", (-Math.random() * 30).toFixed(1) + "s");
+            frag.appendChild(s);
+        }
+        host.appendChild(frag);
+    })();
+
+    /* ---------- ۲. ظاهر شدن با اسکرول ---------- */
+    var revealables = document.querySelectorAll("[data-reveal]");
+    if ("IntersectionObserver" in window) {
+        var revealObs = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+                if (e.isIntersecting) {
+                    e.target.classList.add("is-in");
+                    revealObs.unobserve(e.target);
                 }
             });
-        }, { threshold: 0.2, rootMargin: "0px 0px -50px 0px" });
-        
-        storyCards.forEach(card => cardObserver.observe(card));
+        }, { threshold: 0.12, rootMargin: "0px 0px -60px 0px" });
+        revealables.forEach(function (el) { revealObs.observe(el); });
+    } else {
+        revealables.forEach(function (el) { el.classList.add("is-in"); });
+    }
 
-        // 2. انیمیشن بنتو گرید
-        const bentoItems = document.querySelectorAll('.reveal-on-scroll');
-        const bentoObserver = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if(entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                    bentoObserver.unobserve(entry.target);
-                }
+    /* ---------- ۳. شمارنده‌های عددی ---------- */
+    var counters = document.querySelectorAll("[data-count]");
+    function runCount(el) {
+        var target = parseInt(el.getAttribute("data-count"), 10) || 0;
+        if (reduce || target === 0) { el.textContent = toFa(target); return; }
+        var dur = 1400, start = null;
+        function step(ts) {
+            if (start === null) start = ts;
+            var p = Math.min((ts - start) / dur, 1);
+            var eased = 1 - Math.pow(1 - p, 3);
+            el.textContent = toFa(Math.round(target * eased));
+            if (p < 1) requestAnimationFrame(step);
+        }
+        requestAnimationFrame(step);
+    }
+    if ("IntersectionObserver" in window) {
+        var countObs = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+                if (e.isIntersecting) { runCount(e.target); countObs.unobserve(e.target); }
             });
-        }, { threshold: 0.1 });
-        
-        bentoItems.forEach(item => {
-            item.style.opacity = '0';
-            item.style.transform = 'translateY(30px)';
-            item.style.transition = 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
-            bentoObserver.observe(item);
-        });
+        }, { threshold: 0.6 });
+        counters.forEach(function (el) { countObs.observe(el); });
+    } else {
+        counters.forEach(runCount);
+    }
 
-        // 3. اسکرول تعاملی بخش تایم‌لاین (پر شدن خط و روشن شدن آیکون ها)
-        const pathSection = document.getElementById('interactive-path');
-        const pathFill = document.getElementById('path-fill');
-        const pathNodes = document.querySelectorAll('.path-node');
-        
-        window.addEventListener('scroll', () => {
-            if(!pathSection) return;
-            
-            const sectionRect = pathSection.getBoundingClientRect();
-            const sectionTop = sectionRect.top;
-            const sectionHeight = sectionRect.height;
-            const windowHeight = window.innerHeight;
-            
-            // محاسبه میزان اسکرول در سکشن تایم لاین
-            if (sectionTop < windowHeight && sectionTop > -sectionHeight) {
-                let scrollPercentage = (windowHeight - sectionTop) / (windowHeight + sectionHeight) * 100;
-                
-                // تنظیم ارتفاع خط پر شونده (بین 0 تا 100)
-                let fillHeight = Math.max(0, Math.min(100, scrollPercentage * 1.5 - 20)); 
-                pathFill.style.height = fillHeight + '%';
-                
-                // روشن شدن نود ها به ترتیب
-                pathNodes.forEach((node, index) => {
-                    const nodeTop = node.getBoundingClientRect().top;
-                    // اگر نود به میانه صفحه رسید روشن شود
-                    if(nodeTop < windowHeight * 0.75) {
-                        node.classList.add('active');
-                    } else {
-                        node.classList.remove('active'); // برای اینکه اگر بالا رفت دوباره خاموش شود
-                    }
-                });
-            }
+    /* ---------- ۴. نورافکن دنبال‌کننده‌ی موس روی تایل‌ها ---------- */
+    document.querySelectorAll("[data-spotlight]").forEach(function (tile) {
+        tile.addEventListener("pointermove", function (ev) {
+            var r = tile.getBoundingClientRect();
+            tile.style.setProperty("--mx", (ev.clientX - r.left) + "px");
+            tile.style.setProperty("--my", (ev.clientY - r.top) + "px");
         });
     });
+
+    /* ---------- ۵. شماره‌ی فصل در بخش داستان ---------- */
+    var chapters = document.querySelectorAll("[data-chapter]");
+    var chapterNum = document.getElementById("abtChapterNum");
+    var chapterDots = document.getElementById("abtChapterDots");
+    if (chapters.length && chapterNum && "IntersectionObserver" in window) {
+        var dots = chapterDots ? chapterDots.querySelectorAll("i") : [];
+        var chapObs = new IntersectionObserver(function (entries) {
+            entries.forEach(function (e) {
+                if (!e.isIntersecting) return;
+                var n = parseInt(e.target.getAttribute("data-chapter"), 10);
+                chapterNum.textContent = toFa(n < 10 ? "0" + n : n);
+                for (var i = 0; i < dots.length; i++) {
+                    dots[i].classList.toggle("on", i === n - 1);
+                }
+            });
+        }, { threshold: 0.5 });
+        chapters.forEach(function (c) { chapObs.observe(c); });
+    }
+
+    /* ---------- ۶. تایم‌لاین مسیر + نوار پیشرفت صفحه ---------- */
+    var progressBar = document.getElementById("abtProgress");
+    var pathFill = document.getElementById("abtPathFill");
+    var pathRail = pathFill ? pathFill.parentElement : null;
+    var steps = document.querySelectorAll(".abt-step");
+    var ticking = false;
+
+    function onScroll() {
+        var vh = window.innerHeight;
+
+        if (progressBar) {
+            var doc = document.documentElement;
+            var scrollable = doc.scrollHeight - vh;
+            var pct = scrollable > 0 ? (doc.scrollTop || document.body.scrollTop) / scrollable : 0;
+            progressBar.style.width = Math.min(100, Math.max(0, pct * 100)) + "%";
+        }
+
+        if (pathRail && pathFill) {
+            var r = pathRail.getBoundingClientRect();
+            var travelled = (vh * 0.72) - r.top;
+            var ratio = r.height > 0 ? travelled / r.height : 0;
+            pathFill.style.height = Math.min(100, Math.max(0, ratio * 100)) + "%";
+        }
+
+        steps.forEach(function (s) {
+            s.classList.toggle("on", s.getBoundingClientRect().top < vh * 0.75);
+        });
+
+        ticking = false;
+    }
+
+    function requestTick() {
+        if (!ticking) { ticking = true; requestAnimationFrame(onScroll); }
+    }
+
+    window.addEventListener("scroll", requestTick, { passive: true });
+    window.addEventListener("resize", requestTick);
+    onScroll();
+
+    /* ---------- ۷. آکاردئون سوالات متداول ---------- */
+    document.querySelectorAll(".abt-acc__q").forEach(function (btn) {
+        btn.addEventListener("click", function () {
+            var acc = btn.parentElement;
+            var willOpen = !acc.classList.contains("open");
+            document.querySelectorAll(".abt-acc.open").forEach(function (other) {
+                other.classList.remove("open");
+                var q = other.querySelector(".abt-acc__q");
+                if (q) q.setAttribute("aria-expanded", "false");
+            });
+            acc.classList.toggle("open", willOpen);
+            btn.setAttribute("aria-expanded", willOpen ? "true" : "false");
+        });
+    });
+
+    /* ---------- ۸. اسکرول نرم برای لینک‌های داخلی صفحه ---------- */
+    document.querySelectorAll('.abt-page a[href^="#"]').forEach(function (a) {
+        a.addEventListener("click", function (ev) {
+            var id = a.getAttribute("href");
+            if (!id || id === "#") return;
+            var target = document.querySelector(id);
+            if (!target) return;
+            ev.preventDefault();
+            var top = target.getBoundingClientRect().top + window.pageYOffset - 90;
+            window.scrollTo({ top: top, behavior: reduce ? "auto" : "smooth" });
+        });
+    });
+})();
 </script>
 {% endblock %}

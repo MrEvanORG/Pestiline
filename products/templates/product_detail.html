@@ -130,6 +130,31 @@
                     </div>
                 </div>
                 {% endif %}
+
+                {% if product.ounce or product.harvest_year %}
+                <div class="grade-metrics">
+                    {% if product.ounce %}
+                    <div class="grade-metric">
+                        <span class="grade-metric-icon"><i class="fa-slab-press fa-regular fa-weight-scale"></i></span>
+                        <div class="grade-metric-body">
+                            <span class="grade-metric-label">اونس</span>
+                            <span class="grade-metric-value">{{ product.ounce }}</span>
+                            <span class="grade-metric-hint">تعداد مغز در هر اونس</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                    {% if product.harvest_year %}
+                    <div class="grade-metric">
+                        <span class="grade-metric-icon"><i class="fa-slab-press fa-regular fa-calendar-days"></i></span>
+                        <div class="grade-metric-body">
+                            <span class="grade-metric-label">سال برداشت</span>
+                            <span class="grade-metric-value">{{ product.harvest_year }}</span>
+                            <span class="grade-metric-hint">محصول باغ‌های رفسنجان</span>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
             </div>
 
             {% if product.description %}

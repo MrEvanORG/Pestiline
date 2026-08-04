@@ -14,6 +14,7 @@ urlpatterns = [
 
     path('dashboard/', views.dashboard_page, name='dashboard'),
 
+
     re_path(r'^product/(?P<slug>[-\w]+)/$', views.product_detail, name='product_detail'),
     
     # احراز هویت

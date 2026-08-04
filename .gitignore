@@ -84,3 +84,4 @@ seo/migrations/0005_alter_customseodata_path.py
 resume/migrations/0006_alter_resume_address.py
 /products/templatetags/__pycache__
 products/templatetags/__pycache__/custom_filters.cpython-313.pyc
+products/migrations/0041_product_harvest_year_product_ounce_and_more.py

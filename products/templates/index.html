@@ -114,6 +114,12 @@
                 <div class="details-scroll-area">
                     <div class="spec-row"><span class="spec-label">نوع:</span><span class="spec-val">{{ p.get_dynamic_title }}</span></div>
                     <div class="spec-row"><span class="spec-label">فرآوری:</span><span class="spec-val">{{ p.get_dynamic_processing }}</span></div>
+                    {% if p.ounce %}
+                    <div class="spec-row"><span class="spec-label">اونس:</span><span class="spec-val">{{ p.ounce }}</span></div>
+                    {% endif %}
+                    {% if p.harvest_year %}
+                    <div class="spec-row"><span class="spec-label">سال برداشت:</span><span class="spec-val">{{ p.harvest_year }}</span></div>
+                    {% endif %}
                 </div>
             </div>
         </article>

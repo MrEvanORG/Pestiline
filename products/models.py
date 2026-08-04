@@ -319,6 +319,20 @@ class Product(models.Model):
         verbose_name='فرکانس تغییر'
     )
     seller = models.ForeignKey(User, on_delete=models.CASCADE, related_name='products', verbose_name="فروشنده", help_text='فروشنده ابرکاربر پستیلاین تلقی میشود .')
+    ounce = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(14), MaxValueValidator(60)],
+        verbose_name="اونس (تعداد مغز در هر اونس)",
+        help_text='عدد صحیح بین ۱۴ تا ۶۰. هرچه عدد کمتر باشد، پسته درشت‌تر است. اختیاری'
+    )
+    harvest_year = models.PositiveSmallIntegerField(
+        null=True,
+        blank=True,
+        validators=[MinValueValidator(1300), MaxValueValidator(1499)],
+        verbose_name="سال برداشت",
+        help_text='سال شمسی برداشت، عدد صحیح بین ۱۳۰۰ تا ۱۴۹۹ (مثلا: ۱۴۰۵). اختیاری'
+    )
     name = models.CharField(max_length=220, verbose_name="نام محصول")
     sale_method = models.CharField(max_length=20, choices=SALE_METHODS, verbose_name="نوع فروش")
     price = models.DecimalField(max_digits=12, decimal_places=0, verbose_name="قیمت (تومان)", help_text='برای هر کیلوگرم یا هر بسته')
@@ -334,10 +348,25 @@ class Product(models.Model):
     updated_at = models.DateTimeField(auto_now=True, verbose_name="تاریخ بروزرسانی")
 
     def clean(self):
-        super().clean()  
+        super().clean()
         if self.sale_method == 'PACKAGED' and not self.package_weight:
             raise ValidationError("برای فروش بسته‌ای، وارد کردن وزن هر بسته الزامی است.")
-    
+
+        # بازه مجاز اونس و سال برداشت
+        range_errors = {}
+        if self.ounce is not None and not (14 <= self.ounce <= 60):
+            range_errors['ounce'] = ValidationError(
+                'اونس باید عددی بین ۱۴ تا ۶۰ باشد.',
+                code='ounce_out_of_range'
+            )
+        if self.harvest_year is not None and not (1300 <= self.harvest_year <= 1499):
+            range_errors['harvest_year'] = ValidationError(
+                'سال برداشت باید عددی بین ۱۳۰۰ تا ۱۴۹۹ باشد (مثلا: ۱۴۰۵).',
+                code='year_out_of_range'
+            )
+        if range_errors:
+            raise ValidationError(range_errors)
+
         if self.sale_method == 'PACKAGED':
             errors = {}
             if self.min_order and self.min_order % 1 != 0:

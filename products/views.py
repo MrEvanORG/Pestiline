@@ -35,9 +35,7 @@ def index_page(request):
     }
     return render(request, 'index.html', context)
 
-@login_required(login_url='auth')
-def dashboard_page(request):
-    return render(request,"developing.html",{"message":f"خوش آمدید {request.user.get_full_name()} متاسفانه صفحه داشبورد هنوز در دسترس نیست ! ما در حال تلاش برای توسعه و ساخت نسخه مدرن تر داشبورد کاربری هستیم \nاز صبوری شما سپاس گزاریم."})
+
 
 
 def get_cart_count(request):
@@ -627,8 +625,7 @@ def product_detail(request, slug):
     return render(request, 'product_detail.html', context)
 
 def aboutus_page(request):
-    return render(request,"developing.html",{"message":"ما در حال طراحی، برنامه‌نویسی و آماده‌سازی صفحه درباره ما از پستیلاین هستیم تا تجربه بی‌نظیری را برای شما رقم بزنیم. به زودی با امکانات جدید در این صفحه میزبان شما خواهیم بود"})
-    # return render(request,"about_us.html")
+    return render(request,"about_us.html")
 def shop_page(request):
     return render(request,"developing.html",{"message":"ما در حال طراحی، برنامه‌نویسی و آماده‌سازی صفحه فروشگاه از پستیلاین هستیم تا تجربه بی‌نظیری را برای شما رقم بزنیم. به زودی با امکانات جدید در این صفحه میزبان شما خواهیم بود"})
 
@@ -870,3 +867,5 @@ def commingsoon_page(request):
     context['team_members'] = Resume.objects.filter(is_confirmed=True).order_by('-id')[:6]
     return render(request, 'coming_soon.html', context)
 
+def dashboard_page(request):
+    return render(request,"developing.html")

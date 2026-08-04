@@ -1,307 +1,1642 @@
-/* =========================================
-   About Us - Advanced & Interactive UI
-   ========================================= */
+/* =========================================================
+   About Us — "از خاک تا خانه"
+   Pestiline · Editorial / Immersive UI
+   همه کلاس‌ها با پیشوند abt- تا با main.css تداخل نداشته باشد
+   ========================================================= */
 
-/* --- 1. Parallax Hero Section --- */
-.about-hero-immersive {
+/* ---------------------------------------------------------
+   0. توکن‌های محلی صفحه
+   --------------------------------------------------------- */
+.abt-page {
+    /* رنگ‌ها از root سایت می‌آیند، اینجا فقط مشتق می‌سازیم */
+    --abt-ink: var(--primary);
+    --abt-pist: var(--secondary);
+    --abt-surface: var(--bg-product-card);
+    --abt-muted: var(--text-feature-desc);
+    --abt-line: rgba(18, 53, 36, 0.10);
+    --abt-soft: rgba(133, 169, 71, 0.10);
+    --abt-glass: rgba(255, 255, 255, 0.55);
+
+    /* روی سطوح سبز تیره، متن همیشه سفید است (در هر دو تم) */
+    --abt-on-dark: #f4f8f2;
+    --abt-on-dark-dim: rgba(244, 248, 242, 0.68);
+
+    --abt-r-sm: 14px;
+    --abt-r-md: 22px;
+    --abt-r-lg: 32px;
+    --abt-r-xl: 44px;
+
+    --abt-ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --abt-pad: clamp(1.25rem, 5vw, 5rem);
+    --abt-max: 1280px;
+
     position: relative;
-    height: 90vh;
-    min-height: 600px;
-    background: linear-gradient(to bottom, rgba(18, 53, 36, 0.6), rgba(18, 53, 36, 0.95)), url('../img/home/banner.webp') no-repeat center center;
-    background-size: cover;
-    background-attachment: fixed; /* Parallax Effect */
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    color: var(--white);
-    padding: 0 5%;
-    overflow: hidden;
-}
-
-.about-hero-immersive::after {
-    content: '';
-    position: absolute;
-    bottom: -50px;
-    left: 0;
-    width: 100%;
-    height: 100px;
+    overflow-x: clip;
     background: var(--bg-body);
-    filter: blur(20px);
-    border-radius: 50% 50% 0 0;
 }
 
-.hero-title-glitch {
-    font-size: 4rem;
-    font-weight: 900;
-    margin-bottom: 20px;
-    background: linear-gradient(45deg, #fff, var(--secondary));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    transform: translateY(30px);
-    opacity: 0;
-    animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.3s;
-}
-
-.hero-subtitle {
-    font-size: 1.3rem;
-    max-width: 700px;
-    line-height: 1.8;
-    color: #e0e0e0;
-    transform: translateY(30px);
-    opacity: 0;
-    animation: fadeUp 1s cubic-bezier(0.16, 1, 0.3, 1) forwards 0.6s;
-}
-
-.scroll-indicator {
-    position: absolute;
-    bottom: 40px;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    color: var(--secondary);
-    font-size: 0.9rem;
-    opacity: 0;
-    animation: fadeUp 1s forwards 1.2s;
-    z-index: 10;
-}
-
-.mouse {
-    width: 25px;
-    height: 40px;
-    border: 2px solid var(--secondary);
-    border-radius: 15px;
-    position: relative;
-    margin-bottom: 10px;
-}
-.mouse::before {
+/* بافت دانه‌دانه (Grain) برای حس چاپی و لوکس */
+.abt-page::before {
     content: '';
-    position: absolute;
-    top: 6px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 4px;
-    height: 8px;
-    background: var(--secondary);
-    border-radius: 2px;
-    animation: scrollMouse 1.5s infinite;
+    position: absolute; /* محدود به همین صفحه، بدون تاثیر روی هدر و فوتر */
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.30;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.35'/%3E%3C/svg%3E");
 }
 
-/* --- 2. Bento Box Grid (Modern Stats) --- */
-.bento-section {
-    padding: 6rem 5%;
-    background-color: var(--bg-body);
-    position: relative;
-    z-index: 5;
+.abt-shell {
+    max-width: var(--abt-max);
+    margin-inline: auto;
+    width: 100%;
 }
 
-.bento-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: minmax(200px, auto);
-    gap: 20px;
-    max-width: 1200px;
-    margin: 0 auto;
-}
-
-.bento-item {
-    background: var(--bg-product-card);
-    border-radius: 24px;
-    padding: 2rem;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.03);
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
-    border: 1px solid rgba(0,0,0,0.02);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
-
-.bento-item:hover {
-    transform: translateY(-5px) scale(1.01);
-    box-shadow: 0 20px 40px rgba(18, 53, 36, 0.08);
-}
-
-.bento-item.large { grid-column: span 2; grid-row: span 2; background: var(--primary); color: white;}
-.bento-item.medium-h { grid-column: span 2; }
-.bento-item.medium-v { grid-row: span 2; background: var(--section-bg); }
-
-.bento-item i { font-size: 2.5rem; margin-bottom: 15px; color: var(--secondary); }
-.bento-item.large i { color: var(--secondary); font-size: 3.5rem; }
-
-.bento-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; color: var(--primary); }
-.bento-item.large .bento-title { color: white; font-size: 2.5rem; }
-.bento-desc { color: var(--text-feature-desc); line-height: 1.7; font-size: 0.95rem;}
-.bento-item.large .bento-desc { color: #ccc; font-size: 1.1rem; }
-
-/* Abstract shapes inside bento */
-.bento-shape {
-    position: absolute;
-    right: -20px;
-    bottom: -20px;
-    width: 150px;
-    height: 150px;
-    background: linear-gradient(135deg, transparent, rgba(133, 169, 71, 0.1));
-    border-radius: 50%;
-    z-index: 0;
+/* ---------------------------------------------------------
+   1. نوار پیشرفت اسکرول
+   --------------------------------------------------------- */
+.abt-progress {
+    position: fixed;
+    top: 0;
+    inset-inline: 0;
+    height: 3px;
+    z-index: 9999;
+    background: transparent;
     pointer-events: none;
 }
 
-/* --- 3. Sticky Scroll Story Section --- */
-.sticky-story-section {
-    display: flex;
-    padding: 0 5% 6rem 5%;
-    gap: 50px;
-    background-color: var(--bg-body);
+.abt-progress span {
+    display: block;
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, var(--abt-pist), #cfe89a, var(--abt-pist));
+    box-shadow: 0 0 12px rgba(133, 169, 71, 0.7);
+    transition: width 0.12s linear;
+}
+
+/* ---------------------------------------------------------
+   2. ابزار: ظاهر شدن با اسکرول
+   --------------------------------------------------------- */
+[data-reveal] {
+    opacity: 0;
+    transform: translateY(34px);
+    transition:
+        opacity 0.9s var(--abt-ease),
+        transform 0.9s var(--abt-ease);
+    transition-delay: var(--d, 0ms);
+    will-change: opacity, transform;
+}
+
+[data-reveal].is-in {
+    opacity: 1;
+    transform: none;
+}
+
+[data-reveal="scale"] {
+    transform: translateY(34px) scale(0.96);
+}
+
+[data-reveal="side"] {
+    transform: translateX(40px);
+}
+
+/* ---------------------------------------------------------
+   3. عناصر مشترک: تیتر بخش، برچسب، دکمه
+   --------------------------------------------------------- */
+.abt-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 9px;
+    padding: 7px 16px 7px 14px;
+    border-radius: 100px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.2px;
+    color: var(--abt-ink);
+    background: var(--abt-soft);
+    border: 1px solid rgba(133, 169, 71, 0.28);
+    backdrop-filter: blur(6px);
+}
+
+.abt-eyebrow i {
+    color: var(--abt-pist);
+    font-size: 0.9rem;
+}
+
+.abt-eyebrow--onDark {
+    color: var(--abt-on-dark);
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.16);
+}
+
+.abt-head {
+    max-width: 720px;
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+}
+
+.abt-head--center {
+    margin-inline: auto;
+    text-align: center;
+}
+
+.abt-head h2 {
+    font-size: clamp(1.9rem, 4.4vw, 3.1rem);
+    line-height: 1.35;
+    font-weight: 900;
+    color: var(--abt-ink);
+    margin: 1.1rem 0 0.9rem;
+}
+
+.abt-head p {
+    color: var(--abt-muted);
+    font-size: clamp(0.98rem, 1.6vw, 1.1rem);
+    line-height: 2;
+}
+
+.abt-head--onDark h2 { color: var(--abt-on-dark); }
+.abt-head--onDark p { color: var(--abt-on-dark-dim); }
+
+/* واژه‌های هایلایت شده با قلم‌موی سبز */
+.abt-mark {
     position: relative;
-    align-items: flex-start;
+    display: inline-block;
+    color: var(--abt-ink);
+    z-index: 0;
 }
 
-.story-sticky-side {
-    flex: 1;
-    position: sticky;
-    top: 120px; /* زیر هدر قرار میگیرد */
-    padding-bottom: 20px;
+.abt-mark::after {
+    content: '';
+    position: absolute;
+    inset-inline: -4px;
+    bottom: 0.08em;
+    height: 0.42em;
+    background: var(--abt-pist);
+    opacity: 0.32;
+    border-radius: 4px;
+    z-index: -1;
+    transform: scaleX(0);
+    transform-origin: right center;
+    transition: transform 0.7s var(--abt-ease) 0.25s;
 }
 
-.story-sticky-side h2 {
-    font-size: 2.5rem;
-    color: var(--primary);
-    margin-bottom: 1rem;
-    line-height: 1.4;
+.is-in .abt-mark::after,
+[data-reveal].is-in.abt-mark::after {
+    transform: scaleX(1);
 }
 
-.story-scrolling-side {
-    flex: 1.5;
+.abt-mark--onDark { color: #ffffff; }
+.abt-mark--onDark::after { opacity: 0.45; }
+
+/* دکمه‌ها */
+.abt-btn {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 15px 30px;
+    border-radius: 100px;
+    font-size: 0.98rem;
+    font-weight: 800;
+    font-family: inherit;
+    cursor: pointer;
+    overflow: hidden;
+    text-decoration: none;
+    transition: transform 0.35s var(--abt-ease), box-shadow 0.35s var(--abt-ease), background 0.35s ease, color 0.35s ease;
+}
+
+.abt-btn i { font-size: 0.95rem; transition: transform 0.35s var(--abt-ease); }
+.abt-btn:hover i { transform: translateX(-4px); }
+
+.abt-btn--solid {
+    background: var(--abt-pist);
+    color: #0d1f13;
+    box-shadow: 0 12px 30px -10px rgba(133, 169, 71, 0.8);
+}
+
+.abt-btn--solid:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 20px 44px -12px rgba(133, 169, 71, 0.95);
+}
+
+.abt-btn--ghost {
+    color: var(--abt-on-dark);
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    backdrop-filter: blur(8px);
+}
+
+.abt-btn--ghost:hover {
+    background: rgba(255, 255, 255, 0.14);
+    transform: translateY(-3px);
+}
+
+.abt-btn--ink {
+    background: var(--abt-ink);
+    color: #ffffff;
+    box-shadow: 0 12px 30px -12px rgba(18, 53, 36, 0.7);
+}
+
+.abt-btn--ink:hover { transform: translateY(-3px); }
+
+/* ---------------------------------------------------------
+   4. HERO
+   --------------------------------------------------------- */
+.abt-hero {
+    position: relative;
+    min-height: clamp(620px, 96vh, 1000px);
+    display: flex;
+    align-items: center;
+    padding: clamp(6rem, 12vh, 9rem) var(--abt-pad) clamp(5rem, 10vh, 8rem);
+    background: var(--primary);
+    isolation: isolate;
+    overflow: hidden;
+}
+
+/* لایه‌های پس‌زمینه: هاله‌های نوری + توری */
+.abt-hero__bg {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    pointer-events: none;
+}
+
+.abt-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+    opacity: 0.5;
+    animation: abtFloat 18s ease-in-out infinite;
+}
+
+.abt-orb--1 {
+    width: 46vw;
+    height: 46vw;
+    max-width: 620px;
+    max-height: 620px;
+    background: rgba(133, 169, 71, 0.55);
+    top: -12%;
+    inset-inline-start: -8%;
+}
+
+.abt-orb--2 {
+    width: 38vw;
+    height: 38vw;
+    max-width: 520px;
+    max-height: 520px;
+    background: rgba(159, 74, 64, 0.38);
+    bottom: -18%;
+    inset-inline-end: -6%;
+    animation-delay: -6s;
+}
+
+.abt-orb--3 {
+    width: 30vw;
+    height: 30vw;
+    max-width: 420px;
+    max-height: 420px;
+    background: rgba(207, 232, 154, 0.30);
+    top: 42%;
+    inset-inline-end: 26%;
+    animation-delay: -11s;
+}
+
+@keyframes abtFloat {
+    0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+    33%      { transform: translate3d(3%, -5%, 0) scale(1.08); }
+    66%      { transform: translate3d(-4%, 4%, 0) scale(0.94); }
+}
+
+/* توری ظریف */
+.abt-hero__mesh {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.045) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.045) 1px, transparent 1px);
+    background-size: 72px 72px;
+    mask-image: radial-gradient(ellipse 80% 65% at 50% 45%, #000 20%, transparent 78%);
+    -webkit-mask-image: radial-gradient(ellipse 80% 65% at 50% 45%, #000 20%, transparent 78%);
+}
+
+/* پسته‌های شناور */
+.abt-seeds {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    pointer-events: none;
+    overflow: hidden;
+}
+
+.abt-seed {
+    position: absolute;
+    width: var(--s, 10px);
+    height: calc(var(--s, 10px) * 1.35);
+    background: linear-gradient(150deg, #cfe89a, var(--secondary));
+    border-radius: 50% 50% 48% 48% / 60% 60% 40% 40%;
+    opacity: 0.16;
+    animation: abtSeedRise var(--dur, 26s) linear infinite;
+    animation-delay: var(--dl, 0s);
+    inset-inline-start: var(--x, 50%);
+    bottom: -60px;
+}
+
+@keyframes abtSeedRise {
+    0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+    12%  { opacity: 0.22; }
+    88%  { opacity: 0.14; }
+    100% { transform: translateY(-118vh) rotate(320deg); opacity: 0; }
+}
+
+.abt-hero__inner {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr;
+    align-items: center;
+    gap: clamp(2rem, 5vw, 5rem);
+    max-width: var(--abt-max);
+    margin-inline: auto;
+    width: 100%;
+}
+
+.abt-hero__title {
+    font-size: clamp(2.4rem, 6.6vw, 5.1rem);
+    line-height: 1.42;
+    font-weight: 900;
+    color: var(--abt-on-dark);
+    margin: 1.4rem 0 1.5rem;
+}
+
+/* انیمیشن کلمه‌به‌کلمه (فارسی: فضای کافی برای دنباله حروف) */
+.abt-word {
+    display: inline-block;
+    overflow: hidden;
+    vertical-align: bottom;
+    padding-bottom: 0.3em;
+    margin-bottom: -0.3em;
+}
+
+.abt-word > span {
+    display: inline-block;
+    transform: translateY(105%);
+    animation: abtWordUp 1s var(--abt-ease) forwards;
+    animation-delay: calc(var(--i, 0) * 75ms + 200ms);
+}
+
+@keyframes abtWordUp {
+    to { transform: translateY(0); }
+}
+
+.abt-hero__title em {
+    font-style: normal;
+    background: linear-gradient(100deg, #cfe89a 0%, var(--secondary) 55%, #e8f5cf 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}
+
+.abt-hero__lead {
+    font-size: clamp(1rem, 1.9vw, 1.22rem);
+    line-height: 2.1;
+    color: var(--abt-on-dark-dim);
+    max-width: 620px;
+    text-align: justify;
+    opacity: 0;
+    animation: abtFadeUp 1s var(--abt-ease) forwards 0.85s;
+}
+
+.abt-hero__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    margin-top: 2.4rem;
+    opacity: 0;
+    animation: abtFadeUp 1s var(--abt-ease) forwards 1.05s;
+}
+
+@keyframes abtFadeUp {
+    from { opacity: 0; transform: translateY(26px); }
+    to   { opacity: 1; transform: none; }
+}
+
+.abt-hero__eyebrowWrap {
+    opacity: 0;
+    animation: abtFadeUp 0.9s var(--abt-ease) forwards 0.1s;
+}
+
+/* نشان پسته SVG */
+.abt-hero__art {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.abt-nut {
+    width: clamp(220px, 30vw, 380px);
+    height: auto;
+    overflow: visible;
+    filter: drop-shadow(0 30px 60px rgba(0, 0, 0, 0.45));
+    animation: abtNutBob 7s ease-in-out infinite;
+}
+
+@keyframes abtNutBob {
+    0%, 100% { transform: translateY(0) rotate(-2deg); }
+    50%      { transform: translateY(-18px) rotate(2deg); }
+}
+
+.abt-nut__stroke {
+    fill: none;
+    stroke: var(--secondary);
+    stroke-width: 3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    stroke-dasharray: 1400;
+    stroke-dashoffset: 1400;
+    animation: abtDraw 2.6s var(--abt-ease) forwards 0.5s;
+}
+
+@keyframes abtDraw {
+    to { stroke-dashoffset: 0; }
+}
+
+.abt-nut__kernel {
+    opacity: 0;
+    transform-origin: 110px 150px;
+    animation: abtKernel 1.2s var(--abt-ease) forwards 2.2s;
+}
+
+@keyframes abtKernel {
+    from { opacity: 0; transform: scale(0.7); }
+    to   { opacity: 1; transform: scale(1); }
+}
+
+.abt-nut__halo {
+    opacity: 0;
+    animation: abtHalo 3.4s ease-in-out infinite 2.6s;
+    transform-origin: 110px 150px;
+}
+
+@keyframes abtHalo {
+    0%, 100% { opacity: 0.10; transform: scale(1); }
+    50%      { opacity: 0.30; transform: scale(1.06); }
+}
+
+/* آمار کوتاه زیر هیرو */
+.abt-hero__stats {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: clamp(0.75rem, 2vw, 2rem);
+    margin-top: 3rem;
+    padding-top: 2rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.12);
+    opacity: 0;
+    animation: abtFadeUp 1s var(--abt-ease) forwards 1.25s;
+}
+
+.abt-hero__stat b {
+    display: block;
+    font-size: clamp(1.6rem, 3.4vw, 2.5rem);
+    font-weight: 900;
+    color: var(--secondary);
+    line-height: 1.2;
+    letter-spacing: -1px;
+}
+
+.abt-hero__stat span {
+    display: block;
+    margin-top: 4px;
+    font-size: 0.82rem;
+    color: var(--abt-on-dark-dim);
+    line-height: 1.7;
+}
+
+/* راهنمای اسکرول */
+.abt-cue {
+    position: absolute;
+    bottom: 26px;
+    inset-inline-start: 50%;
+    transform: translateX(50%);
     display: flex;
     flex-direction: column;
-    gap: 40px;
-}
-
-.story-card {
-    background: var(--bg-product-card);
-    padding: 3rem;
-    border-radius: 20px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
-    border-right: 4px solid var(--secondary);
-    transform: translateY(50px);
+    align-items: center;
+    gap: 10px;
+    color: var(--abt-on-dark-dim);
+    font-size: 0.76rem;
+    z-index: 3;
     opacity: 0;
-    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+    animation: abtFadeUp 1s forwards 1.6s;
 }
 
-.story-card.visible {
-    transform: translateY(0);
-    opacity: 1;
+.abt-cue__mouse {
+    width: 24px;
+    height: 38px;
+    border: 2px solid rgba(133, 169, 71, 0.7);
+    border-radius: 14px;
+    position: relative;
 }
 
-.story-card h3 { font-size: 1.5rem; color: var(--primary); margin-bottom: 15px; }
-.story-card p { line-height: 1.9; color: var(--text-blog-desc); text-align: justify; font-size: 1.05rem;}
+.abt-cue__mouse::before {
+    content: '';
+    position: absolute;
+    top: 6px;
+    inset-inline-start: 50%;
+    transform: translateX(50%);
+    width: 3px;
+    height: 8px;
+    border-radius: 3px;
+    background: var(--secondary);
+    animation: abtWheel 1.6s ease-in-out infinite;
+}
 
-/* --- 4. Interactive Path (Timeline) --- */
-.interactive-path {
-    padding: 8rem 5%;
+@keyframes abtWheel {
+    0%   { top: 6px; opacity: 1; }
+    75%  { top: 20px; opacity: 0; }
+    100% { top: 6px; opacity: 0; }
+}
+
+/* ---------------------------------------------------------
+   5. نوار متحرک (Marquee)
+   --------------------------------------------------------- */
+.abt-marquee {
+    background: var(--primary); /* در هر دو تم تیره می‌ماند تا متن سفید خوانا باشد */
+    padding: 1.15rem 0;
+    overflow: hidden;
+    position: relative;
+    border-block: 1px solid rgba(133, 169, 71, 0.25);
+}
+
+.abt-marquee__track {
+    display: flex;
+    width: max-content;
+    animation: abtMarquee 34s linear infinite;
+}
+
+.abt-marquee:hover .abt-marquee__track {
+    animation-play-state: paused;
+}
+
+.abt-marquee__group {
+    display: flex;
+    align-items: center;
+    gap: 2.6rem;
+    padding-inline-end: 2.6rem;
+    flex-shrink: 0;
+}
+
+.abt-marquee__group span {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+    font-size: clamp(0.9rem, 1.6vw, 1.15rem);
+    font-weight: 800;
+    color: var(--abt-on-dark);
+    white-space: nowrap;
+}
+
+.abt-marquee__group i {
+    color: var(--secondary);
+    font-size: 0.7rem;
+}
+
+@keyframes abtMarquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(50%); }
+}
+
+/* ---------------------------------------------------------
+   6. بیانیه (Manifesto)
+   --------------------------------------------------------- */
+.abt-manifesto {
+    padding: clamp(5rem, 12vw, 9rem) var(--abt-pad);
+    background: var(--bg-body);
+    position: relative;
+}
+
+.abt-manifesto__quoteMark {
+    font-size: clamp(6rem, 16vw, 13rem);
+    line-height: 0.7;
+    font-weight: 900;
+    color: var(--abt-pist);
+    opacity: 0.16;
+    margin-bottom: -0.25em;
+    user-select: none;
+}
+
+.abt-manifesto p {
+    font-size: clamp(1.25rem, 3.2vw, 2.35rem);
+    line-height: 1.9;
+    font-weight: 700;
+    color: var(--abt-ink);
+    max-width: 980px;
+}
+
+.abt-manifesto__sign {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-top: 2.6rem;
+    color: var(--abt-muted);
+    font-size: 0.95rem;
+}
+
+.abt-manifesto__sign i {
+    font-size: 1.5rem;
+    color: var(--abt-pist);
+}
+
+.abt-manifesto__sign b {
+    color: var(--abt-ink);
+    display: block;
+    font-size: 1.02rem;
+}
+
+/* ---------------------------------------------------------
+   7. بنتو گرید (DNA)
+   --------------------------------------------------------- */
+.abt-bento {
+    padding: clamp(4rem, 10vw, 7rem) var(--abt-pad) clamp(5rem, 11vw, 8rem);
+    background: var(--bg-blog-section);
+    position: relative;
+}
+
+.abt-bento__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(14px, 1.6vw, 22px);
+}
+
+.abt-tile {
+    position: relative;
+    overflow: hidden;
+    padding: clamp(1.5rem, 2.6vw, 2.4rem);
+    border-radius: var(--abt-r-lg);
+    background: var(--abt-surface);
+    border: 1px solid var(--border);
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    min-height: 230px;
+    transition: transform 0.5s var(--abt-ease), box-shadow 0.5s var(--abt-ease), border-color 0.4s ease;
+}
+
+/* نورافکن دنبال‌کننده موس */
+.abt-tile::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    opacity: 0;
+    transition: opacity 0.45s ease;
+    pointer-events: none;
+    background: radial-gradient(340px circle at var(--mx, 50%) var(--my, 50%), rgba(133, 169, 71, 0.20), transparent 62%);
+}
+
+.abt-tile:hover::before { opacity: 1; }
+
+.abt-tile:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 26px 55px -25px rgba(18, 53, 36, 0.45);
+    border-color: rgba(133, 169, 71, 0.45);
+}
+
+.abt-tile__icon {
+    width: 56px;
+    height: 56px;
+    border-radius: 18px;
+    display: grid;
+    place-items: center;
+    font-size: 1.45rem;
+    color: var(--abt-pist);
+    background: var(--abt-soft);
+    border: 1px solid rgba(133, 169, 71, 0.24);
+    margin-bottom: auto;
+    transition: transform 0.5s var(--abt-ease);
+}
+
+.abt-tile:hover .abt-tile__icon { transform: rotate(-8deg) scale(1.08); }
+
+.abt-tile h3 {
+    font-size: clamp(1.12rem, 2vw, 1.45rem);
+    font-weight: 900;
+    color: var(--abt-ink);
+    margin: 1.4rem 0 0.6rem;
+    line-height: 1.55;
+}
+
+.abt-tile p {
+    color: var(--abt-muted);
+    line-height: 1.95;
+    font-size: 0.94rem;
+}
+
+/* تایل شاخص */
+.abt-tile--hero {
+    grid-column: span 2;
+    grid-row: span 2;
+    min-height: 420px;
+    background:
+        radial-gradient(circle at 85% 12%, rgba(133, 169, 71, 0.30), transparent 55%),
+        var(--primary);
+    border-color: rgba(133, 169, 71, 0.30);
+}
+
+.abt-tile--hero h3 {
+    color: var(--abt-on-dark);
+    font-size: clamp(1.6rem, 3.2vw, 2.4rem);
+}
+
+.abt-tile--hero p {
+    color: var(--abt-on-dark-dim);
+    font-size: 1.02rem;
+    max-width: 46ch;
+}
+
+.abt-tile--hero .abt-tile__icon {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(255, 255, 255, 0.16);
+    color: var(--secondary);
+    width: 68px;
+    height: 68px;
+    font-size: 1.8rem;
+}
+
+.abt-tile--hero::after {
+    content: '';
+    position: absolute;
+    inset-inline-end: -70px;
+    bottom: -70px;
+    width: 240px;
+    height: 240px;
+    border-radius: 50%;
+    border: 1px solid rgba(133, 169, 71, 0.28);
+    box-shadow: 0 0 0 40px rgba(133, 169, 71, 0.05);
+    pointer-events: none;
+}
+
+/* چیدمان دسکتاپ (۴ ستون):
+   سطر ۱ → hero (۲) + wide (۲)
+   سطر ۲ → hero (ادامه) + third (۱) + third (۱)  */
+.abt-tile--wide { grid-column: span 2; }
+.abt-tile--third { grid-column: span 1; }
+
+.abt-tile--accent {
+    background: var(--section-bg);
+    border-color: rgba(133, 169, 71, 0.35);
+}
+
+/* ---------------------------------------------------------
+   8. داستان چسبان (Sticky Story)
+   --------------------------------------------------------- */
+.abt-story {
+    padding: clamp(5rem, 11vw, 8rem) var(--abt-pad);
+    background: var(--bg-body);
+}
+
+.abt-story__layout {
+    display: grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+}
+
+.abt-story__aside {
+    position: sticky;
+    top: 110px;
+}
+
+.abt-story__counter {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: clamp(3.4rem, 9vw, 7rem);
+    font-weight: 900;
+    color: var(--abt-ink);
+    line-height: 1;
+    letter-spacing: -3px;
+    margin-top: 1.6rem;
+}
+
+.abt-story__counter small {
+    font-size: 0.28em;
+    color: var(--abt-muted);
+    font-weight: 700;
+    letter-spacing: 0;
+}
+
+.abt-story__counterNum {
+    display: inline-block;
+    min-width: 1.1ch;
+    color: var(--abt-pist);
+    transition: transform 0.4s var(--abt-ease);
+}
+
+.abt-story__aside h2 {
+    font-size: clamp(1.7rem, 3.6vw, 2.7rem);
+    line-height: 1.5;
+    font-weight: 900;
+    color: var(--abt-ink);
+    margin: 1.1rem 0;
+}
+
+.abt-story__aside > p {
+    color: var(--abt-muted);
+    line-height: 2.05;
+    max-width: 40ch;
+}
+
+/* نشانگر فصل‌ها */
+.abt-story__dots {
+    display: flex;
+    gap: 8px;
+    margin-top: 2rem;
+}
+
+.abt-story__dots i {
+    width: 30px;
+    height: 4px;
+    border-radius: 4px;
+    background: var(--abt-line);
+    transition: background 0.4s ease, width 0.4s var(--abt-ease);
+}
+
+.abt-story__dots i.on {
+    background: var(--abt-pist);
+    width: 54px;
+}
+
+.abt-story__list {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(1.5rem, 3vw, 2.4rem);
+}
+
+.abt-chapter {
+    position: relative;
+    background: var(--abt-surface);
+    border: 1px solid var(--border);
+    border-radius: var(--abt-r-lg);
+    padding: clamp(1.8rem, 3.4vw, 3rem);
+    overflow: hidden;
+    transition: box-shadow 0.5s var(--abt-ease), transform 0.5s var(--abt-ease), border-color 0.4s ease;
+}
+
+.abt-chapter::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background: linear-gradient(180deg, var(--abt-pist), transparent);
+    transform: scaleY(0);
+    transform-origin: top;
+    transition: transform 0.8s var(--abt-ease);
+}
+
+.abt-chapter.is-in::before { transform: scaleY(1); }
+
+.abt-chapter:hover {
+    transform: translateY(-4px);
+    border-color: rgba(133, 169, 71, 0.4);
+    box-shadow: 0 24px 50px -28px rgba(18, 53, 36, 0.5);
+}
+
+.abt-chapter__no {
+    position: absolute;
+    top: clamp(0.6rem, 2vw, 1rem);
+    inset-inline-end: clamp(1rem, 3vw, 2rem);
+    font-size: clamp(3.4rem, 8vw, 5.6rem);
+    font-weight: 900;
+    color: var(--abt-pist);
+    opacity: 0.12;
+    line-height: 1;
+    user-select: none;
+}
+
+.abt-chapter h3 {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: clamp(1.15rem, 2.3vw, 1.55rem);
+    font-weight: 900;
+    color: var(--abt-ink);
+    margin-bottom: 1rem;
+}
+
+.abt-chapter h3 i {
+    color: var(--abt-pist);
+    font-size: 1.1em;
+}
+
+.abt-chapter p {
+    color: var(--abt-muted);
+    line-height: 2.15;
+    text-align: justify;
+    font-size: 1rem;
+}
+
+/* ---------------------------------------------------------
+   9. مسیر شفاف (Process)
+   --------------------------------------------------------- */
+.abt-path {
+    position: relative;
+    padding: clamp(5rem, 12vw, 9rem) var(--abt-pad);
     background: var(--primary);
-    color: white;
+    overflow: hidden;
+    isolation: isolate;
+}
+
+.abt-path::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background-image:
+        radial-gradient(circle at 12% 18%, rgba(133, 169, 71, 0.20), transparent 45%),
+        radial-gradient(circle at 88% 82%, rgba(133, 169, 71, 0.14), transparent 45%);
+}
+
+.abt-path__rail {
+    position: relative;
+    max-width: 880px;
+    margin-inline: auto;
+    padding-inline-start: clamp(70px, 10vw, 100px);
+}
+
+.abt-path__rail::before {
+    content: '';
+    position: absolute;
+    inset-inline-start: clamp(29px, 4.4vw, 39px);
+    top: 12px;
+    bottom: 12px;
+    width: 2px;
+    background: rgba(255, 255, 255, 0.10);
+    border-radius: 2px;
+}
+
+.abt-path__fill {
+    position: absolute;
+    inset-inline-start: clamp(29px, 4.4vw, 39px);
+    top: 12px;
+    width: 2px;
+    height: 0;
+    border-radius: 2px;
+    background: linear-gradient(180deg, var(--secondary), #cfe89a);
+    box-shadow: 0 0 16px rgba(133, 169, 71, 0.75);
+    transition: height 0.35s ease-out;
+}
+
+.abt-step {
+    position: relative;
+    display: flex;
+    gap: clamp(1rem, 2.6vw, 1.8rem);
+    padding-bottom: clamp(2.5rem, 5vw, 3.6rem);
+    opacity: 0.32;
+    transform: translateX(18px);
+    transition: opacity 0.6s var(--abt-ease), transform 0.6s var(--abt-ease);
+}
+
+.abt-step:last-child { padding-bottom: 0; }
+
+.abt-step.on {
+    opacity: 1;
+    transform: none;
+}
+
+.abt-step__dot {
+    position: absolute;
+    inset-inline-start: calc(-1 * clamp(70px, 10vw, 100px));
+    top: 0;
+    width: clamp(60px, 8.8vw, 80px);
+    display: grid;
+    place-items: center;
+}
+
+.abt-step__icon {
+    width: clamp(52px, 7vw, 62px);
+    height: clamp(52px, 7vw, 62px);
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: clamp(1.1rem, 2vw, 1.4rem);
+    color: var(--secondary);
+    background: var(--primary);
+    border: 2px solid rgba(133, 169, 71, 0.45);
+    box-shadow: 0 0 0 8px rgba(133, 169, 71, 0.07);
+    transition: all 0.5s var(--abt-ease);
+}
+
+.abt-step.on .abt-step__icon {
+    background: var(--secondary);
+    color: #0d1f13;
+    border-color: var(--secondary);
+    box-shadow: 0 0 26px rgba(133, 169, 71, 0.55), 0 0 0 10px rgba(133, 169, 71, 0.16);
+    transform: scale(1.06);
+}
+
+.abt-step__body {
+    background: rgba(255, 255, 255, 0.035);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    border-radius: var(--abt-r-md);
+    padding: clamp(1.2rem, 2.4vw, 1.8rem);
+    backdrop-filter: blur(4px);
+    flex: 1;
+    transition: background 0.4s ease, border-color 0.4s ease;
+}
+
+.abt-step.on .abt-step__body {
+    background: rgba(255, 255, 255, 0.06);
+    border-color: rgba(133, 169, 71, 0.28);
+}
+
+.abt-step__tag {
+    display: inline-block;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.6px;
+    color: var(--secondary);
+    background: rgba(133, 169, 71, 0.12);
+    border-radius: 100px;
+    padding: 4px 12px;
+    margin-bottom: 12px;
+}
+
+.abt-step__body h4 {
+    font-size: clamp(1.08rem, 2.1vw, 1.4rem);
+    font-weight: 900;
+    color: var(--abt-on-dark);
+    margin-bottom: 10px;
+}
+
+.abt-step__body p {
+    color: var(--abt-on-dark-dim);
+    line-height: 2;
+    font-size: 0.96rem;
+}
+
+/* ---------------------------------------------------------
+   10. آمار شمارشی
+   --------------------------------------------------------- */
+.abt-stats {
+    padding: clamp(4rem, 9vw, 6.5rem) var(--abt-pad);
+    background: var(--bg-body);
+}
+
+.abt-stats__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(14px, 2vw, 24px);
+}
+
+.abt-stat {
+    position: relative;
+    text-align: center;
+    padding: clamp(1.8rem, 3.2vw, 2.6rem) 1.2rem;
+    border-radius: var(--abt-r-md);
+    background: var(--abt-surface);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: transform 0.45s var(--abt-ease), border-color 0.4s ease;
+}
+
+.abt-stat:hover {
+    transform: translateY(-5px);
+    border-color: rgba(133, 169, 71, 0.45);
+}
+
+.abt-stat i {
+    font-size: 1.5rem;
+    color: var(--abt-pist);
+    margin-bottom: 14px;
+    display: block;
+}
+
+.abt-stat b {
+    display: block;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 900;
+    color: var(--abt-ink);
+    line-height: 1.15;
+    letter-spacing: -1.5px;
+}
+
+.abt-stat b sup {
+    font-size: 0.42em;
+    color: var(--abt-pist);
+    vertical-align: super;
+    margin-inline-start: 2px;
+}
+
+.abt-stat span {
+    display: block;
+    margin-top: 8px;
+    color: var(--abt-muted);
+    font-size: 0.9rem;
+    line-height: 1.8;
+}
+
+/* ---------------------------------------------------------
+   11. مقایسه (پستیلاین در برابر مسیر سنتی)
+   --------------------------------------------------------- */
+.abt-vs {
+    padding: clamp(4.5rem, 10vw, 7.5rem) var(--abt-pad);
+    background: var(--bg-blog-section);
+}
+
+.abt-vs__grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(16px, 2.4vw, 28px);
+    align-items: stretch;
+}
+
+.abt-card {
+    border-radius: var(--abt-r-lg);
+    padding: clamp(1.8rem, 3.4vw, 2.8rem);
+    border: 1px solid var(--border);
+    background: var(--abt-surface);
+    display: flex;
+    flex-direction: column;
+}
+
+.abt-card--bad {
+    opacity: 0.92;
+}
+
+.abt-card--good {
+    background:
+        radial-gradient(circle at 90% 0%, rgba(133, 169, 71, 0.28), transparent 55%),
+        var(--primary);
+    border-color: rgba(133, 169, 71, 0.35);
+    box-shadow: 0 30px 70px -35px rgba(18, 53, 36, 0.7);
     position: relative;
     overflow: hidden;
 }
 
-.path-container {
-    max-width: 800px;
-    margin: 0 auto;
-    position: relative;
+.abt-card__head {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding-bottom: 1.4rem;
+    margin-bottom: 1.4rem;
+    border-bottom: 1px dashed var(--border);
 }
 
-/* خط مرکزی تایم لاین */
-.path-container::before {
+.abt-card--good .abt-card__head {
+    border-bottom-color: rgba(255, 255, 255, 0.14);
+}
+
+.abt-card__head i {
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    display: grid;
+    place-items: center;
+    font-size: 1.15rem;
+    flex-shrink: 0;
+}
+
+.abt-card--bad .abt-card__head i {
+    color: var(--accent-brick);
+    background: rgba(159, 74, 64, 0.10);
+}
+
+.abt-card--good .abt-card__head i {
+    color: #0d1f13;
+    background: var(--secondary);
+}
+
+.abt-card__head h3 {
+    font-size: clamp(1.1rem, 2.2vw, 1.45rem);
+    font-weight: 900;
+    color: var(--abt-ink);
+}
+
+.abt-card--good .abt-card__head h3 { color: var(--abt-on-dark); }
+
+.abt-card__head small {
+    display: block;
+    font-weight: 500;
+    font-size: 0.8rem;
+    color: var(--abt-muted);
+    margin-top: 3px;
+}
+
+.abt-card--good .abt-card__head small { color: var(--abt-on-dark-dim); }
+
+.abt-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+}
+
+.abt-list li {
+    display: flex;
+    align-items: flex-start;
+    gap: 11px;
+    line-height: 1.95;
+    font-size: 0.96rem;
+    color: var(--abt-muted);
+}
+
+.abt-card--good .abt-list li { color: var(--abt-on-dark-dim); }
+
+.abt-list li i {
+    margin-top: 0.45em;
+    font-size: 0.85rem;
+    flex-shrink: 0;
+}
+
+.abt-card--bad .abt-list li i { color: var(--accent-brick); }
+.abt-card--good .abt-list li i { color: var(--secondary); }
+
+.abt-vs__badge {
+    position: absolute;
+    top: 18px;
+    inset-inline-start: 18px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: #0d1f13;
+    background: var(--secondary);
+    padding: 5px 12px;
+    border-radius: 100px;
+}
+
+/* ---------------------------------------------------------
+   12. تیم / تخصص‌ها
+   --------------------------------------------------------- */
+.abt-team {
+    padding: clamp(4.5rem, 10vw, 7.5rem) var(--abt-pad);
+    background: var(--bg-body);
+}
+
+.abt-team__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: clamp(14px, 2vw, 22px);
+}
+
+.abt-member {
+    position: relative;
+    border-radius: var(--abt-r-lg);
+    padding: clamp(1.6rem, 3vw, 2.2rem);
+    background: var(--abt-surface);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: transform 0.5s var(--abt-ease), border-color 0.4s ease, box-shadow 0.5s var(--abt-ease);
+}
+
+.abt-member::after {
     content: '';
     position: absolute;
-    top: 0;
-    right: 50px;
-    width: 2px;
-    height: 100%;
-    background: rgba(255,255,255,0.1);
-}
-
-.path-line-fill {
-    position: absolute;
-    top: 0;
-    right: 50px;
-    width: 2px;
-    height: 0%; /* با جاوااسکریپت پر میشود */
-    background: var(--secondary);
-    transition: height 0.5s ease-out;
-    box-shadow: 0 0 15px var(--secondary);
-}
-
-.path-node {
-    display: flex;
-    align-items: center;
-    margin-bottom: 60px;
-    position: relative;
-    opacity: 0.3;
-    transform: translateX(20px);
-    transition: all 0.6s ease;
-}
-
-.path-node.active {
-    opacity: 1;
-    transform: translateX(0);
-}
-
-.node-icon {
-    width: 60px;
-    height: 60px;
-    background: var(--primary);
-    border: 2px solid var(--secondary);
+    inset-inline-end: -40px;
+    top: -40px;
+    width: 130px;
+    height: 130px;
     border-radius: 50%;
+    background: var(--abt-soft);
+    transition: transform 0.6s var(--abt-ease);
+}
+
+.abt-member:hover {
+    transform: translateY(-7px);
+    border-color: rgba(133, 169, 71, 0.45);
+    box-shadow: 0 26px 55px -28px rgba(18, 53, 36, 0.45);
+}
+
+.abt-member:hover::after { transform: scale(2.4); }
+
+.abt-member__avatar {
+    position: relative;
+    z-index: 1;
+    width: 62px;
+    height: 62px;
+    border-radius: 20px;
+    display: grid;
+    place-items: center;
+    font-size: 1.5rem;
+    color: #0d1f13;
+    background: linear-gradient(140deg, #cfe89a, var(--secondary));
+    box-shadow: 0 10px 24px -12px rgba(133, 169, 71, 0.9);
+    margin-bottom: 1.3rem;
+}
+
+.abt-member h3 {
+    position: relative;
+    z-index: 1;
+    font-size: 1.1rem;
+    font-weight: 900;
+    color: var(--abt-ink);
+    margin-bottom: 6px;
+}
+
+.abt-member small {
+    position: relative;
+    z-index: 1;
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--abt-pist);
+    margin-bottom: 0.9rem;
+}
+
+.abt-member p {
+    position: relative;
+    z-index: 1;
+    color: var(--abt-muted);
+    line-height: 1.95;
+    font-size: 0.92rem;
+}
+
+/* ---------------------------------------------------------
+   13. سوالات متداول
+   --------------------------------------------------------- */
+.abt-faq {
+    padding: clamp(4.5rem, 10vw, 7.5rem) var(--abt-pad);
+    background: var(--bg-blog-section);
+}
+
+.abt-faq__layout {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: clamp(2rem, 5vw, 4.5rem);
+    align-items: start;
+}
+
+.abt-faq__aside { position: sticky; top: 110px; }
+
+.abt-faq__list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.abt-acc {
+    border-radius: var(--abt-r-md);
+    background: var(--abt-surface);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: border-color 0.35s ease, box-shadow 0.35s ease;
+}
+
+.abt-acc.open {
+    border-color: rgba(133, 169, 71, 0.45);
+    box-shadow: 0 18px 40px -28px rgba(18, 53, 36, 0.5);
+}
+
+.abt-acc__q {
+    width: 100%;
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    color: var(--secondary);
-    margin-left: 30px;
+    justify-content: space-between;
+    gap: 16px;
+    padding: clamp(1.05rem, 2.2vw, 1.4rem) clamp(1.2rem, 2.4vw, 1.7rem);
+    background: transparent;
+    text-align: start;
+    font-family: inherit;
+    font-size: clamp(0.96rem, 1.8vw, 1.08rem);
+    font-weight: 800;
+    color: var(--abt-ink);
+    line-height: 1.8;
+}
+
+.abt-acc__q span:last-child {
+    width: 30px;
+    height: 30px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+    font-size: 0.8rem;
+    color: var(--abt-pist);
+    background: var(--abt-soft);
+    transition: transform 0.45s var(--abt-ease), background 0.35s ease, color 0.35s ease;
+}
+
+.abt-acc.open .abt-acc__q span:last-child {
+    transform: rotate(180deg);
+    background: var(--abt-pist);
+    color: #0d1f13;
+}
+
+.abt-acc__a {
+    display: grid;
+    grid-template-rows: 0fr;
+    transition: grid-template-rows 0.5s var(--abt-ease);
+}
+
+.abt-acc.open .abt-acc__a { grid-template-rows: 1fr; }
+
+.abt-acc__a > div { overflow: hidden; }
+
+.abt-acc__a p {
+    padding: 0 clamp(1.2rem, 2.4vw, 1.7rem) clamp(1.2rem, 2.4vw, 1.6rem);
+    color: var(--abt-muted);
+    line-height: 2.15;
+    font-size: 0.95rem;
+    text-align: justify;
+}
+
+/* ---------------------------------------------------------
+   14. فراخوان پایانی (CTA)
+   --------------------------------------------------------- */
+.abt-cta {
+    padding: clamp(3rem, 8vw, 6rem) var(--abt-pad) clamp(5rem, 10vw, 8rem);
+    background: var(--bg-body);
+}
+
+.abt-cta__box {
     position: relative;
-    z-index: 2;
-    transition: 0.4s;
-    box-shadow: 0 0 0 10px rgba(133, 169, 71, 0.1);
+    overflow: hidden;
+    border-radius: var(--abt-r-xl);
+    padding: clamp(2.5rem, 6vw, 5rem) clamp(1.6rem, 5vw, 4rem);
+    text-align: center;
+    background: linear-gradient(135deg, #0e2a1a 0%, #123524 42%, #1c4a2f 100%);
+    border: 1px solid rgba(133, 169, 71, 0.28);
+    isolation: isolate;
 }
 
-.path-node.active .node-icon {
+.abt-cta__box::before {
+    content: '';
+    position: absolute;
+    inset: -50%;
+    z-index: -1;
+    background: conic-gradient(from 0deg, transparent 0%, rgba(133, 169, 71, 0.28) 18%, transparent 38%, rgba(207, 232, 154, 0.20) 62%, transparent 82%);
+    animation: abtSpin 16s linear infinite;
+}
+
+@keyframes abtSpin {
+    to { transform: rotate(360deg); }
+}
+
+.abt-cta__box::after {
+    content: '';
+    position: absolute;
+    inset: 1px;
+    z-index: -1;
+    border-radius: inherit;
+    background: linear-gradient(135deg, #0e2a1a 0%, #123524 42%, #1c4a2f 100%);
+}
+
+.abt-cta__icon {
+    width: 78px;
+    height: 78px;
+    margin: 0 auto 1.6rem;
+    border-radius: 26px;
+    display: grid;
+    place-items: center;
+    font-size: 2rem;
+    color: #0d1f13;
+    background: linear-gradient(140deg, #cfe89a, var(--secondary));
+    box-shadow: 0 18px 40px -16px rgba(133, 169, 71, 0.85);
+    animation: abtNutBob 6s ease-in-out infinite;
+}
+
+.abt-cta__box h2 {
+    font-size: clamp(1.6rem, 4.2vw, 2.9rem);
+    font-weight: 900;
+    color: var(--abt-on-dark);
+    line-height: 1.5;
+    margin-bottom: 1.1rem;
+}
+
+.abt-cta__box p {
+    color: var(--abt-on-dark-dim);
+    line-height: 2.1;
+    max-width: 640px;
+    margin: 0 auto 2.4rem;
+    font-size: clamp(0.95rem, 1.7vw, 1.08rem);
+}
+
+.abt-cta__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: center;
+}
+
+/* ---------------------------------------------------------
+   15. ریسپانسیو
+   --------------------------------------------------------- */
+@media (max-width: 1100px) {
+    .abt-hero__inner { grid-template-columns: 1fr; text-align: center; }
+    .abt-hero__lead { margin-inline: auto; text-align: center; }
+    .abt-hero__actions { justify-content: center; }
+    .abt-hero__art { order: -1; }
+    .abt-nut { width: clamp(180px, 42vw, 260px); }
+
+    /* تبلت: هر تایل یک سطر کامل، جز دو تایل کوچک که نصف‌نصف می‌شوند */
+    .abt-tile--hero { grid-column: span 4; grid-row: span 1; min-height: 340px; }
+    .abt-tile--wide { grid-column: span 4; }
+    .abt-tile--third { grid-column: span 2; }
+
+    .abt-team__grid { grid-template-columns: repeat(2, 1fr); }
+    .abt-stats__grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 900px) {
+    .abt-story__layout,
+    .abt-faq__layout { grid-template-columns: 1fr; }
+
+    .abt-story__aside,
+    .abt-faq__aside { position: relative; top: 0; }
+
+    .abt-vs__grid { grid-template-columns: 1fr; }
+}
+
+@media (max-width: 600px) {
+    .abt-hero { min-height: auto; }
+    .abt-hero__stats { grid-template-columns: 1fr; gap: 1.1rem; text-align: center; }
+    .abt-hero__stat { display: flex; align-items: baseline; justify-content: center; gap: 10px; }
+    .abt-hero__stat span { margin-top: 0; }
+
+    .abt-bento__grid { grid-template-columns: 1fr; }
+    .abt-tile { grid-column: span 1 !important; grid-row: span 1 !important; min-height: 200px; }
+
+    .abt-team__grid { grid-template-columns: 1fr; }
+    .abt-stats__grid { grid-template-columns: 1fr; }
+
+    .abt-path__rail { padding-inline-start: 56px; }
+    .abt-path__rail::before,
+    .abt-path__fill { inset-inline-start: 25px; }
+    .abt-step__dot { inset-inline-start: -56px; width: 50px; }
+    .abt-step__icon { width: 46px; height: 46px; font-size: 1rem; }
+
+    .abt-btn { padding: 13px 24px; font-size: 0.92rem; }
+    .abt-cue { display: none; }
+}
+
+/* ---------------------------------------------------------
+   16. اصلاحات دارک‌مود
+   --------------------------------------------------------- */
+[data-theme="dark"] .abt-page {
+    --abt-ink: var(--secondary);
+    --abt-line: rgba(161, 209, 92, 0.16);
+    --abt-soft: rgba(161, 209, 92, 0.10);
+    --abt-glass: rgba(16, 23, 19, 0.6);
+}
+
+[data-theme="dark"] .abt-page::before {
+    mix-blend-mode: overlay;
+    opacity: 0.22;
+}
+
+[data-theme="dark"] .abt-eyebrow {
+    color: var(--secondary);
+    border-color: rgba(161, 209, 92, 0.3);
+}
+
+[data-theme="dark"] .abt-manifesto p,
+[data-theme="dark"] .abt-mark { color: #d8e6d0; }
+
+[data-theme="dark"] .abt-tile--hero,
+[data-theme="dark"] .abt-card--good {
+    background:
+        radial-gradient(circle at 88% 8%, rgba(161, 209, 92, 0.20), transparent 55%),
+        #12301f;
+}
+
+[data-theme="dark"] .abt-tile--accent {
+    background: #15241b;
+}
+
+[data-theme="dark"] .abt-cta__box,
+[data-theme="dark"] .abt-cta__box::after {
+    background: linear-gradient(135deg, #0a1a10 0%, #12301f 45%, #17402a 100%);
+}
+
+[data-theme="dark"] .abt-btn--ink {
     background: var(--secondary);
-    color: var(--primary);
-    box-shadow: 0 0 20px rgba(133, 169, 71, 0.4), 0 0 0 10px rgba(133, 169, 71, 0.2);
+    color: #070a08;
 }
 
-.node-content h4 { font-size: 1.5rem; margin-bottom: 10px; color: var(--secondary);}
-.node-content p { color: #ddd; line-height: 1.7;}
+[data-theme="dark"] .abt-card--bad .abt-card__head i,
+[data-theme="dark"] .abt-card--bad .abt-list li i { color: #d98a80; }
 
-/* --- Animations --- */
-@keyframes fadeUp {
-    to { opacity: 1; transform: translateY(0); }
-}
-@keyframes scrollMouse {
-    0% { top: 6px; opacity: 1; }
-    100% { top: 20px; opacity: 0; }
-}
+/* ---------------------------------------------------------
+   17. احترام به کاهش انیمیشن
+   --------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+    .abt-page *,
+    .abt-page *::before,
+    .abt-page *::after {
+        animation-duration: 0.001ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.001ms !important;
+    }
 
-/* --- Responsive adjustments --- */
-@media (max-width: 1024px) {
-    .bento-grid { grid-template-columns: repeat(2, 1fr); }
-    .bento-item.medium-h, .bento-item.medium-v { grid-column: span 2; grid-row: span 1;}
-}
-@media (max-width: 991px) {
-    .sticky-story-section { flex-direction: column; }
-    .story-sticky-side { position: relative; top: 0; margin-bottom: 30px; }
-}
-@media (max-width: 768px) {
-    .hero-title-glitch { font-size: 2.5rem; }
-    .bento-grid { grid-template-columns: 1fr; }
-    .bento-item { grid-column: span 1 !important; grid-row: span 1 !important; }
-    .path-container::before, .path-line-fill { right: 30px; }
-    .node-icon { width: 50px; height: 50px; font-size: 1.2rem; margin-left: 20px; }
+    [data-reveal] { opacity: 1; transform: none; }
+    .abt-word > span { transform: none; }
+    .abt-hero__lead,
+    .abt-hero__actions,
+    .abt-hero__stats,
+    .abt-hero__eyebrowWrap,
+    .abt-cue { opacity: 1; }
+    .abt-nut__stroke { stroke-dashoffset: 0; }
+    .abt-nut__kernel { opacity: 1; }
 }
